@@ -1,0 +1,5 @@
+export(IData, RepLOptim, DACrossVal)
+exportClasses(IData,IdtE,IdtSngDE,IdtMxE,IdtSngNDE,IdtMxNDE,LRTest,ConfTests,IdtMANOVA,IdtClMANOVA,IdtHetNMANOVA,Idtlda,Idtqda)
+exportPattern("*.IData")
+exportMethods(show,summary,head,tail,nrow,ncol,mle,coef,stdEr,testMod,BestModel,MANOVA,lda,qda,predict,testMod)
+

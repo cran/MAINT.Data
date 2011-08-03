@@ -1,0 +1,43 @@
+\name{IdtSngDE-class}
+\Rdversion{1.1}
+\docType{class}
+\alias{IdtSngDE-class}
+
+\title{Class "IdtSngDE"}
+\description{IdtSngDE contains the results of a single class model estimation, with the five different possible variance-covariance configurations.
+}
+
+\section{Slots}{
+  \describe{
+\item{\code{ModelNames}:}{The model acronym, indicating the model type, currently N for Normal 
+and the configuration (C1 to C5)}
+\item{\code{ModelType}:}{Indicates the model; currently, only Gaussian (Normal) distributions are implemented}
+    \item{\code{ModelConfig}:}{Configuration of the variance-covariance matrix: a vector of integers in the range 1 to 5}    
+  \item{\code{NIVar}:}{Number of interval variables}
+\item{\code{SelCrit}:}{The model selection criterion; currently, AIC and BIC are implemented}
+    \item{\code{logLiks}:}{The logarithms of the likelihood function for the different cases}
+    \item{\code{AICs}:}{Value of the AIC criterion }
+    \item{\code{BICs}:}{Value of the BIC criterion }
+    \item{\code{BestModel}:}{The index of best model according to the chosen selection criterion}
+  }  
+}
+
+\section{Extends}{
+Class \code{"\linkS4class{IdtE}"}, directly.
+}
+
+\references{
+Brito, P., Duarte Silva, A. P.  (2011): "Modelling Interval Data with Normal and Skew-Normal Distributions". Journal of Applied Statistics (forthcoming).\cr
+}
+
+\author{Pedro Duarte Silva <psilva@porto.ucp.pt>\cr 
+        Paula Brito <mpbrito.fep.up.pt>
+}
+
+\seealso{
+   \code{\link{mle}}, \code{\linkS4class{IData}} 
+}
+
+\keyword{classes}
+\keyword{interval data}
+
