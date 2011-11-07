@@ -1,4 +1,4 @@
-fL2 = function(fx,L2,...)
+fL2 <- function(fx,L2,...)
 {
 	n = nrow(L2)
 	p = ncol(L2)
@@ -7,14 +7,14 @@ fL2 = function(fx,L2,...)
 	return(res)
 }
 
-fL = function(fx,L=NULL,L2=NULL,...) 
+fL <- function(fx,L=NULL,L2=NULL,...) 
 {
 	if (is.null(L) && is.null(L2)) stop("At leat one of the L, L2 arguments must be supplied\n")
 	if (is.null(L2)) return(fL2(fx=fx,L2=L%*%t(L),...)) 
 	if (!is.null(L2)) return(fL2(fx=fx,L2=L2,...))
 }
 
-fL.grad = function(dfx,L,l1,l2,totald=FALSE,L2=NULL,...)
+fL.grad <- function(dfx,L,l1,l2,totald=FALSE,L2=NULL,...)
 {
 	p = ncol(L)
 	colgrad = array(dim=p-l2+1)

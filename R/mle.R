@@ -1,4 +1,4 @@
-source("R/ClasGenMetDef.R")
+#source("R/ClasGenMetDef.R")
 
 setMethod("mle",
 	signature(Idt = "IData"),
@@ -190,7 +190,7 @@ IdtNmle <- function(Idt,grouping=NULL,Type=c("SingDst","HomMxt"),Config=1:5,SelC
 	else Configurations[[model]] <- list(mleSigE=NULL,mleSigEse=NULL,logLik=NULL,AIC=NULL,BIC=NULL,optres=NULL)
   if (Type=="SingDst") {
    	mleNmuE <- colMeans(X)
-   	mleNmuEse <- sd(X)/sqrt(n)
+   	mleNmuEse <- sapply(X,sd)/sqrt(n)
 	if (is.element(1,Config)) {
 		Configurations[[1]]$mleSigE <- var(X) * (n-1)/n
                	XVar <- diag(Configurations[[1]]$mleSigE)
@@ -321,15 +321,13 @@ IdtHetMxtNmle <- function(Idt,grouping,Config,SelCrit,tol=1.0e-4)
 	for (model in Config)  { 
 		if (model==2) Configurations[[2]] <- list(mleSigE=array(dim=c(p,p,k),dimnames=anams),mleSigEse=array(dim=c(p,p,k),dimnames=anams),
 								logLik=0.,AIC=NULL,BIC=NULL,optres=vector("list",k))
-#		if (model==2) Configurations[[2]] <- list(mleSigE=array(dim=c(p,p,k),dimnames=anams),mleSigEse=NULL,
-#								logLik=0.,AIC=NULL,BIC=NULL,optres=vector("list",k))
 		else Configurations[[model]] <- list(mleSigE=array(dim=c(p,p,k),dimnames=anams),mleSigEse=array(dim=c(p,p,k),dimnames=anams),
 							logLik=0.,AIC=NULL,BIC=NULL)
 	}
         if (is.element(2,Config)) names(Configurations[[2]]$optres) <- levels(grouping)
 	for (g in 1:k) {
 		Idtg <- Idt[grouping==levels(grouping)[g],]
-		Xstdev <- sd(cbind(Idtg@MidP,Idtg@LogR))
+		Xstdev <- sapply(cbind(Idtg@MidP,Idtg@LogR),sd)
 		Cnststdev <- Xstdev[Xstdev<tol]
 		if (length(Cnststdev)==1) 
 			stop("Variable ",names(Cnststdev)," appears to be constant in group",levels(grouping)[g],"\n")
@@ -341,7 +339,6 @@ IdtHetMxtNmle <- function(Idt,grouping,Config,SelCrit,tol=1.0e-4)
 	   	for (model in Config)  { 
 			Configurations[[model]]$mleSigE[,,g] <- pres@Configurations[[model]]$mleSigE
 			Configurations[[model]]$mleSigEse[,,g] <- pres@Configurations[[model]]$mleSigEse
-#			if (model!=2) Configurations[[model]]$mleSigEse[,,g] <- pres@Configurations[[model]]$mleSigEse
 			Configurations[[model]]$logLik <- Configurations[[model]]$logLik + pres@Configurations[[model]]$logLik
 	        	if (model==2) Configurations[[2]]$optres[[g]] <- pres@Configurations[[2]]$optres
 		}            

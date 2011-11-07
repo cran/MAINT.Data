@@ -19,7 +19,7 @@
 
 \usage{
 
-\S4method{lda}{IdtClMANOVA}(x,prior="proportions",selmodel=BestModel(H1res(x)),\dots)
+\S4method{lda}{IdtClMANOVA}(x,prior="proportions",selmodel=BestModel(H1res(x)),egvtol=1.0e-9,\dots)
 
 \S4method{lda}{IData}(x, grouping, prior="proportions", tol=1.0e-4, 
 subset=1:nrow(x) ,Config=1:5,SelCrit=c("AIC","BIC"))
@@ -41,6 +41,10 @@ subset=1:nrow(x) ,Config=1:5,SelCrit=c("AIC","BIC"))
   \item{tol}{A tolerance to decide if a matrix is singular; it will reject
           variables and linear combinations of unit-variance variables
           whose standard deviation is less than tol}
+
+  \item{egvtol}{A tolerance for positive eigenvalues of the scatter matris; 
+	  eigenvalues below egvtol will be considered equal to 0, and the corresponding
+	  linear discriminant functions will be ignored}
 
   \item{subset}{An index vector specifying the cases to be used in the
           training sample.  (NOTE: If given, this argument must be

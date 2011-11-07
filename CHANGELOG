@@ -1,0 +1,16 @@
+
+##########  Version 0.2  (October 2011) #################
+
+The following changes were made in Version 0.2 of R package MAINT.Data:
+
+1) The deprecated direct use of sd for data.frames was replaced by sapply(object,sd).
+
+2) The original functions head, tail, coef, predict, stdEr, lda and qda
+   were imported in order to properly recognizing them in the definition
+   of methods for MAINT.Data classes.
+
+3) the S3 method print for class summaryIData, and the S3 methods "[", "[<-" "=="
+   and "!=" for class IData, were registered.
+
+4) The function is.IData was replaced by is(object,"IData")
+ 

@@ -1,4 +1,4 @@
-source("R/ClasGenMetDef.R")
+#source("R/ClasGenMetDef.R")
 
 setMethod("summary",
     signature(object = "IData"),
@@ -92,8 +92,6 @@ IData <- function(Data,
 	res
 }
 
-is.IData <- function(object)  inherits(object,"IData")
-
 # Standard operators for IData objects
 
 # Indexing and assignement
@@ -106,7 +104,7 @@ is.IData <- function(object)  inherits(object,"IData")
 
 "[<-.IData" <- function(x,rowi=1:x@NObs,coli=1:x@NIVar,value)
 {
-	if (!is.IData(value)) stop("Argument value is not an IData object\n")
+	if (!is(value,"IData")) stop("Argument value is not an IData object\n")
 	x@MidP[rowi,coli] <- value@MidP
 	x@LogR[rowi,coli] <- value@LogR
 	x
@@ -118,7 +116,7 @@ is.IData <- function(object)  inherits(object,"IData")
 {
 	CompIvalue <- function(Ival) Ival[1,1] == Ival[1,2] && Ival[2,1] == Ival[2,2]
 
-	if (!is.IData(y)) stop("Trying to compare an IData object with an object of a diferent type\n")
+	if (!is(y,"IData")) stop("Trying to compare an IData object with an object of a diferent type\n")
 	if ( x@NObs != y@NObs || x@NIVar != y@NIVar )  stop("== only defined for equally-sized IData objects\n")
 	TmpArray <- array(dim=c(x@NObs,x@NIVar,2,2))
 	for (j in 1:x@NIVar)  {
@@ -130,7 +128,7 @@ is.IData <- function(object)  inherits(object,"IData")
 
 "!=.IData" <- function(x,y)  
 {
-	if (!is.IData(y)) stop("Trying to compare an IData object with an object of a diferent type\n")
+	if (!is(y,"IData")) stop("Trying to compare an IData object with an object of a diferent type\n")
 	if ( x@NObs != y@NObs || x@NIVar != y@NIVar )  stop("!= only defined for equally-sized IData objects\n")
 	!(x==y)
 }

@@ -1,19 +1,14 @@
 \name{IData}
 \alias{IData}
-\alias{is.IData}
 \title{Interval Data objects}
 \description{
 \sQuote{IData} creates IData objects from data frames of interval bounds or MidPoint/LogRange values of the interval-valued observations.
-
-\sQuote{is.IData} tests if its argument is an IData object.
 }
 
 \usage{
 IData(Data, 
 Seq = c("LbUb_VarbyVar", "MidPLogR_VarbyVar", "AllLb_AllUb",
 "AllMidP_AllLogR"), VarNames=NULL, ObsNames=row.names(Data))
-
-is.IData(object)
 }
 
 \arguments{
@@ -29,8 +24,6 @@ is.IData(object)
   \item{VarNames}{An optional vector of names to be assigned to the Interval-Valued Variables.}
 
   \item{ObsNames}{An optional vector of names assigned to the individual observations.}
-
-  \item{object}{An R object}
 }
 
 \details{Objects of type \sQuote{IData}, describe a data set of \sQuote{NObs} observations on \sQuote{NIVar} Interval-Valued variables. This function creates an interval-data object from a data-frame with either the lower and upper bounds of the observed intervals or by their midpoints and log-ranges.}

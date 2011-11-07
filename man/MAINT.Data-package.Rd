@@ -27,8 +27,8 @@ Methods for (M)ANOVA and Linear and Quadratic Discriminant Analysis of this data
 \tabular{ll}{
 Package: \tab MAINT.Data\cr
 Type: \tab Package\cr
-Version: \tab 0.1\cr
-Date: \tab 2011-08-03\cr
+Version: \tab 0.2\cr
+Date: \tab 2011-11-07\cr
 License: \tab GPL-2\cr
 LazyLoad: \tab yes\cr
 LazyData: \tab yes\cr
@@ -66,34 +66,37 @@ tail(ChinaT)
 #Print summary statistics
 summary(ChinaT)
 
+#Create a new data set considering only the Winter (1st and 4th) quarter intervals
+
+ChinaWT <- ChinaT[,c(1,4)]
+
 # Estimate parameters by maximum likelihood, assuming 
 # the classical (unrestricted) covariance configuration C1
-ChinaEC1 <- mle(ChinaT,Config=1)
-cat("China maximum likelhiood estimation results:\n") ; print(ChinaEC1)
-cat("Standard Errors of Estimators:\n") ; print(stdEr(ChinaEC1))
+ChinaWTE.C1 <- mle(ChinaWT,Config=1)
+cat("Winter temperatures of China -- maximum likelhiood estimation results:\n") ; print(ChinaWTE.C1)
+cat("Standard Errors of Estimators:\n") ; print(stdEr(ChinaWTE.C1))
 
 # Estimate parameters by maximum likelihood, 
 # assuming that one of the restricted covariance configurations holds
-ChinaEC2345 <- mle(ChinaT,Config=2:5)
-cat("China maximum likelhiood estimation results:\n") ; print(ChinaEC2345)
-cat("Standard Errors of Estimators:\n") ; print(stdEr(ChinaEC2345))
+ChinaWTE.C2345 <- mle(ChinaWT,Config=2:5)
+cat("Winter temperatures of China -- maximum likelhiood estimation results:\n") ; print(ChinaWTE.C2345)
+cat("Standard Errors of Estimators:\n") ; print(stdEr(ChinaWTE.C2345))
 
-#MANOVA tests  
-ManvChina <- MANOVA(ChinaT,ChinaTemp$GeoReg)
-cat("China, MANOVA by geografical regions results:\n") ; print(ManvChina)
+#MANOVA tests assuming that configuariton 1 (unrestricted covariance) or 4 (MidPoints independt of Log-Ranges) holds.  
+ManvChinaWT.C14 <- MANOVA(ChinaWT,ChinaTemp$GeoReg,Config=c(1,4))
+cat("Winter temperatures of China -- MANOVA by geografical regions results:\n") ; print(ManvChinaWT.C14)
 
 #Linear Discriminant Analysis
-Chinalda <- lda(ManvChina)
-cat("China linear discriminant analysis results =\n") ; print(Chinalda)
+ChinaWT.lda <- lda(ManvChinaWT.C14)
+cat("Winter temperatures of China -- linear discriminant analysis results:\n") ; print(ChinaWT.lda)
 cat("lda Prediction results:\n")
-print(predict(Chinalda,ChinaT)$class)
+print(predict(ChinaWT.lda,ChinaWT)$class)
 
-#Estimate error rates by ten-fold cross-validation
-CVlda <- DACrossVal(ChinaT,ChinaTemp$GeoReg,TrainAlg=lda,
-Config=BestModel(ManvChina@H1res),CVrep=1)
+#Estimate error rates by ten-fold cross-validation 
+CVlda <- DACrossVal(ChinaWT,ChinaTemp$GeoReg,TrainAlg=lda,
+Config=BestModel(ManvChinaWT.C14@H1res),CVrep=1)
 summary(CVlda[,,"Clerr"])
 glberrors <- 
   apply(CVlda[,,"Nk"]*CVlda[,,"Clerr"],1,sum)/apply(CVlda[,,"Nk"],1,sum)
 cat("Average global classification error =",mean(glberrors),"\n")
-
 }

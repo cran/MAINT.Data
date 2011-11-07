@@ -1,8 +1,8 @@
-source("R/ClasGenMetDef.R")
+#source("R/ClasGenMetDef.R")
 
 setMethod("lda",
 	signature(x = "IdtClMANOVA"),
-	function(x,prior="proportions",selmodel=BestModel(H1res(x)),...)
+	function(x,prior="proportions",selmodel=BestModel(H1res(x)),egvtol=1.0e-9,...)
 	{
         	p <- 2*x@NIVar
      		nk <- as.numeric(table(x@grouping))
@@ -10,29 +10,26 @@ setMethod("lda",
      		k <- length(nk) 
 		if (k==1) stop("The data belongs to one single group. A partition into at least two different groups is required\n")
 		if (is.character(selmodel))  selmodel <- sapply(selmodel,function(mod) which(mod==x@H0res@ModelNames))
-
 		means <- x@H1res@mleNmuE
 		if (prior[1]=="proportions") prior <- nk/N
 		names(prior) <- rownames(means)
+		W <- x@H1res@Configurations[[selmodel]]$mleSigE	
+		Wi <- solve(W)					
+		B <- x@H0res@Configurations[[selmodel]]$mleSigE - W	
+		WiBdecp <- eigen(Wi%*%B)	
 		if (selmodel != 5) {
-			W <- x@H1res@Configurations[[selmodel]]$mleSigE
-			if (selmodel==1)  {
-				Wi <- solve(W)
-				B <- x@H0res@Configurations[[1]]$mleSigE - W
- 				WiBdecp <- eigen(Wi%*%B)
-				r <- min(p,k-1)
-				eigvct <- Re(WiBdecp$vectors[,1:r])
-				if (r==1) dim(eigvct) <- c(p,1)
-				sclvar <- apply(eigvct,2,function(v) v%*%W%*%v)
-				scaling <- scale(eigvct,center=FALSE,scale=sqrt(sclvar))
-				dimnames(scaling) <- list(rownames(W),paste("LD",1:r,sep=""))
-				attr(scaling,"scaled:scale") <- NULL
-			}
+			if (selmodel==1)  r <- min(p,k-1)
 			else  {
-				W <- x@H1res@Configurations[[selmodel]]$mleSigE
-				scaling <- backsolve(chol(W),diag(p))
-				dimnames(scaling) <- list(rownames(W),paste("LD",1:p,sep=""))
+				WiBegval <- Re(WiBdecp$values)	
+				posWiBegval <- WiBegval[WiBegval>egvtol]
+				r <- length(posWiBegval)
 			}
+			eigvct <- Re(WiBdecp$vectors[,1:r])
+			if (r==1) dim(eigvct) <- c(p,1)
+			sclvar <- apply(eigvct,2,function(v) v%*%W%*%v)	
+			scaling <- scale(eigvct,center=FALSE,scale=sqrt(sclvar))
+			dimnames(scaling) <- list(rownames(W),paste("LD",1:r,sep=""))	
+			attr(scaling,"scaled:scale") <- NULL
         	}
 		else {
 			Wd <- diag(x@H1res@Configurations[[5]]$mleSigE)
@@ -63,8 +60,8 @@ setMethod("predict",
 	signature(object = "Idtlda"),
 	function(object,newdata,prior=object@prior,...)
 	{
-   		if (is.IData(newdata)) newdata <- as.matrix(cbind(newdata@MidP,newdata@LogR))
-   		if (is.data.frame(newdata)) newdata <- as.matrix(newdata)
+   		if (is(newdata,"IData")) newdata <- as.matrix(cbind(newdata@MidP,newdata@LogR))
+   		if (is(newdata,"data.frame")) newdata <- as.matrix(newdata)
    		n <- nrow(newdata)
    		k <- length(prior) 
 		if (k==1) stop("The data belongs to one single group. A partition into at least two different groups is required\n")
@@ -144,8 +141,8 @@ setMethod("predict",
 	signature(object = "Idtqda"),
 	function(object,newdata,prior=object@prior,...)
 	{
-		if (is.IData(newdata)) newdata <- as.matrix(cbind(newdata@MidP,newdata@LogR))
-   		if (is.data.frame(newdata)) newdata <- as.matrix(newdata)
+		if (is(newdata,"IData")) newdata <- as.matrix(cbind(newdata@MidP,newdata@LogR))
+   		if (is(newdata,"data.frame")) newdata <- as.matrix(newdata)
    		n <- nrow(newdata)
    		p <- ncol(newdata)
    		k <- length(prior) 

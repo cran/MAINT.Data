@@ -32,19 +32,20 @@ possible comparisons are performed}
 
 ChinaT <- IData(ChinaTemp[1:8])
 
-#Estimate parameters by maximum likelihood
-ChinaE <- mle(ChinaT)
-cat("China maximum likelhiood estimation results =\n") ; print(ChinaE)
+#Estimate by maximum likelihood the parameters of Gaussian models for the Winter (1st and 4th) quarter intervals
+ChinaWTE <- mle(ChinaT[,c(1,4)])
+cat("China maximum likelhiood estimation results for Winter quarters:\n") ; print(ChinaWTE)
 
 # Perform Likelihood-Ratio tests comparing models with consecutive nested configuration 
-testMod(ChinaE)
+testMod(ChinaWTE)
 
 # Perform Likelihood-Ratio tests comparing all possible models 
-testMod(ChinaE,FullMod="All")
+testMod(ChinaWTE,FullMod="All")
 
 # Compare model with covariance Configuration 2 against model with covariance Configuration 1 (unrestricted covariance)  
-testMod(ChinaE,RestMod=2,FullMod=1)
+testMod(ChinaWTE,RestMod=2,FullMod=1)
 
 }
-
+
+
 
