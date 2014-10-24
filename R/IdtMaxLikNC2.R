@@ -88,7 +88,6 @@ GC2mLogLik.grad <- function(t0,X,ue=NULL)
 	fixpgrad = matrix(0.,nrow=2*q,ncol=2*q)
 	for (a in 1:(q-1))  for (b in q:(a+1)) {
 		fixpgrad[q+a,b] = fixpgrad[q+a,b] + fL.grad(dfx=Sigmagrad,L=Sigmasr,l1=q+a,l2=b,totald=TRUE,L2=SigmaInv,n=n,V=V) 
-#		fixpgrad[q+a,b] = fixpgrad[q+a,b] + fL.grad(dfx=SigmasrgradCnt,L=Sigmasr,l1=q+a,l2=b,totald=TRUE,L2=SigmaInv,n=n,VCnt=V) 
 		if (b > a+1) for (k in (a+1):(b-1)) fixpgrad[q+a,k] = fixpgrad[q+a,k] - Sigmasr[b,k]/Sigmasr[b,b] * fixpgrad[q+a,b]
 	}
 
@@ -96,19 +95,15 @@ GC2mLogLik.grad <- function(t0,X,ue=NULL)
 	for (i in 1:q)  { 
 		for (j in 1:i) {		
 			grad[i*(i-1)/2+j] = fL.grad(dfx=Sigmagrad,L=Sigmasr,l1=i,l2=j,totald=TRUE,L2=SigmaInv,n=n,V=V) 
-#			grad[i*(i-1)/2+j] = fL.grad(dfx=SigmasrgradCnt,L=Sigmasr,l1=i,l2=j,totald=TRUE,L2=SigmaInv,n=n,VCnt=V) 
 			if (j<i) for (a in 1:(i-1)) grad[i*(i-1)/2+j] = grad[i*(i-1)/2+j] - Sigmasr[q+a,j]/Sigmasr[i,i] * fixpgrad[q+a,i]
 			else if (j>1) for (a in 1:(j-1)) for (k in a:(j-1))
 				grad[j*(j-1)/2+j] = grad[j*(j-1)/2+j] + Sigmasr[q+a,k]*Sigmasr[j,k]/Sigmasr[j,j]^2 * fixpgrad[q+a,j]
 			grad[intcomb+i*(i-1)/2+j] = fL.grad(dfx=Sigmagrad,L=Sigmasr,l1=q+i,l2=q+j,totald=TRUE,L2=SigmaInv,n=n,V=V) 
-#			grad[intcomb+i*(i-1)/2+j] = fL.grad(dfx=SigmasrgradCnt,L=Sigmasr,l1=q+i,l2=q+j,totald=TRUE,L2=SigmaInv,n=n,VCnt=V) 
 		}
 		grad[2*intcomb+i] = fL.grad(dfx=Sigmagrad,L=Sigmasr,l1=q+i,l2=i,totald=TRUE,L2=SigmaInv,n=n,V=V)
-#		grad[2*intcomb+i] = fL.grad(dfx=SigmasrgradCnt,L=Sigmasr,l1=q+i,l2=i,totald=TRUE,L2=SigmaInv,n=n,VCnt=V)
 		if (i<q) for (b in (i+1):q) grad[2*intcomb+i] = grad[2*intcomb+i] - Sigmasr[b,i]/Sigmasr[b,b] * fixpgrad[q+i,b]
 	}
 	-matrix(grad,1,length(grad))
-#	-grad
 }
 
 GC2LogLikC.grad <- function(t0,X,ue=NULL)   
@@ -159,7 +154,6 @@ GC2LogLikC.grad <- function(t0,X,ue=NULL)
 		gradc[2*intcomb+i,] = apply(Vcnt,3,SigmasrgradCnt,L=Sigmasr,l1=q+i,l2=i,L2=SigmaInv,n=n) 
 		if (i<q) for (b in (i+1):q) gradc[2*intcomb+i,] = gradc[2*intcomb+i,] - Sigmasr[b,i]/Sigmasr[b,b] * fixpgradc[q+i,b,]
 	}
-#	matrix(apply(gradc,1,sum),1,nrow(gradc))
 	t(gradc)
 }
 
@@ -218,7 +212,6 @@ C2GetCov <- function(par,OStdv,q,tol=1E-8)
 			L[q+i,j] <- -tempsum/L[j,j]
 		}
 	}
-	# OStdv * (L %*% t(L))
 	StdSigma <- L %*% t(L)
 	StdSigma[abs(StdSigma)<tol]  <- 0.
 	OStdv * StdSigma

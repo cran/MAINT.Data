@@ -1,11 +1,9 @@
-#source("R/ClasGenMetDef.R")
-
 setMethod("mle",
 	signature(Idt = "IData"),
 	function(Idt,Model="Normal",Config=1:5,SelCrit=c("AIC","BIC"))
 	{
-	   	Model <- match.arg(Model)
-	   	SelCrit <- match.arg(SelCrit)
+	  Model <- match.arg(Model)
+	  SelCrit <- match.arg(SelCrit)
 		IdtNmle(Idt,Type="SingDst",Config=Config,SelCrit=SelCrit)
 	}
 )
@@ -15,19 +13,19 @@ setMethod("MANOVA",
 	function(Idt, grouping, Model="Normal", Config=1:5,
 			SelCrit=c("AIC","BIC"), Mxt=c("Hom","Het"), tol=1.0e-4)
 	{
-  		if (!is.factor(grouping)) stop("'grouping' is not a factor\n")
-  		if ( nrow(Idt) != length(grouping)) stop("The numbers of data and partition observations are different\n")
+		if (!is.factor(grouping)) stop("'grouping' is not a factor\n")
+		if ( nrow(Idt) != length(grouping)) stop("The numbers of data and partition observations are different\n")
 		Mxt <- match.arg(Mxt)
 		Model <- match.arg(Model)
 		SelCrit <- match.arg(SelCrit)
-    		nk <- as.numeric(table(grouping))
-    		q <- Idt@NIVar 
-    		p <- 2*q 
-     		k <- length(nk) 
+		nk <- as.numeric(table(grouping))
+		q <- Idt@NIVar 
+		p <- 2*q 
+		k <- length(nk) 
 		if (k==1) stop("The data belongs to one single group. A partition into at least two different groups is required\n")
 		H0res <- mle(Idt,Model=Model,Config=Config,SelCrit=SelCrit)
 		if (Mxt=="Hom")  H1res <- IdtNmle(Idt,grouping,Type="HomMxt",Config=Config,SelCrit=SelCrit,tol=tol)
-	   	else if (Mxt=="Het") H1res <- IdtHetMxtNmle(Idt,grouping,Config=Config,SelCrit=SelCrit,tol=tol)
+		else if (Mxt=="Het") H1res <- IdtHetMxtNmle(Idt,grouping,Config=Config,SelCrit=SelCrit,tol=tol)
 		H0Ll <- H0res@logLiks[H1res@BestModel]
 		H1Ll <- H1res@logLiks[H1res@BestModel]
 		QuiSq <- 2*(H1Ll-H0Ll)
@@ -61,13 +59,15 @@ setMethod("show",
 
 setMethod("testMod",					
 	signature(Idt = "IdtE"),
-	function(Idt,RestMod=1:length(Idt@ModelNames),FullMod="Next")
+	function(Idt,RestMod=Idt@ModelConfig[2]:length(Idt@ModelConfig),FullMod="Next")
 	{
 		if (is.character(RestMod))  
 			RestMod <- sapply(RestMod,function(Rmd) which(Rmd==Idt@ModelNames))
 		if (FullMod[1]!="Next" && FullMod[1]!="All" && is.character(FullMod)) 
 			FullMod <- sapply(FullMod,function(Fmd) which(Fmd==Idt@ModelNames))
-		RestMod <- RestMod[RestMod!=1]
+		if (is.element(Idt@ModelConfig[1],RestMod))
+			stop("Model",Idt@ModelNames[1],"can not be sepecified as a restricted model\n",
+				"since it is the most general model that has been estimated.\n")
 		TestRes <- list()
 		RestModels <- character()
 		FullModels <- character()
@@ -155,8 +155,14 @@ setMethod("show",
 	{
 		cat("Null Model Log likelihoods:\n") ; print(object@H0res@logLiks)
 		cat("Full Model Log likelihoods:\n") ; print(object@H1res@logLiks)
-		if (object@H1res@SelCrit=="AIC") { cat("Full Model Akaike Information Criteria:\n") ; print(object@H1res@AICs) }
-		else if (object@H1res@SelCrit=="BIC") { cat("Full Model Bayesian (Schwartz) Information Criteria:\n") ; print(object@H1res@BICs) }
+		if (object@H1res@SelCrit=="AIC") { 
+			cat("Full Model Akaike Information Criteria:\n")
+			print(object@H1res@AICs)
+		}
+		else if (object@H1res@SelCrit=="BIC") {
+			cat("Full Model Bayesian (Schwartz) Information Criteria:\n")
+			print(object@H1res@BICs)
+		}
        		cat("Selected Model:\n") ; print(names(object@H1res@BestModel)) ; cat("\n")
 		callNextMethod()
 	}
@@ -165,78 +171,87 @@ setMethod("show",
  
 IdtNmle <- function(Idt,grouping=NULL,Type=c("SingDst","HomMxt"),Config=1:5,SelCrit=c("AIC","BIC"),tol=1.0e-4)
 {
-   Type <- match.arg(Type)
-   SelCrit <- match.arg(SelCrit)
-   q <- Idt@NIVar
-   p <- 2*q
-   n <- Idt@NObs
-   if (Type=="SingDst") k <- 1
-   else if (Type=="HomMxt") {
-	if (is.null(grouping)) stop("Argument grouping is missing from MANOVA method\n")
-  	if (!is.factor(grouping)) stop("'grouping' is not a factor")
-	nk <- as.numeric(table(grouping))
-	if (n != sum(nk)) stop("Number of observations in IData object and grouping factor do not agree with each other\n")
-	k <- length(nk) 
-	if (k==1) stop("The data belongs to one single group. A partition into at least two different groups is required\n")
-  }
+	Type <- match.arg(Type)
+	SelCrit <- match.arg(SelCrit)
+	q <- Idt@NIVar
+	p <- 2*q
+	n <- Idt@NObs
+	if (Type=="SingDst") k <- 1
+	else if (Type=="HomMxt") {
+		if (is.null(grouping)) stop("Argument grouping is missing from MANOVA method\n")
+		if (!is.factor(grouping)) stop("'grouping' is not a factor")
+		nk <- as.numeric(table(grouping))
+		if (n != sum(nk)) stop("Number of observations in IData object and grouping factor do not agree with each other\n")
+		k <- length(nk) 
+		if (k==1) stop("The data belongs to one single group. A partition into at least two different groups is required\n")
+	}
   
-  X <- cbind(Idt@MidP,Idt@LogR)
-  logLiks <- AICs <- BICs <- rep(NA_real_,5)
+	X <- cbind(Idt@MidP,Idt@LogR)
+	logLiks <- AICs <- BICs <- rep(NA_real_,5)
 
-  Configurations <- vector("list",5)
-  names(logLiks)[1:5] <- names(AICs)[1:5] <- names(BICs)[1:5] <- names(Configurations)[1:5]<- paste("NC",1:5,sep="")
-  for (model in Config)  
-	if (model!=2) Configurations[[model]] <- list(mleSigE=NULL,mleSigEse=NULL,logLik=NULL,AIC=NULL,BIC=NULL)
-	else Configurations[[model]] <- list(mleSigE=NULL,mleSigEse=NULL,logLik=NULL,AIC=NULL,BIC=NULL,optres=NULL)
-  if (Type=="SingDst") {
-   	mleNmuE <- colMeans(X)
-   	mleNmuEse <- sapply(X,sd)/sqrt(n)
-	if (is.element(1,Config)) {
-		Configurations[[1]]$mleSigE <- var(X) * (n-1)/n
-               	XVar <- diag(Configurations[[1]]$mleSigE)
-		CnstVar <- XVar[XVar<tol^2]
-		if (length(CnstVar)==1) stop("Variable ",names(CnstVar)," appears to be constant \n")
-		else if (length(CnstVar)>0) stop("Variables ",paste(names(CnstVar),collapse=" ")," appear to be constant\n")
-		Configurations[[1]]$mleSigEse  <- sqrt((Configurations[[1]]$mleSigE^2+outer(XVar,XVar))/n)
-		dimnames(Configurations[[1]]$mleSigEse) <- dimnames(Configurations[[1]]$mleSigE)
-	}	
-	else {
+	Configurations <- vector("list",5)
+	names(logLiks)[1:5] <- names(AICs)[1:5] <- names(BICs)[1:5] <- names(Configurations)[1:5]<- paste("NC",1:5,sep="")
+	for (model in Config)  
+		if (model!=2) Configurations[[model]] <- list(mleSigE=NULL,mleSigEse=NULL,logLik=NULL,AIC=NULL,BIC=NULL)
+		else Configurations[[model]] <- list(mleSigE=NULL,mleSigEse=NULL,logLik=NULL,AIC=NULL,BIC=NULL,optres=NULL)
+	if (Type=="SingDst") {
+		mleNmuE <- colMeans(X)
+		mleNmuEse <- sapply(X,sd)/sqrt(n)
+		if (is.element(1,Config)) {
+			Configurations[[1]]$mleSigE <- var(X) * (n-1)/n
+               		XVar <- diag(Configurations[[1]]$mleSigE)
+			CnstVar <- XVar[XVar<tol^2]
+			if (length(CnstVar)==1)
+				stop("Variable ",names(CnstVar)," appears to be constant \n")
+			else if (length(CnstVar)>0) 
+				stop("Variables ",paste(names(CnstVar),collapse=" ")," appear to be constant\n")
+			Configurations[[1]]$mleSigEse  <- sqrt((Configurations[[1]]$mleSigE^2+outer(XVar,XVar))/n)
+			dimnames(Configurations[[1]]$mleSigEse) <- dimnames(Configurations[[1]]$mleSigE)		
+	  }	
+	  else {
 		SigNEC1 <- var(X) * (n-1)/n
-               	XVar <- diag(SigNEC1)
+		XVar <- diag(SigNEC1)
 		CnstVar <- XVar[XVar<tol^2]
-		if (length(CnstVar)==1) stop("Variable ",names(CnstVar)," appears to be constant \n")
-		else if (length(CnstVar)>0) stop("Variables ",paste(names(CnstVar),collapse=" ")," appear to be constant\n")
-		SigNEseC1 <- sqrt((SigNEC1^2+outer(XVar,XVar))/n)
-		dimnames(SigNEseC1) <- dimnames(SigNEC1)
+		if (length(CnstVar)==1)
+			stop("Variable ",names(CnstVar)," appears to be constant \n")
+		  else if (length(CnstVar)>0)
+			stop("Variables ",paste(names(CnstVar),collapse=" ")," appear to be constant\n")
+		  SigNEseC1 <- sqrt((SigNEC1^2+outer(XVar,XVar))/n)
+		  dimnames(SigNEseC1) <- dimnames(SigNEC1)
+	  }
 	}
-   }
-   else if (Type=="HomMxt") {
-   	mleNmuE <- apply(X,2,function(x) tapply(x,grouping,mean))
-   	mleNmuEse <- apply(X,2,function(x) tapply(x,grouping,sd))/sqrt(nk)
-	rownames(mleNmuE) <- rownames(mleNmuEse) <- levels(grouping)
-	if (is.element(1,Config)) {
-		Configurations[[1]]$mleSigE <- var(X[grouping==levels(grouping)[1],]) * (nk[1]-1)/n
-		for (g in 2:k) Configurations[[1]]$mleSigE <- Configurations[[1]]$mleSigE + var(X[grouping==levels(grouping)[g],]) * (nk[g]-1)/n
-                XVar <- diag(Configurations[[1]]$mleSigE)
-		CnstVar <- XVar[XVar<tol^2]
-		if (length(CnstVar)==1) stop("Variable ",names(CnstVar)," appears to be constant within groups\n")
-		else if (length(CnstVar)>0) stop("Variables ",paste(names(CnstVar),collapse=" ")," appear to be constant within groups\n")
-		Configurations[[1]]$mleSigEse  <- sqrt((Configurations[[1]]$mleSigE^2+outer(XVar,XVar))/n)
-		dimnames(Configurations[[1]]$mleSigEse) <- dimnames(Configurations[[1]]$mleSigE)
-	}	
-	else {
-		SigNEC1 <- var(X[grouping==levels(grouping)[1],]) * (nk[1]-1)/n
-		for (g in 2:k) SigNEC1 <- SigNEC1 + var(X[grouping==levels(grouping)[g],]) * (nk[g]-1)/n
-               	XVar <- diag(SigNEC1)
-		CnstVar <- XVar[XVar<tol^2]
-		if (length(CnstVar)==1) stop("Variable ",names(CnstVar)," appears to be constant within groups\n")
-		else if (length(CnstVar)>0) stop("Variables ",paste(names(CnstVar),collapse=" ")," appear to be constant within groups\n")
-		SigNEseC1  <- sqrt((SigNEC1^2+outer(XVar,XVar))/n)
-		dimnames(SigNEseC1) <- dimnames(SigNEC1)
+	else if (Type=="HomMxt") {
+		mleNmuE <- apply(X,2,function(x) tapply(x,grouping,mean))
+		mleNmuEse <- apply(X,2,function(x) tapply(x,grouping,sd))/sqrt(nk)
+		rownames(mleNmuE) <- rownames(mleNmuEse) <- levels(grouping)
+		if (is.element(1,Config)) {
+			Configurations[[1]]$mleSigE <- var(X[grouping==levels(grouping)[1],]) * (nk[1]-1)/n
+			for (g in 2:k) Configurations[[1]]$mleSigE <- 
+				Configurations[[1]]$mleSigE + var(X[grouping==levels(grouping)[g],]) * (nk[g]-1)/n
+			XVar <- diag(Configurations[[1]]$mleSigE)
+			CnstVar <- XVar[XVar<tol^2]
+			if (length(CnstVar)==1) 
+				stop("Variable ",names(CnstVar)," appears to be constant within groups\n")
+			else if (length(CnstVar)>0)
+				stop("Variables ",paste(names(CnstVar),collapse=" ")," appear to be constant within groups\n")
+			Configurations[[1]]$mleSigEse  <- sqrt((Configurations[[1]]$mleSigE^2+outer(XVar,XVar))/n)
+			dimnames(Configurations[[1]]$mleSigEse) <- dimnames(Configurations[[1]]$mleSigE)
+		}	
+		else {
+			SigNEC1 <- var(X[grouping==levels(grouping)[1],]) * (nk[1]-1)/n
+			for (g in 2:k) SigNEC1 <- SigNEC1 + var(X[grouping==levels(grouping)[g],]) * (nk[g]-1)/n
+			XVar <- diag(SigNEC1)
+			CnstVar <- XVar[XVar<tol^2]
+			if (length(CnstVar)==1)
+				stop("Variable ",names(CnstVar)," appears to be constant within groups\n")
+			else if (length(CnstVar)>0)
+				stop("Variables ",paste(names(CnstVar),collapse=" ")," appear to be constant within groups\n")
+			SigNEseC1  <- sqrt((SigNEC1^2+outer(XVar,XVar))/n)
+			dimnames(SigNEseC1) <- dimnames(SigNEC1)
+		}
 	}
-  }
-  Cnf35 <- Config[Config>2]
-  if (length(Cnf35)!=0)  
+	Cnf35 <- Config[Config>2]
+	if (length(Cnf35)!=0)  
 	for (Conf in Cnf35)  {
 		if (is.element(1,Config)) {
 			Configurations[[Conf]]$mleSigE <- mleNSigC35(Conf,Configurations[[1]]$mleSigE,q,p,0.)
@@ -248,8 +263,8 @@ IdtNmle <- function(Idt,grouping=NULL,Type=c("SingDst","HomMxt"),Config=1:5,SelC
 		}
 	}
 	if (is.element(2,Config)) {
-        	Xsd <- sqrt(XVar)
-   	 	lglikdif <- -n*sum(log(Xsd)) 
+		Xsd <- sqrt(XVar)
+		lglikdif <- -n*sum(log(Xsd)) 
 		if (Type=="SingDst") Xscld <- scale(X,scale=Xsd)
 		else if (Type=="HomMxt") {
 			Xscld <- scale(X[grouping==levels(grouping)[1],],center=mleNmuE[1,],scale=Xsd)
@@ -286,20 +301,19 @@ IdtNmle <- function(Idt,grouping=NULL,Type=c("SingDst","HomMxt"),Config=1:5,SelC
 			AICs[5] <- Configurations[[5]]$AIC <- -2*Configurations[[5]]$logLik + 2*npar(5,p,q,Ngrps=k)
 			BICs[5] <- Configurations[[5]]$BIC <- -2*Configurations[[5]]$logLik + log(n)*npar(5,p,q,Ngrps=k)
 		}
-    } 
-    if (SelCrit=="AIC") bestmod <- which.min(AICs)
-    else if (SelCrit=="BIC") bestmod <- which.min(BICs)
+	} 
+	if (SelCrit=="AIC") bestmod <- which.min(AICs)
+	else if (SelCrit=="BIC") bestmod <- which.min(BICs)
 
-    if (Type=="SingDst")   
-	new("IdtSngNDE",ModelNames=names(AICs),ModelType=rep("Normal",5),ModelConfig=1:5,
-			NIVar=q,mleNmuE=mleNmuE,mleNmuEse=mleNmuEse,Configurations=Configurations,SelCrit=SelCrit,
-			logLiks=logLiks,AICs=AICs,BICs=BICs,BestModel=bestmod)
-    else
-    	new("IdtMxNDE",ModelNames=names(AICs),ModelType=rep("Normal",5),ModelConfig=1:5,NIVar=q,grouping=grouping,
-			Hmcdt=TRUE,mleNmuE=mleNmuE,mleNmuEse=mleNmuEse,Configurations=Configurations,SelCrit=SelCrit,
-			logLiks=logLiks,AICs=AICs,BICs=BICs,BestModel=bestmod)
+	if (Type=="SingDst")
+		new("IdtSngNDE",ModelNames=names(AICs),ModelType=rep("Normal",5),ModelConfig=1:5,
+			  NIVar=q,mleNmuE=mleNmuE,mleNmuEse=mleNmuEse,Configurations=Configurations,SelCrit=SelCrit,
+			  logLiks=logLiks,AICs=AICs,BICs=BICs,BestModel=bestmod)
+	else
+		new("IdtMxNDE",ModelNames=names(AICs),ModelType=rep("Normal",5),ModelConfig=1:5,NIVar=q,grouping=grouping,
+			  Hmcdt=TRUE,mleNmuE=mleNmuE,mleNmuEse=mleNmuEse,Configurations=Configurations,SelCrit=SelCrit,
+			  logLiks=logLiks,AICs=AICs,BICs=BICs,BestModel=bestmod)
 }
-
 
 IdtHetMxtNmle <- function(Idt,grouping,Config,SelCrit,tol=1.0e-4)
 {

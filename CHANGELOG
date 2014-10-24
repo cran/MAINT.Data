@@ -1,4 +1,15 @@
 
+##########  Version 0.3  (October 2014) #################
+
+The following changes were made in Version 0.3 of R package MAINT.Data:
+
+1) In the DESCRIPTION file the Depends directive for imported packages was repalced by an Imports directive
+
+2) Lines with more 100 characters in the documentation files were split into two
+
+3) The longer examples in the documentation files were replace by faster examples   
+
+
 ##########  Version 0.2  (October 2011) #################
 
 The following changes were made in Version 0.2 of R package MAINT.Data:

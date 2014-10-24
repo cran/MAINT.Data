@@ -36,14 +36,14 @@
     \item{qda}{\code{signature(x = "IData")}: performs Quadratic Discriminant Analysis using the estimated model parameters} }
 }
 
-\references{
-Brito, P., Duarte Silva, A. P.  (2011): "Modelling Interval Data with Normal and Skew-Normal Distributions". Journal of Applied Statistics (forthcoming).\cr
-
-Noirhomme-Fraiture, M., Brito, P. (2011): "Far Beyond the Classical Data Models: Symbolic Data Analysis". Statistical Analysis and Data Mining, Volume 4, Issue 2, 157-170.
-}
-
 \author{Pedro Duarte Silva <psilva@porto.ucp.pt>\cr 
         Paula Brito <mpbrito.fep.up.pt>
+}
+
+\references{
+Brito, P., Duarte Silva, A. P.  (2012): "Modelling Interval Data with Normal and Skew-Normal Distributions". Journal of Applied Statistics, Volume 39, Issue 1, 3-20.\cr
+
+Noirhomme-Fraiture, M., Brito, P. (2011): "Far Beyond the Classical Data Models: Symbolic Data Analysis". Statistical Analysis and Data Mining, Volume 4, Issue 2, 157-170.
 }
 
 \seealso{

@@ -1,5 +1,3 @@
-#source("R/ClasGenMetDef.R")
-
 setMethod("lda",
 	signature(x = "IdtClMANOVA"),
 	function(x,prior="proportions",selmodel=BestModel(H1res(x)),egvtol=1.0e-9,...)

@@ -16,7 +16,7 @@ by allowing multiple, possibly weighted, values for each variable.
 New variable types - interval, categorical multi-valued and modal variables - have been introduced.\cr
 We focus on the analysis of interval data, i.e., where
 elements are described by variables whose values are intervals.
-Parametric inference methodologies based on probabilistic models for interval variables are developed in Brito and Duarte Silva (2011) where each interval is represented by its midpoint and log-range,for which Normal and Skew-Normal distributions are assumed.
+Parametric inference methodologies based on probabilistic models for interval variables are developed in Brito and Duarte Silva (2012) where each interval is represented by its midpoint and log-range,for which Normal and Skew-Normal distributions are assumed.
 The intrinsic nature of the interval variables leads to special structures of the variance-covariance matrix, which are represented by five different possible configurations.\cr
 MAINT.DATA implements the proposed methodologies in R,
 introducing a data class for representing interval data; it
@@ -27,8 +27,8 @@ Methods for (M)ANOVA and Linear and Quadratic Discriminant Analysis of this data
 \tabular{ll}{
 Package: \tab MAINT.Data\cr
 Type: \tab Package\cr
-Version: \tab 0.2\cr
-Date: \tab 2011-11-07\cr
+Version: \tab 0.3\cr
+Date: \tab 2014-10-24\cr
 License: \tab GPL-2\cr
 LazyLoad: \tab yes\cr
 LazyData: \tab yes\cr
@@ -41,7 +41,7 @@ Maintainer: Pedro Duarte Silva <psilva@porto.ucp.pt>\cr
 }
 
 \references{
-Brito, P., Duarte Silva, A. P.  (2011): "Modelling Interval Data with Normal and Skew-Normal Distributions". Journal of Applied Statistics (forthcoming).\cr
+Brito, P., Duarte Silva, A. P.  (2012): "Modelling Interval Data with Normal and Skew-Normal Distributions". Journal of Applied Statistics, Volume 39, Issue 1, 3-20.\cr
 
 Noirhomme-Fraiture, M., Brito, P. (2011): "Far Beyond the Classical Data Models: Symbolic Data Analysis". Statistical Analysis and Data Mining, Volume 4, Issue 2, 157-170.
 }
@@ -73,22 +73,27 @@ ChinaWT <- ChinaT[,c(1,4)]
 # Estimate parameters by maximum likelihood, assuming 
 # the classical (unrestricted) covariance configuration C1
 ChinaWTE.C1 <- mle(ChinaWT,Config=1)
-cat("Winter temperatures of China -- maximum likelhiood estimation results:\n") ; print(ChinaWTE.C1)
+cat("Winter temperatures of China -- maximum likelhiood estimation results:\n")
+print(ChinaWTE.C1)
 cat("Standard Errors of Estimators:\n") ; print(stdEr(ChinaWTE.C1))
 
 # Estimate parameters by maximum likelihood, 
-# assuming that one of the restricted covariance configurations holds
-ChinaWTE.C2345 <- mle(ChinaWT,Config=2:5)
-cat("Winter temperatures of China -- maximum likelhiood estimation results:\n") ; print(ChinaWTE.C2345)
-cat("Standard Errors of Estimators:\n") ; print(stdEr(ChinaWTE.C2345))
+# assuming that one of the C3, C4 or C5 restricted covariance configurations holds
+ChinaWTE.C345 <- mle(ChinaWT,Config=3:5)
+cat("Winter temperatures of China -- maximum likelhiood estimation results:\n")
+print(ChinaWTE.C345)
+cat("Standard Errors of Estimators:\n") ; print(stdEr(ChinaWTE.C345))
 
-#MANOVA tests assuming that configuariton 1 (unrestricted covariance) or 4 (MidPoints independt of Log-Ranges) holds.  
+#MANOVA tests assuming that configuariton 1 (unrestricted covariance) 
+# or 4 (MidPoints independent of Log-Ranges) holds.  
 ManvChinaWT.C14 <- MANOVA(ChinaWT,ChinaTemp$GeoReg,Config=c(1,4))
-cat("Winter temperatures of China -- MANOVA by geografical regions results:\n") ; print(ManvChinaWT.C14)
+cat("Winter temperatures of China -- MANOVA by geografical regions results:\n")
+print(ManvChinaWT.C14)
 
 #Linear Discriminant Analysis
 ChinaWT.lda <- lda(ManvChinaWT.C14)
-cat("Winter temperatures of China -- linear discriminant analysis results:\n") ; print(ChinaWT.lda)
+cat("Winter temperatures of China -- linear discriminant analysis results:\n")
+print(ChinaWT.lda)
 cat("lda Prediction results:\n")
 print(predict(ChinaWT.lda,ChinaWT)$class)
 

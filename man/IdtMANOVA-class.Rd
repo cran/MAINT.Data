@@ -38,7 +38,7 @@ Class \code{"\linkS4class{LRTest}"}, directly.
 }
 
 \references{
-Brito, P., Duarte Silva, A. P.  (2011): "Modelling Interval Data with Normal and Skew-Normal Distributions". Journal of Applied Statistics (forthcoming).}
+Brito, P., Duarte Silva, A. P.  (2012): "Modelling Interval Data with Normal and Skew-Normal Distributions". Journal of Applied Statistics, Volume 39, Issue 1, 3-20.}
 
 \seealso{
   \code{\link{MANOVA}}, \code{\link{lda}}, 

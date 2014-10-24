@@ -1,5 +1,3 @@
-#source("R/ClasGenMetDef.R")
-
 setMethod("summary",
     signature(object = "IData"),
     function (object) 
