@@ -1,4 +1,9 @@
 
+##########  Version 0.4  (May 2015) #################
+
+The strict dependecy on packages MASS and miscTools was replaced by a Suggests directive
+
+
 ##########  Version 0.3  (October 2014) #################
 
 The following changes were made in Version 0.3 of R package MAINT.Data:
