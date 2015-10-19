@@ -21,9 +21,9 @@ setGeneric("head",package="utils",signature="x")
 setGeneric("tail",package="utils",signature="x")
 setGeneric("coef",package="stats",signature="object")
 setGeneric("predict",package="stats",signature="object")
-if (requireNamespace("miscTools",quietly=TRUE)) 
+if (require("miscTools",quietly=TRUE)) 
 	setGeneric("stdEr",package="miscTools",signature="x") else setGeneric("stdEr",function(x,...) standardGeneric("stdEr"))
-if (requireNamespace("MASS",quietly=TRUE)) {
+if (require("MASS",quietly=TRUE)) {
 	setGeneric("lda",package="MASS",signature="x")
 	setGeneric("qda",package="MASS",signature="x")
 }  else {
