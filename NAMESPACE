@@ -1,6 +1,9 @@
 import(methods)
 importFrom(utils,head,tail)
 importFrom(stats,coef,predict,nlm,nlminb,optim,pchisq,qnorm,runif,sd,var)
+importFrom(MASS,lda,qda)
+importFrom(miscTools,stdEr)
+
 export(IData, RepLOptim, DACrossVal)
 exportClasses(IData,IdtE,IdtSngDE,IdtMxE,IdtSngNDE,IdtMxNDE,LRTest,ConfTests,IdtMANOVA,IdtClMANOVA,IdtHetNMANOVA,Idtlda,Idtqda)
 exportPattern("*.IData")

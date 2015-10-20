@@ -1,3 +1,13 @@
+########## Versions 0.5 and 0.5.1 (October 2015) ###################
+
+The following changes were made in Versions 0.5 and 0.5.1 of R package MAINT.Data:
+
+1)  Several functions from the default package ""stats"" were imported 
+    into the MAINT.Data namespace to ensure that they did not become undefined globals. 
+
+2)  The strict dependecy on packages MASS and miscTools was restored by an Imports directive
+    in the DESCRIPTION file (ensuring that these packages are always attached when installed)
+
 
 ##########  Version 0.4  (May 2015) #################
 

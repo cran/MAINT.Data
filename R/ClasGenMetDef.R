@@ -21,15 +21,10 @@ setGeneric("head",package="utils",signature="x")
 setGeneric("tail",package="utils",signature="x")
 setGeneric("coef",package="stats",signature="object")
 setGeneric("predict",package="stats",signature="object")
-if (require("miscTools",quietly=TRUE)) 
-	setGeneric("stdEr",package="miscTools",signature="x") else setGeneric("stdEr",function(x,...) standardGeneric("stdEr"))
-if (require("MASS",quietly=TRUE)) {
-	setGeneric("lda",package="MASS",signature="x")
-	setGeneric("qda",package="MASS",signature="x")
-}  else {
-	setGeneric("lda",function(x,...) standardGeneric("lda"))
-	setGeneric("qda",function(x,...) standardGeneric("qda"))
-}
+
+setGeneric("stdEr",package="miscTools",signature="x")
+setGeneric("lda",package="MASS",signature="x")
+setGeneric("qda",package="MASS",signature="x")
 
 setGeneric("mle",function(Idt,Model="Normal",Config=1:5,SelCrit=c("AIC","BIC"))  standardGeneric("mle"))
 setGeneric("MANOVA",function(Idt, grouping, Model="Normal", Config=1:5, SelCrit=c("AIC","BIC"), Mxt=c("Hom","Het"), tol=1.0e-4)  standardGeneric("MANOVA"))

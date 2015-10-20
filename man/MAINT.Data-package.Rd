@@ -27,8 +27,8 @@ Methods for (M)ANOVA and Linear and Quadratic Discriminant Analysis of this data
 \tabular{ll}{
 Package: \tab MAINT.Data\cr
 Type: \tab Package\cr
-Version: \tab 0.5\cr
-Date: \tab 2015-10-18\cr
+Version: \tab 0.5.1\cr
+Date: \tab 2015-10-20\cr
 License: \tab GPL-2\cr
 LazyLoad: \tab yes\cr
 LazyData: \tab yes\cr
