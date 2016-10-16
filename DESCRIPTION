@@ -1,17 +1,26 @@
 Package: MAINT.Data
 Type: Package
 Title: Model and Analyse Interval Data
-Version: 0.5.1
-Date: 2015-10-20
-Author: Pedro Duarte Silva <psilva@porto.ucp.pt>, Paula Brito <mpbrito.fep.up.pt>
+Version: 1.0.0
+Date: 2016-10-16
+Author: Pedro Duarte Silva <psilva@porto.ucp.pt>, Paula Brito
+    <mpbrito.fep.up.pt>
 Maintainer: Pedro Duarte Silva <psilva@porto.ucp.pt>
-Description: Implements methodologies for modelling interval data, considering appropriate parameterizations of the variance-covariance matrix that take into account the intrinsic nature of interval data, and lead to five different possible configuration structures.
+Description: Implements methodologies for modelling interval data by Normal
+    and Skew-Normal distributions, considering appropriate parameterizations of
+    the variance-covariance matrix that takes into account the intrinsic nature of
+    interval data, and lead to four different possible configuration structures.
+    The Skew-Normal parameters can be estimated by maximum likelihood, while Normal
+    parameters may be estimated by maximum likelihood or robust trimmed maximum
+    likelihood methods.
 License: GPL-2
 LazyLoad: yes
 LazyData: yes
-Depends: R (>= 2.8.0)
-Imports: methods, miscTools, MASS
+Depends: R (>= 3.1.0), Rcpp (>= 0.11.0), sn (>= 1.3.0)
+Imports: MASS, methods, miscTools, robustbase, rrcov, pcaPP
+LinkingTo: Rcpp, RcppEigen
+RoxygenNote: 5.0.1
+NeedsCompilation: yes
+Packaged: 2016-10-16 12:51:39 UTC; antonio
 Repository: CRAN
-NeedsCompilation: no
-Packaged: 2015-10-20 13:59:09 UTC; antonio
-Date/Publication: 2015-10-20 21:12:59
+Date/Publication: 2016-10-16 17:39:04

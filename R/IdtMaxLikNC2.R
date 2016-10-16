@@ -1,4 +1,30 @@
-GC2mLogLik <- function(t0,X,ue=NULL,maxsdratio=10000)  # Minus Log-likelihood for Gaussian model with Configuration 2
+Cnf2MaxLik <- function(Data,initpar=NULL,EPS=1E-6,OptCntrl=list())
+{
+   #  Note  -  The Data argument should be a matrix containing the mid-points in the first columns and the log-ranges in the following columns 
+
+	sd0_default <- 0.1
+
+	n <- nrow(Data)			    # number of observations
+	p <- ncol(Data)			    # total number of variables (mid-points + log-ranges)
+	q <- p/2			    # number of interval variables
+	intcomb <- q*(q+1)/2	   	    # Number of possible combinations between pairs of interval variables
+	npar <- 2*intcomb + q	   	    # Total number of parameters to optimize
+	if (is.null(initpar)) 
+		initpar <- initparconf2(var(Data)*(n-1)/n,n,q)	
+	if (!is.null(OptCntrl$sd0)) sd0 <- OptCntrl$sd0 
+	else sd0 <- sd0_default 
+	OptCntrl$sd0 <- NULL 
+	parsd <- rep(sd0,npar)      	    # standard deviation hyper-parameters - used to generate random starting points
+	parlb <- rep(-Inf,npar)    	    # vector of lower bounds
+	for (i in 1:q)  { 
+		parlb[i*(i-1)/2+i] <- EPS 	    # diagonal elements of Choleski decomposition must be positive
+		parlb[intcomb+i*(i-1)/2+i] <- EPS
+	}
+	res <- RepLOptim(initpar,parsd,fr=GC2mLogLik,gr=GC2mLogLik.grad,lower=parlb,X=Data,control=OptCntrl)
+	list(lnLik=-res$val,SigmaSr=res$par,optres=res)
+}
+
+GC2mLogLik <- function(t0,X,ue=NULL,maxsdratio=10000)  # Minus Log-likelihood for the Gaussian model with Configuration 2
 {
    # Wrapper function to be minimized in the ML estimation of a gaussian model assuming configuration 2 
    # (all correlations allowed except for mid-points and log-ranges between different interval variables) 
@@ -157,7 +183,7 @@ GC2LogLikC.grad <- function(t0,X,ue=NULL)
 	t(gradc)
 }
 
-initparconf2 <- function(Data,n,q)	
+initparconf2 <- function(S,n,q)	
 {					 
 # 	Find initial parameter estimates in configuration 2 (all correlations allowed except for mid-points and log-ranges 
 #	between different interval variables) by replacing values in the Choleski decomposition of the within covariance 
@@ -166,7 +192,6 @@ initparconf2 <- function(Data,n,q)
 	EPS <- 1E-9
 	intcomb <- q*(q+1)/2			# Number of possible combinations between pairs of interval variables
 	initpar <- array(dim=2*intcomb+q)
-	S <- var(Data)*(n-1)/n	
 	Segv <- eigen(S,symmetric=TRUE,only.values=TRUE)$values	
 	if (Segv[2*q]<EPS) Sigmasr <- diag(1,2*q)			
 	else Sigmasr <- t(chol(S))	
@@ -217,28 +242,6 @@ C2GetCov <- function(par,OStdv,q,tol=1E-8)
 	OStdv * StdSigma
 }
 
-Cnf2MaxLik <- function(Data,sd0=0.1,maxrepet=3,maxnoimprov=20,maxreplic=200,iter=10000,eval=100000,EPS=1E-6)
-{
-   #  Note  -  The Data argument should be a matrix containing the mid-points in the first columns and the log-ranges in the following columns 
-
-	n <- nrow(Data)			    # number of observations
-	p <- ncol(Data)			    # total number of variables (mid-points + log-ranges)
-	q <- p/2			    # number of interval variables
-	intcomb <- q*(q+1)/2	   	    # Number of possible combinations between pairs of interval variables
-	npar <- 2*intcomb + q	   	    # Total number of parameters to optimize
-	initpar <- initparconf2(Data,n,q)	
-	parsd <- rep(sd0,npar)      	    # standard deviation hyper-parameters - used to generate random starting points
-	parlb <- rep(-Inf,npar)    	    # vector of lower bounds
-	for (i in 1:q)  { 
-	  parlb[i*(i-1)/2+i] <- EPS 	    # diagonal elements of Choleski decomposition must be positive
-	  parlb[intcomb +i*(i-1)/2+i] <- EPS
-	}
-	res <- RepLOptim(initpar,parsd,fr=GC2mLogLik,gr=GC2mLogLik.grad,
-			maxrepet=maxrepet,maxnoimprov=maxnoimprov,maxreplic=maxreplic,
-			method="nlminb",maxiter=iter,maxeval=eval,lower=parlb,X=Data)
-	list(lnLik=-res$val,SigmaSr=res$par,optres=res)
-}
-
 Sigmagrad <- function(j1,j2,n,V,L2)
 {
    grad <- n * ( sum(outer(L2[,j1],L2[,j2])*V) - L2[j1,j2] )
@@ -280,7 +283,7 @@ VCovGC2LogLikC.grad <- function(t0,X,ue=NULL)
 	else  X <- as.matrix(X-ue)
         Vcnt <- apply(X,1,function(v) outer(v,v)/n)
 	dim(Vcnt) <- c(p,p,n)
-	SigmaInv <- solve(Sigma)
+	SigmaInv <- pdwt.solve(Sigma)
  	gradc = matrix(nrow=2*intcomb+q,ncol=n)
 	for (i in 1:q)  { 
 		for (j in 1:i) {		
@@ -315,8 +318,6 @@ CovtoParC2 <- function(Sigma,q,Sqrt)
 PartoMatC2 <- function(par,q,initval)
 
 #  Converts a vectorized form of parameters (or standard errors) according to Configuration 2, to ist matrix form
-
-
 {
 	mat <- matrix(initval,2*q,2*q)
 	intcomb <- q*(q+1)/2		# Number of possible combinations between pairs of interval variables
@@ -332,6 +333,7 @@ PartoMatC2 <- function(par,q,initval)
 	mat
 }
 
+
 C2GetCovStderr <- function(mleSigmaC2,Data,q,ue=NULL)
 
 #  Arguments
@@ -343,16 +345,11 @@ C2GetCovStderr <- function(mleSigmaC2,Data,q,ue=NULL)
 #  ue		 - Vector with the MidPoints and Log-Ranges means (or NULL if Data is centered)
   
 {
-	p <- 2*q
-	n <- nrow(Data)
 	if (!is.null(ue)) Data <- scale(Data,center=ue,scale=FALSE)
 	par <- CovtoParC2(mleSigmaC2,q,Sqrt=FALSE)
-	npar <- length(par)	
 	gradc <- VCovGC2LogLikC.grad(par,Data)
-	OtProd <- apply(gradc,1,function(v) outer(v,v))
-	dim(OtProd) <- c(npar,npar,n)
-	HessAp <- matrix(apply(OtProd,c(1,2),sum),nrow=npar,ncol=npar,byrow=FALSE)
-	stderr <- sqrt(diag(solve(HessAp)))
+	VCov <- mleVCov(gradc)
+	stderr <- sqrt(diag(VCov))
 	PartoMatC2(stderr,q,NA)
 }
 

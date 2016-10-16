@@ -1,61 +1,99 @@
 \name{MANOVA-methods}
 \docType{methods}
-\alias{MANOVA}   % Check if this sintax is really correct !!!
+\alias{MANOVA}
 \alias{MANOVA-methods}
 \alias{MANOVA,IData-method}
-\title{Methods for Function MANOVA in Package `MAINT.Data'}
-\description{Performs MANOVA tests based on likelihood ratios allowing for both homocedastic and heterocedastic setups
-}
-\section{Methods}{
-\describe{
+\alias{H0res}
+\alias{H0res,IdtMANOVA-method}
+\alias{H1res}
+\alias{H1res,IdtMANOVA-method}
+\alias{show,IdtMANOVA-method}
 
-\item{\code{signature(Idt = "IData")}}{
-Performs MANOVA tests on interval-valued data}
-}}
+\title{Methods for Function MANOVA in Package `MAINT.Data'}
+\description{Function MANOVA performs MANOVA tests based on likelihood ratios allowing for both Gaussian and Skew-Normal distribtuions and homocedastic or heterocedastic setups. Methods H0res and H1res retrieve the model estimates under the null and alternative hypothesis, and method show displays the  MANOVA results.}
+
+\usage{
+
+MANOVA(Idt, grouping, Model=c("Normal","SKNormal","NrmandSKN"), CovCase=1:4, 
+		SelCrit=c("BIC","AIC"), Mxt=c("Hom","Het","Loc","Gen"), CVtol=1.0e-5, 
+		OptCntrl=list(), onerror=c("stop","warning","silentNull"), \dots)
+
+\S4method{H0res}{IdtMANOVA}(object)
+\S4method{H1res}{IdtMANOVA}(object)
+\S4method{show}{IdtMANOVA}(object)
+
+}
+
+\arguments{
+  \item{object}{An object representing a MANOVA analysis on interval-valued entities.}
+
+  \item{Idt}{An IData object representing interval-valued entities.}
+
+  \item{grouping}{Factor indicating the group to which each observation belongs to.}
+
+  \item{Model}{The joint distribution assumed for the MidPoint and LogRanges. Current alternatives are \dQuote{Normal} for Gaussian,
+distributions, \dQuote{SKNormal} for Skew-Normal and \dQuote{NrmandSKN} for both Gaussian and Skew-Normal distributions.}
+
+  \item{CovCase}{Configuration of the variance-covariance matrix: a set of integers between 1 and 4.}
+
+   \item{SelCrit}{The model selection criterion.}
+
+   \item{Mxt}{Indicates the type of mixing distributions to be considered. Current alternatives are \dQuote{Hom} (homocedastic) and \dQuote{Het} (hetereocedasic) for Gaussian models, \dQuote{Loc} (location model -- groups differ only on their location parameters) and \dQuote{Gen} \dQuote{Loc} (general model -- groups differ on all parameters) for Skew-Normal models.}
+
+  \item{CVtol}{Tolerance level for absolute value of the coefficient of variation of non-constant variables. When a MidPoint or LogRange has an absolute value within-groups coefficient of variation below CVtol, it is considered to be a constant.}
+
+   \item{OptCntrl}{List of optional control parameters to passed to the optimization routine. See the documentation of RepLOptim for a description of the available options.}
+
+   \item{onerror}{Indicates whether an error in the optimization algorithm should stop the current call, generate a warning, or return silently a NULL object.}
+
+  \item{\dots}{Other named arguments.}
+}
+
+\value{An object of type IdtMANOVA, containing the estimation and test results.}
+
 
 \keyword{methods}
 \keyword{MANOVA}
 \keyword{interval data}
 \keyword{likelihood ratio tets}
 
-\usage{MANOVA(Idt, grouping, Model="Normal", Config=1:5,
-			SelCrit=c("AIC","BIC"), Mxt=c("Hom","Het"), tol=1.0e-4)}
 
-\arguments{
-  \item{Idt}{An IData object representing NObs interval-valued entities}
-
-  \item{grouping}{Factor indicating the group to which each observation belongs to}
-
-  \item{Model}{The joint distribution assumed for the MidPoint and LogRanges; currently, only Gaussian (Normal) distributions are implemented}
-
-   \item{Config}{Configuration of the variance-covariance matrix: a vector of integers between 1 and 5}
-
-   \item{SelCrit}{The model selection criterion}
-
-   \item{Mxt}{Indicates whether we consider an homocedastic ("Hom") or a hetereocedasic ("Het") model configuration  }
-
-   \item{tol}{Tolerance level for the standard deviation of non-constant variables. When a MidPoint or LogRange has a within-groups standard deviation below tol, it is considered to be a constant}
-}
-
-\value{An object of type IdtMANOVA, containing the estimation and test results}
-
-\seealso{ \code{\linkS4class{IdtMANOVA}} }
+\seealso{ \code{\linkS4class{IdtMANOVA}}, \code{\link{RepLOptim}} }
 
 \examples{
 
-# Create an Interval-Data object containing the intervals for 899 observations 
-# on the temperatures by quarter in 60 Chinese meteorological stations.
-ChinaT <- IData(ChinaTemp[1:8],VarNames=c("T1","T2","T3","T4"))
+#Create an Interval-Data object containing the intervals of temperatures by quarter 
+# for 899 Chinese meteorological stations.
+ChinaT <- IData(ChinaTemp[1:8])
 
-#MANOVA tests, assuming that one of C3, C4 or C5 restricted configurations holds
+#MANOVA tests assuming that one of C2, C3 or C4 restricted configuration cases hold
 
 #Classical (homocedastic) MANOVA tests
-ManvChina <- MANOVA(ChinaT,ChinaTemp$GeoReg,Config=3:5)
-cat("China, MANOVA by geografical regions results =\n") 
+
+ManvChina <- MANOVA(ChinaT,ChinaTemp$GeoReg,CovCase=2:4)
+cat("China, MANOVA by geografical regions results =\n")
 print(ManvChina)
 
 #Heterocedastic MANOVA tests
-HetManvChina <- MANOVA(ChinaT,ChinaTemp$GeoReg,Mxt="Het",Config=3:5)
-cat("China, heterocedastic MANOVA by geografical regions results =\n") 
+
+HetManvChina <- MANOVA(ChinaT,ChinaTemp$GeoReg,Mxt="Het",CovCase=2:4)
+cat("China, heterocedastic MANOVA by geografical regions results =\n")
 print(HetManvChina)
+
+#Skew-Normal based MANOVA assuming the the groups differ only according to location parameters
+\dontrun{
+
+SKNLocManvChina <- MANOVA(ChinaT,ChinaTemp$GeoReg,Model="SKNormal",Mxt="Loc",CovCase=2:4)
+cat("China, Skew-Normal MANOVA (location model) by geografical regions results =\n")
+print(SKNLocManvChina)
+
+#Skew-Normal based MANOVA assuming the the groups may differ in all parameters
+
+SKNGenManvChina <- MANOVA(ChinaT,ChinaTemp$GeoReg,Model="SKNormal",Mxt="Gen",CovCase=2:4)
+cat("China, Skew-Normal MANOVA (general model)  by geografical regions results =\n")
+print(SKNGenManvChina)
+
 }
+
+}
+

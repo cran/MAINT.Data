@@ -1,3 +1,23 @@
+########## Version 1.0.0 (October 2016) ###################
+
+This is a major upgrade of the package with several new features and improvements of
+the existing code. The two main extensions of version 1.0.0 are:
+
+1)  The implementation of methods for estimation, testing and discriminant analysis based on the Skew-Normal
+    distribution. For details see the documentation of the mle, MANOVA and snda methods and the IDtSNDE, IDtNandSNDE,
+    IDtSngSNDE, IDtSngNandSNDE, IDtMxSNDE, IDtMxNandSNDE, IdtSNlocda, IdtLocSNMANOVA, IdtLocNSNMANOVA, 
+    IdtGenSNMANOVA and IdtGenNSNMANOVA classes.
+
+2)  The implementation of methods for the robust estimation of parameters of the guassian distribution, as well
+    as the corresponding methods for robust linear and quadratic discriminant analysis. For details see the 
+    documentation of fasttle, fulltle, Roblda and Robqda methods and the IDtSngNDRE and IDtMxNRDE classes.  
+
+Furthermore, among other new features, version 1.0.0 also includes specializations of the generic vcov method
+(returning estimates of the variance-covariance matrices for the parameter estimators used) for almost all 
+(all except those based on robust methods) classes derived from IdtE, i.e. the classes containing results 
+of model estimation.  
+
+
 ########## Versions 0.5 and 0.5.1 (October 2015) ###################
 
 The following changes were made in Versions 0.5 and 0.5.1 of R package MAINT.Data:

@@ -2,35 +2,63 @@
 \Rdversion{1.1}
 \docType{class}
 \alias{IdtMANOVA-class}
-\alias{show,IdtMANOVA-method}
+\alias{IdtClMANOVA-class}
+\alias{IdtHetNMANOVA-class}
+\alias{IdtLocSNMANOVA-class}
+\alias{IdtLocNSNMANOVA-class}
+\alias{IdtGenSNMANOVA-class}
+\alias{IdtGenNSNMANOVA-class}
 
 \title{Class "IdtMANOVA"}
-\description{IdtMANOVA contains the results of MANOVA tests on the interval-valued data.
+\description{IdtMANOVA extends\code{"\linkS4class{LRTest}"} directly, containing the results of MANOVA tests on the interval-valued data. This class is not used directly, but is the basis for different specializations according to the model assumed for the
+distribution in each group. In paticular, the following specializations of IdtMANOVA are currently implemented:\cr
+
+"IdtClMANOVA" extends IdtMANOVA, assuming a classical (i.e., homocedastic gaussian) setup.\cr
+
+
+"IdtHetNMANOVA" extends IdtMANOVA, assuming a heterocedastic gaussian set-up.\cr
+
+"IdtLocNMANOVA" extends IdtMANOVA, assuming a Skew-Normal location model set-up.\cr
+
+"IdtLocNSNMANOVA" extends IdtMANOVA, assuming either a homocedastic gaussian or Skew-Normal location model set-up.\cr
+
+"IdtGenNMANOVA" extends IdtMANOVA, assuming a Skew-Normal general model set-up.\cr
+
+"IdtLocNSNMANOVA" extends IdtMANOVA, assuming either a heterocedastic gaussian or Skew-Normal general model set-up.
 }
 
 \section{Slots}{
   \describe{
-    \item{\code{NIVar}:}{Number of interval variables}
-    \item{\code{grouping}:}{Factor indicating the group to which each observation belongs to}
-    \item{\code{H0res}:}{Model estimates under the null hypothesis}
-    \item{\code{H1res}:}{Model estimates under the alternative hypothesis}
-    \item{\code{QuiSq}:}{Value of the Qui-Square statistics corresponding to the performed test}
-    \item{\code{df}:}{Degrees of freedom of the Qui-Square statistics}
-    \item{\code{pvalue}:}{p-value of the Qui-Square statistics value, obtained from the Qui-Square distribution with df degrees of freedom}
-    \item{\code{H0logLik}:}{Logarithm of the Likelihood function under the null hypothesis}
-    \item{\code{H1logLik}:}{Logarithm of the Likelihood function under the alternative hypothesis}
+    \item{\code{NIVar}:}{Number of interval variables.}
+    \item{\code{grouping}:}{Factor indicating the group to which each observation belongs to.}
+    \item{\code{H0res}:}{Model estimates under the null hypothesis.}
+    \item{\code{H1res}:}{Model estimates under the alternative hypothesis.}
+    \item{\code{QuiSq}:}{Inherited from class \code{"LRTest"}. Value of the Qui-Square statistics corresponding to the performed test.}
+    \item{\code{df}:}{Inherited from class \code{"LRTest"}. Degrees of freedom of the Qui-Square statistics.}
+    \item{\code{pvalue}:}{Inherited from class \code{"LRTest"}. p-value of the Qui-Square statistics value, obtained from the Qui-Square distribution with df degrees of freedom.}
+    \item{\code{H0logLik}:}{Inherited from class \code{"LRTest"}. Logarithm of the Likelihood function under the null hypothesis.}
+    \item{\code{H1logLik}:}{Inherited from class \code{"LRTest"}. Logarithm of the Likelihood function under the alternative hypothesis.}
   }
-}
-
-\section{Extends}{
-Class \code{"\linkS4class{LRTest}"}, directly.
 }
 
 \section{Methods}{
   \describe{
-    \item{show}{\code{signature(object = "IdtMANOVA")}: show S4 method for the IdtMANOVA-class
- }
-	 }
+    \item{show}{\code{signature(object = "IdtMANOVA")}: show S4 method for the IdtMANOVA-classes.}
+    \item{H0res}{\code{signature(object = "IdtMANOVA")}: retrieves the model estimates under the null hypothesis.}
+    \item{H1res}{\code{signature(object = "IdtMANOVA")}: retrieves the model estimates under the alternative hypothesis.}
+    \item{lda}{\code{signature(x = "IdtClMANOVA")}: Linear Discriminant Analysis using the estimated model parameters.}
+    \item{lda}{\code{signature(x = "IdtLocNSNMANOVA")}: Linear Discriminant Analysis using the estimated model parameters.}
+    \item{qda}{\code{signature(x = "IdtHetNMANOVA")}: Quadratic Discriminant Analysis using the estimated model parameters.}
+    \item{qda}{\code{signature(x = "IdtGenNSNMANOVA")}: Quadratic Discriminant Analysis using the estimated model parameters.}
+    \item{snda}{\code{signature(x = "IdtLocSNMANOVA")}: Discriminant Analysis using maximum likelihood parameter estimates of SkewNormal mixtures assuming a "location" model (i.e., groups differ only in location parameters).}
+    \item{snda}{\code{signature(x = "IdtLocNSNMANOVA")}: Discriminant Analysis using maximum likelihood parameter estimates of SkewNormal mixtures assuming a "location" model (i.e., groups differ only in location parameters).}
+    \item{snda}{\code{signature(x = "IdtGenSNMANOVA")}: Discriminant Analysis using maximum likelihood parameter estimates of SkewNormal mixtures assuming a general model (i.e., groups differ in all parameters).}
+    \item{snda}{\code{signature(x = "IdtGenNSNMANOVA")}: Discriminant Analysis using maximum likelihood parameter estimates of SkewNormal mixtures assuming a general model (i.e., groups differ in all parameters).}
+   }
+}
+
+\section{Extends}{
+Class \code{"\linkS4class{LRTest}"}, directly.
 }
 
 \author{Pedro Duarte Silva <psilva@porto.ucp.pt>\cr 
@@ -41,8 +69,8 @@ Class \code{"\linkS4class{LRTest}"}, directly.
 Brito, P., Duarte Silva, A. P.  (2012): "Modelling Interval Data with Normal and Skew-Normal Distributions". Journal of Applied Statistics, Volume 39, Issue 1, 3-20.}
 
 \seealso{
-  \code{\link{MANOVA}}, \code{\link{lda}}, 
-\code{\linkS4class{IData}}, \code{\linkS4class{IdtClMANOVA}} , \code{\linkS4class{IdtHetNMANOVA}} 
+  \code{\link{MANOVA}}, \code{\link{lda}}, \code{\link{qda}}, \code{\link{snda}}, \code{\link{Roblda}}, \code{\link{Robqda}}, 
+  \code{\link{RobMxtDEst}}, \code{\linkS4class{IData}} 
 }
 
 \keyword{classes}

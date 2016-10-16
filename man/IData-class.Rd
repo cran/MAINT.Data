@@ -25,15 +25,24 @@
 
 \section{Methods}{
   \describe{
-    \item{head}{\code{signature(x = "IData")}: head S4 method for the IData-class}
-    \item{show}{\code{signature(object = "IData")}: show S4 method for the IData-class}
-    \item{nrow}{\code{signature(x = "IData")}: returns the number of entities}
-    \item{ncol}{\code{signature(x = "IData")}: returns the number of Iterval Variables }
-    \item{tail}{\code{signature(x = "IData")}: tail S4 method for the IData-class }
-    \item{mle}{\code{signature(x = "IData")}: Maximum likelihood estimation}
-    \item{MANOVA}{\code{signature(x = "IData")}: MANOVA tests on the interval-valued data}
-    \item{lda}{\code{signature(x = "IData")}: performs Linear Discriminant Analysis using the estimated model parameters}
-    \item{qda}{\code{signature(x = "IData")}: performs Quadratic Discriminant Analysis using the estimated model parameters} }
+    \item{head}{\code{signature(x = "IData")}: head S4 method for the IData-class.}
+    \item{show}{\code{signature(object = "IData")}: show S4 method for the IData-class.}
+    \item{nrow}{\code{signature(x = "IData")}: returns the number of entities (observations).}
+    \item{ncol}{\code{signature(x = "IData")}: returns the number of Iterval Variables.}
+    \item{show}{\code{signature(object = "IData")}: show S4 method for the IData-class.}
+    \item{tail}{\code{signature(x = "IData")}: tail S4 method for the IData-class.}
+    \item{mle}{\code{signature(x = "IData")}: Maximum likelihood estimation.}
+    \item{fasttle}{\code{signature(x = "IData")}: Fast trimmed maximum likelihood estimation.}
+    \item{fulltle}{\code{signature(x = "IData")}: Exact trimmed maximum likelihood estimation.}
+    \item{mle}{\code{signature(x = "IData")}: Maximum likelihood estimation.}
+    \item{RobMxtDEst}{\code{signature(x = "IData")}: Robust estimation of distribution mixtures for interval-valued data.}
+    \item{MANOVA}{\code{signature(x = "IData")}: MANOVA tests on the interval-valued data.}
+    \item{lda}{\code{signature(x = "IData")}: Linear Discriminant Analysis using maximum likelihood parameter estimates of Gaussian mixtures.}
+    \item{qda}{\code{signature(x = "IData")}: Quadratic Discriminant Analysis using maximum likelihood parameter estimates of Gaussian mixtures.}
+    \item{Roblda}{\code{signature(x = "IData")}: Linear Discriminant Analysis using robust estimates of location and scatter.}
+    \item{Robqda}{\code{signature(x = "IData")}: Quadratic Discriminant Analysis using robust estimates of location and scatter.}
+    \item{snda}{\code{signature(x = "IData")}: Discriminant Analysis using maximum likelihood parameter estimates of SkewNormal mixtures.}
+  }
 }
 
 \author{Pedro Duarte Silva <psilva@porto.ucp.pt>\cr 
@@ -41,13 +50,17 @@
 }
 
 \references{
-Brito, P., Duarte Silva, A. P.  (2012): "Modelling Interval Data with Normal and Skew-Normal Distributions". Journal of Applied Statistics, Volume 39, Issue 1, 3-20.\cr
+Brito, P., Duarte Silva, A. P. (2012), Modelling Interval Data with Normal and Skew-Normal Distributions. \emph{Journal of Applied Statistics} \bold{39}(1), 3--20.\cr
 
-Noirhomme-Fraiture, M., Brito, P. (2011): "Far Beyond the Classical Data Models: Symbolic Data Analysis". Statistical Analysis and Data Mining, Volume 4, Issue 2, 157-170.
+Hadi, A. S. and Luceno, A. (1997), Maximum trimmed likelihood estimators: a unified approach, examples, and algorithms.
+\emph{Computational Statistics and Data Analysis} \bold{25}(3), 251--272.\cr
+
+Noirhomme-Fraiture, M., Brito, P. (2011), Far Beyond the Classical Data Models: Symbolic Data Analysis. \emph{Statistical Analysis and Data Mining} \bold{4}(2), 157--170.
 }
 
 \seealso{
-\code{\link{IData}}, \code{\link{mle}}, \code{\link{MANOVA}}, \code{\link{lda}}, \code{\link{qda}}
+\code{\link{IData}}, \code{\link{mle}}, \code{\link{fasttle}}, \code{\link{fulltle}}, \code{\link{RobMxtDEst}}, 
+\code{\link{MANOVA}}, \code{\link{lda}}, \code{\link{qda}}, \code{\link{Roblda}}, \code{\link{Robqda}}
 }
 
 \keyword{classes}

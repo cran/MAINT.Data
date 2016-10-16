@@ -1,5 +1,6 @@
 \name{IData}
 \alias{IData}
+\alias{is.IData}
 \title{Interval Data objects}
 \description{
 \sQuote{IData} creates IData objects from data frames of interval bounds or MidPoint/LogRange values of the interval-valued observations.
@@ -7,8 +8,8 @@
 
 \usage{
 IData(Data, 
-Seq = c("LbUb_VarbyVar", "MidPLogR_VarbyVar", "AllLb_AllUb",
-"AllMidP_AllLogR"), VarNames=NULL, ObsNames=row.names(Data))
+Seq = c("LbUb_VarbyVar", "MidPLogR_VarbyVar", "AllLb_AllUb", "AllMidP_AllLogR"), 
+VarNames=NULL, ObsNames=row.names(Data))
 }
 
 \arguments{
@@ -24,19 +25,19 @@ Seq = c("LbUb_VarbyVar", "MidPLogR_VarbyVar", "AllLb_AllUb",
   \item{VarNames}{An optional vector of names to be assigned to the Interval-Valued Variables.}
 
   \item{ObsNames}{An optional vector of names assigned to the individual observations.}
+
 }
 
 \details{Objects of type \sQuote{IData}, describe a data set of \sQuote{NObs} observations on \sQuote{NIVar} Interval-Valued variables. This function creates an interval-data object from a data-frame with either the lower and upper bounds of the observed intervals or by their midpoints and log-ranges.}
 
+\seealso{
+  \code{\linkS4class{IData}} 
+}
+
 \keyword{interval data}
 
 \examples{
-
-# Create an Interval-Data object containing the intervals for 899 observations 
-# on the temperatures by quarter in 60 Chinese meteorological stations.
-
 ChinaT <- IData(ChinaTemp[1:8],VarNames=c("T1","T2","T3","T4"))
-
 cat("Summary of the ChinaT IData object:\n")  ; print(summary(ChinaT))
 cat("ChinaT first ant last observations:\n")  
 print(head(ChinaT,n=3))

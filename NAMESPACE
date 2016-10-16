@@ -1,17 +1,32 @@
-import(methods)
-importFrom(utils,head,tail)
-importFrom(stats,coef,predict,nlm,nlminb,optim,pchisq,qnorm,runif,sd,var)
-importFrom(MASS,lda,qda)
-importFrom(miscTools,stdEr)
+useDynLib(MAINT.Data)
 
-export(IData, RepLOptim, DACrossVal)
-exportClasses(IData,IdtE,IdtSngDE,IdtMxE,IdtSngNDE,IdtMxNDE,LRTest,ConfTests,IdtMANOVA,IdtClMANOVA,IdtHetNMANOVA,Idtlda,Idtqda)
+import(stats,methods,Rcpp)
+
+importFrom(utils,head)
+importFrom(utils,tail)
+importFrom(MASS,lda)
+importFrom(MASS,qda)
+importFrom(miscTools,stdEr)
+importFrom(robustbase,h.alpha.n)
+importFrom(robustbase,.MCDcons)
+importFrom(robustbase,.MCDcnp2)
+importFrom(pcaPP,l1median)
+importFrom(sn,zeta)
+importFrom(sn,duplicationMatrix)
+
+importClassesFrom(rrcov,CovControlMcd)
+
+export(IData, RepLOptim, DACrossVal, cnvDPtoCP, cnvCPtoDP, RobEstControl)
+exportClasses(IData, LRTest, ConfTests, RobEstControl, Idtlda, Idtqda, IdtSNlocda, IdtSNgenda, 
+  IdtSngNDE, IdtSngNDRE, IdtMxNDE, IdtMxNDRE, IdtSngSNDE, IdtMxSNDE, IdtSngNandSNDE, IdtMxNandSNDE,
+  IdtMANOVA, IdtClMANOVA, IdtHetNMANOVA, IdtLocSNMANOVA, IdtGenSNMANOVA, IdtLocNSNMANOVA, IdtGenNSNMANOVA
+  )
 exportPattern("*.IData")
-exportMethods(show,summary,head,tail,nrow,ncol,mle,coef,stdEr,testMod,BestModel,MANOVA,lda,qda,predict,testMod)
+exportMethods(show, summary, head, tail, nrow, ncol, mle, fulltle, fasttle, coef, stdEr, vcov, testMod, BestModel,
+  CovCase, MANOVA, H0res, H1res, RobMxtDEst, lda, qda, Roblda, Robqda, snda, predict, testMod, ObsLogLiks)
 
 S3method(print,summaryIData)
 S3method("[",IData)
 S3method("[<-",IData)
 S3method("==",IData)
 S3method("!=",IData)
-
