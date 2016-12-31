@@ -174,6 +174,7 @@ cat("Average global classification error =",mean(glberrors),"\n")
 # in all SkewNormal parameters
 
 cat("Temperatures of China -- SkewNormal general model discriminant analysis results:\n")
+ChinaT.gensnda <- snda(ChinaT,ChinaTemp$GeoReg,Mxt="Gen")
 print(ChinaT.gensnda)
 
 #Estimate error rates by three-fold cross-validation without replication  

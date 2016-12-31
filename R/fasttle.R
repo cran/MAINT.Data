@@ -107,6 +107,7 @@ fasttle1 <-   function(data,CovCase,SelCrit,alpha,nsamp,ncsteps,trace,use.correc
   if (datatype!="IData" && datatype!="matrix" && datatype!="data.frame")  {
     stop("Wrong class for data argument\n")
   }
+  if (alpha <= 0. || alpha >= 1.) stop("wrong value for the alpha argument\n") 
 
   Config <- getConfig(...)
   if (is.null(Config))  
@@ -169,8 +170,12 @@ fasttle1 <-   function(data,CovCase,SelCrit,alpha,nsamp,ncsteps,trace,use.correc
     n <- nrow(X)
     p <- ncol(X)
   }  
+  if (p>=n) 
+    stop("fasttle can only be used when the number of observations is more than twice the number of interval varibles\n")  
 
   k <- robustbase::h.alpha.n(alpha,n,p)
+  if (k>=n) 
+    stop("The value of the trimming argument (alpha) is too small in order to fasttle perform any trimming at all\n")  
     
   c0 <- -0.5*(p*log(2*pi))
   if (SelCrit=="BIC") {

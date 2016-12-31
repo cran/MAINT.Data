@@ -6,7 +6,8 @@ setMethod("fulltle",
   {
     if (!requireNamespace("robustbase",quietly=TRUE)) 
       stop("fulltle needs the robustbase package to work. Please install it\n")
-
+    if (alpha <= 0. || alpha >= 1.) stop("wrong value for the alpha argument\n") 
+  
     SelCrit <- match.arg(SelCrit)
     otpType <- match.arg(otpType)
     CorrF <- match.arg(CorrF)
@@ -37,15 +38,19 @@ setMethod("fulltle",
         Vind <- (p+1):(2*p)
       }
     }
+    if (p>=n) 
+      stop("fulltle can only be used when the number of observations is more than twice the number of interval varibles\n")  
     rownames(X) <- Idt@ObsNames
     k <- robustbase::h.alpha.n(alpha,n,p)
+    if (k>=n) 
+      stop("The value of the trimming argument (alpha) is too small in order to fulltle perform any trimming at all\n")  
     if (CorrF=="smallsmp") dhn <- robustbase::.MCDcons(p,k/n)*robustbase::.MCDcnp2(p,n,alpha)
     else if (CorrF=="consistent") dhn <- robustbase::.MCDcons(p,k/n)
     else if (CorrF=="none") dhn <- 1.
 
     if (!force) {
       maxnCk <- 10000000
-      nCk <- choose(p,k) 
+      nCk <- choose(n,k) 
       if (nCk> maxnCk) stop(paste("fulltle might take too long since",nCk,"different subsets",
                         "need to be evaluated.\nTo proceed anyway set the 'force'",
                         "argument to TRUE, otherwise try the fasttle method instead.\n"))

@@ -1,3 +1,7 @@
+##########  Version 1.0.1  (December 2016) #################
+
+Version 1.0.1 corrects a C++ bug (leading to possible memory leaks) on the implementation of the function fulltle   
+
 ########## Version 1.0.0 (October 2016) ###################
 
 This is a major upgrade of the package with several new features and improvements of

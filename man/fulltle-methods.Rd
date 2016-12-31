@@ -79,10 +79,15 @@ Cars <- IData(CarsData[1:8],Seq="MidPLogR_VarbyVar",
 
 #Display the first and last observations
 
+head(Cars)
+tail(Cars)
+
+\dontrun{
 # Estimate normal distributuion  parameters robustly by full maximum trimmed likelihood, 
 
 CarsTE <- fulltle(Cars)
 cat("Cars data -- normal maximum trimmed likelhiood estimation results:\n")
 print(CarsTE)
+}
 
 }

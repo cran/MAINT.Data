@@ -90,6 +90,8 @@ Subsmplmle <- function(SmplInd,FullData,Config,SelCrit,...)
 
 Rfulltle <- function(Idt,k=ceiling((Idt@NObs+2*Idt@NIVar+1)/2),Config=2,SelCrit=c("BIC","AIC"),force=FALSE,...)
 {
+  if (Idt@NObs>=2*Idt@NIVar) 
+    stop("fulltle can only be used when the number of observations is more than twice the number of interval varibles\n")  
   if (!force)
   {
     maxnCk <- 10000

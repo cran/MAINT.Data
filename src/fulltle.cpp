@@ -20,7 +20,7 @@ SEXP Cfulltle(SEXP X_s, SEXP n_s, SEXP p_s, SEXP k_s, SEXP Cnf_s, SEXP c0_s)
 		}
 		else {
 			int j(k-1);
-			for (;tmpSet[j]==n-(k-j);--j) 
+			for (;j>=0&&tmpSet[j]==n-(k-j);--j) 
 				;
 			if (j<0) break;
 			++tmpSet[j];
