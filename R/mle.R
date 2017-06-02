@@ -431,6 +431,22 @@ setMethod("vcov",
   }
 )
 
+setMethod("mean", signature(x = "IdtNDE"), function(x,...) { coef(x)$mu } )
+setMethod("var", signature(x ="IdtNDE"), function(x) { coef(x)$Sigma } )
+
+setMethod("cor",
+  signature(x ="IdtNDE"),
+  function(x)
+  { 
+    Sig <- coef(x)$Sigma
+    if (length(dim(Sig))==2) {
+      return(cov2cor(Sig))
+    } else if (length(dim(Sig))==3) {
+      return(array(apply(Sig,3,cov2cor),dim=dim(Sig),dimnames=dimnames(Sig)))
+    }
+  }
+)
+
 setMethod("vcov",
   signature(object = "IdtMxNDE"),
   function(object,selmodel=BestModel(object),group=NULL,...)

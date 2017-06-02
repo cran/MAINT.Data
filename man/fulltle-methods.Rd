@@ -18,31 +18,31 @@ Performs maximum trimmed likelihood estimation for interval-valued data using an
 \keyword{trimmed maximum likelihood estimator}
 \keyword{interval data}
 
-\usage{fulltle(Idt, alpha=0.75, reweighted=TRUE, CorrF=c("smallsmp","consistent","none"),
-  outlin=c("MidPandLogR","MidP","LogR"),
-  CovCase=1:4, SelCrit=c("BIC","AIC"),
-  force=FALSE,otpType=c("OnlyEst","SetMD2andEst"), \dots)
+
+\usage{fulltle(Idt, CovCase=1:4, SelCrit=c("BIC","AIC"), alpha=0.75, 
+  use.correction=TRUE, getalpha="TwoStep", 
+  rawMD2Dist=c("ChiSq","HardRockeAsF","HardRockeAdjF"),
+  MD2Dist=c("ChiSq","CerioliBetaF"),
+  eta=0.025,multiCmpCor=c("never","always","iterstep"),    
+  outlin=c("MidPandLogR","MidP","LogR"), reweighted=TRUE, 
+  otpType=c("OnlyEst","SetMD2andEst"), force=FALSE, \dots)
 }
 
 \arguments{
     \item{Idt}{An IData object representing interval-valued entities.}
-
-    \item{alpha}{Numeric parameter controlling the size of the subsets over which the trimmed likelihood is maximized; roughly alpha*Idt@NIVar observations are used for computing the trimmed likelihood. Allowed values are between 0.5 and 1.}
-
-    \item{reweighted}{Should a (Re)weighted estimate of the covariance matrix be used in the computation of the trimmed likelihood or just a \dQuote{raw} covariance estimate; default is (Re)weighting.}
-
-    \item{CorrF}{Whether to use sample correction factors for the covariance estimates; options are \dQuote{smallsmp} (default), for small sample correction, \dQuote{consistent}, for consistency correction and \dQuote{none} for no correction.}
-
-    \item{outlin}{The type of outliers to be consideres. \dQuote{MidPandLogR} if outliers may be present in both MidPpoints and LogRanges, \dQuote{MidP} if outliers are only present in MidPpoints, or \dQuote{LogR} if outliers are only present in LogRanges.}
-
     \item{CovCase}{Configuration of the variance-covariance matrix: a set of integers between 1 and 4.}
-
     \item{SelCrit}{The model selection criterion.}
-
-    \item{force}{A boolean flag indicating whether, for moderate or large data sets the algorithm should proceed anyway, regardless of an expected long excution time, due to exponential explosions in the number of different subsets that need to be avaluated by fulltle}
-
+    \item{alpha}{Numeric parameter controlling the size of the subsets over which the trimmed likelihood is maximized; roughly alpha*Idt@NIVar observations are used for computing the trimmed likelihood. Allowed values are between 0.5 and 1.}
+    \item{use.correction}{whether to use finite sample correction factors; defaults to \code{TRUE}.}
+    \item{getalpha}{Argument specifying if the \sQuote{alpha} parameter (roughly the percentage of the sample used for computing the trimmed likelihood) should be estimated from the data, or if the value of the argument \sQuote{alpha} should be used instead. When set to \dQuote{TwoStep}, \sQuote{alpha} is estimated by a two-step procedure with the value of argument \sQuote{alpha} specifying the size of the samples used in the first step. Otherwise, with the value of argument \sQuote{alpha} is used directly.}   
+    \item{rawMD2Dist}{The assumed reference distribution of the raw MCD squared distances, which is used to find to cutoffs defining the observations kept in one-step reweighted MCD estimates. Alternatives are \sQuote{ChiSq}, \sQuote{HardRockeAsF} and \sQuote{HardRockeAdjF}, respectivelly for the usual Qui-squared, and the asymptotic and adjusted scaled F distributions proposed by Hardin and Rocke (2005).}    
+    \item{MD2Dist}{The assumed reference distributions used to find cutoffs defining the observations assumed as outliers. Alternatives are \dQuote{ChiSq} and \dQuote{CerioliBetaF} respectivelly for the usual Qui-squared, and the Beta and F distributions proposed by Cerioli (2010).}    
+    \item{eta}{Nominal size of the null hypothesis that a given observation is not an outlier. Defines the raw MCD Mahalanobis distances cutoff used to choose the observations kept in the reweightening step.}
+    \item{multiCmpCor}{Whether a multicomparison correction of the nominal size (eta) for the outliers tests should be performed. Alternatives are: \sQuote{never} -- ignoring the multicomparisons and testing all entities at \sQuote{eta}. \sQuote{always} -- testing all n entitites at 1.- (1.-\sQuote{eta}^(1/n); and \sQuote{iterstep} -- as sugested by Cerioli (2010), make an initial set of tests using the nominal size 1.- (1-\sQuote{eta}^(1/n), and if no outliers were detected stop. Otherwise, make a second step testing for outliers at \sQuote{eta}. }   
+    \item{outlin}{The type of outliers to be consideres. \dQuote{MidPandLogR} if outliers may be present in both MidPpoints and LogRanges, \dQuote{MidP} if outliers are only present in MidPpoints, or \dQuote{LogR} if outliers are only present in LogRanges.}
+    \item{reweighted}{should a (Re)weighted estimate of the covariance matrix be used in the computation of the trimmed likelihood or just a \dQuote{raw} covariance estimate; default is (Re)weighting.}
     \item{otpType}{The amount of output returned by fulltle. Current options are \dQuote{OnlyEst} (default) where only an \sQuote{IdtE} object with the fulltle estimates is returned and \dQuote{SetMD2andEst} which returns a list with an \sQuote{IdtE} object of fulltle estimates, a vector with the final trimmed subset elements used to compute these estimates and the corresponding robust squared Mahalanobis distances.}
-
+    \item{force}{A boolean flag indicating whether, for moderate or large data sets the algorithm should proceed anyway, regardless of an expected long excution time, due to exponential explosions in the number of different subsets that need to be avaluated by fulltle}
     \item{\dots}{Further arguments to be passed to internal functions of \sQuote{fulltle}.} 
 }
 
@@ -53,16 +53,25 @@ If argument \sQuote{otpType} is set to \dQuote{OnlyEst}, an object of class \sQu
 If argument \sQuote{otpType} is set to \dQuote{SetMD2andEst} a list with the following components:
 
 \item{sol}{An object of class \sQuote{IdtE} with the fulltle estimates, their log-likelihood values, and the value of the comparison criterion used to select the covariance configurations.} 
-\item{Set}{A vector with the final trimmed subset elements used to compute the fulltle estimates.} 
+\item{RewghtdSet}{A vector with the final trimmed subset elements used to compute the fasttle estimates.} 
 \item{RobMD2}{A vector with the robust squared Mahalanobis distances used to select the trimmed subset.} 
+\item{cnp2}{A vector of length two containing the consistency correction factor and the finite sample correction factor of the final estimate of the covariance matrix.}
+\item{raw.cov}{A matrix with the raw MCD estimator used to compute the robust squared Mahalanobis distances of RobMD2.} 
+\item{raw.cnp2}{A vector of length two containing the consistency correction factor and the finite sample correction factor of the raw estimate of the covariance matrix.}
 
 } 
 
 \references{
 Brito, P., Duarte Silva, A. P. (2012), Modelling Interval Data with Normal and Skew-Normal Distributions. \emph{Journal of Applied Statistics} \bold{39}(1), 3--20.\cr
 
+Cerioli, A. (2010), Multivariate Outlier Detection with High-Breakdown Estimators.
+\emph{Journal of the American Statistical Association} \bold{105} (489), 147--156. 
+
 Hadi, A. S. and Luceno, A. (1997), Maximum trimmed likelihood estimators: a unified approach, examples, and algorithms.
 \emph{Computational Statistics and Data Analysis} \bold{25}(3), 251--272.\cr
+
+Hardin, J. and Rocke, A. (2005), The Distribution of Robust Distances.
+\emph{Journal of Computational and Graphical Statistics} \bold{14}, 910--927.\cr
 }
 
 
@@ -74,20 +83,14 @@ Hadi, A. S. and Luceno, A. (1997), Maximum trimmed likelihood estimators: a unif
 # Create an Interval-Data object containing the intervals for characteristics 
 # of 27 cars models.
 
-Cars <- IData(CarsData[1:8],Seq="MidPLogR_VarbyVar",
-  VarNames=c("Price","EngineCapacity","TopSpeed","Acceleration"))
+CarsIdt <- IData(Cars[1:8],VarNames=c("Price","EngineCapacity","TopSpeed","Acceleration"))
 
 #Display the first and last observations
 
-head(Cars)
-tail(Cars)
-
-\dontrun{
 # Estimate normal distributuion  parameters robustly by full maximum trimmed likelihood, 
 
-CarsTE <- fulltle(Cars)
+CarsTE <- fulltle(CarsIdt)
 cat("Cars data -- normal maximum trimmed likelhiood estimation results:\n")
 print(CarsTE)
-}
 
 }

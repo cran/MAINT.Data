@@ -37,7 +37,11 @@ setClass("RobEstControl",
   slots=c(
     ncsteps="numeric",
     getalpha="character",
-		getkdblstar="character",
+    rawMD2Dist="character",				
+    MD2Dist="character",
+    eta="numeric",
+    multiCmpCor="character",				
+    getkdblstar="character",
     outlin="character",
     trialmethod="character",
     m="numeric",
@@ -47,6 +51,10 @@ setClass("RobEstControl",
   prototype = list(
     ncsteps=200,
     getalpha = "TwoStep75",
+    rawMD2Dist="ChiSq",				
+    MD2Dist="ChiSq",
+    eta=0.025,
+    multiCmpCor="never",				
     getkdblstar="Twopplusone",
     outlin="MidPandLogR",
     trialmethod="simple",
@@ -59,6 +67,11 @@ setClass("RobEstControl",
 
 setGeneric("nrow")
 setGeneric("ncol")
+setGeneric("rownames")
+setGeneric("colnames")
+setGeneric("var")
+setGeneric("cor")
+setGeneric("mean",signature="x")
 setGeneric("summary",signature="object")
 setGeneric("head",package="utils",signature="x")
 setGeneric("tail",package="utils",signature="x")
@@ -84,10 +97,12 @@ setGeneric("snda",function(x, grouping, prior="proportions", ...) standardGeneri
 setGeneric("ObsLogLiks",function(object,Idt,Conf=object@BestModel) standardGeneric("ObsLogLiks"))
 
 setGeneric("fulltle",
-  function(Idt, alpha=0.75, reweighted=TRUE, CorrF=c("smallsmp","consistent","none"),
-    outlin=c("MidPandLogR","MidP","LogR"),
-    CovCase=1:4, SelCrit=c("BIC","AIC"), force=FALSE, otpType=c("OnlyEst","SetMD2andEst"), ... )
+  function(Idt, CovCase=1:4, SelCrit=c("BIC","AIC"), alpha=0.75, use.correction=TRUE, getalpha="TwoStep", 
+    rawMD2Dist=c("ChiSq","HardRockeAsF","HardRockeAdjF"), MD2Dist=c("ChiSq","CerioliBetaF"),
+    eta=0.025,multiCmpCor=c("never","always","iterstep"), outlin=c("MidPandLogR","MidP","LogR"), reweighted=TRUE, 
+    otpType=c("OnlyEst","SetMD2andEst"), force=FALSE, ...)
   standardGeneric("fulltle"))
+
 setGeneric("fasttle",
   function(Idt,
     CovCase=1:4,
@@ -99,6 +114,10 @@ setGeneric("fasttle",
     use.correction=control@use.correction,
     ncsteps=control@ncsteps,
     getalpha=control@getalpha,
+    rawMD2Dist=control@rawMD2Dist,				
+    MD2Dist=control@MD2Dist,
+    eta=control@eta,
+    multiCmpCor=control@multiCmpCor,				
     getkdblstar=control@getkdblstar,
     outlin=control@outlin,
     trialmethod=control@trialmethod,
@@ -107,6 +126,7 @@ setGeneric("fasttle",
     otpType=control@otpType,
     control=RobEstControl(), ...)
   standardGeneric("fasttle"))
+
 setGeneric("RobMxtDEst",
   function(Idt,grouping,Mxt=c("Hom","Het"),CovEstMet=c("Pooled","Globdev"),
     CovCase=1:4,SelCrit=c("BIC","AIC"),Robcontrol=RobEstControl(), l1medpar=NULL, ...)

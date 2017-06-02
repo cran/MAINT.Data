@@ -36,7 +36,7 @@
   \item{\dots}{ Additional arguments for method functions.}
 }
 
-\value{For the \dQuote{IdtNDE}, \dQuote{IdtSNDE} and \dQuote{IdtSNDE} methods: a matrix of the estimated covariances between the parameter estimates. For the \dQuote{IdtMxNDE}, and \dQuote{IdtMxSNDE} methods: if argument \dQuote{group} is set to NULL, a three-dimensional array with a matrix of the estimated covariances between the parameter estimates for each group at each level of the third dimension. If argument \dQuote{group} is set to an integer, the matrix with the estimated covariances between the parameter estimates, for the group chosen.}
+\value{For the \dQuote{IdtNDE}, \dQuote{IdtSNDE} and \dQuote{IdtSNDE} methods, or \dQuote{IdtMxNDE}, \dQuote{IdtMxSNDE} methods with slot \dQuote{Hmcdt} equal to TRUE: a matrix of the estimated covariances between the parameter estimates. For the \dQuote{IdtMxNDE}, and \dQuote{IdtMxSNDE} methods with slot \dQuote{Hmcdt} equal to FALSE: if argument \dQuote{group} is set to NULL, a three-dimensional array with a matrix of the estimated covariances between the parameter estimates for each group at each level of the third dimension. If argument \dQuote{group} is set to an integer, the matrix with the estimated covariances between the parameter estimates, for the group chosen.}
 
 \seealso{
   \code{\link{stdEr}} 

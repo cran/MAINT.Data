@@ -8,8 +8,8 @@
 
 \section{Slots}{
   \describe{
-    \item{\code{mleNmuE}:}{Matrix with the maximum likelihood mean vectors estimates}
-    \item{\code{mleNmuEse}:}{Matrix with the maximum likelihood means' standard errors  by group}
+    \item{\code{mleNmuE}:}{Vector with the maximum likelihood mean vectors estimates}
+    \item{\code{mleNmuEse}:}{Vector with the maximum likelihood means' standard errors}
     \item{\code{CovConfCases}:}{List of the considered configurations}
     \item{\code{ModelNames}:}{Inherited from class \code{"IdtE"}. The model acronym formed by a "N", indicating a Normal model, followed by the configuration (Case 1 through Case 4)}
     \item{\code{ModelType}:}{Inherited from class \code{"IdtE"}. Indicates the model; always set to "Normal" in objects of the "IdtSngNDE" class}    

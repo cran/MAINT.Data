@@ -89,6 +89,22 @@ setMethod("vcov",
   }
 )
 
+setMethod("mean", signature(x = "IdtSNDE"), function(x,...) { coef(x)$mu } )
+setMethod("var", signature(x ="IdtSNDE"), function(x) { coef(x)$Sigma } )
+
+setMethod("cor",
+  signature(x ="IdtSNDE"),
+  function(x)
+  { 
+    Sig <- coef(x)$Sigma
+    if (length(dim(Sig))==2) {
+      return(cov2cor(Sig))
+    } else if (length(dim(Sig))==3) {
+      return(array(apply(Sig,3,cov2cor),dim=dim(Sig),dimnames=dimnames(Sig)))
+    }
+  }
+)
+
 setMethod("coef",
   signature(object = "IdtNandSNDE"),
   function(object,selmodel=BestModel(object),ParType=c("Centr","Direct","All"),...)
@@ -125,3 +141,23 @@ setMethod("vcov",
     }
   }
 )
+
+setMethod("mean", signature(x = "IdtNandSNDE"), function(x,...) { coef(x)$mu } )
+setMethod("var", signature(x ="IdtNandSNDE"), function(x) { coef(x)$Sigma } )
+
+setMethod("cor",
+  signature(x ="IdtNandSNDE"),
+  function(x)
+  { 
+    Sig <- coef(x)$Sigma
+    if (length(dim(Sig))==2) {
+      return(cov2cor(Sig))
+    } else if (length(dim(Sig))==3) {
+      return(array(apply(Sig,3,cov2cor),dim=dim(Sig),dimnames=dimnames(Sig)))
+    }
+  }
+)
+
+
+
+

@@ -1,4 +1,4 @@
-useDynLib(MAINT.Data)
+useDynLib(MAINT.Data,.registration=TRUE)
 
 import(stats,methods,Rcpp)
 
@@ -16,14 +16,14 @@ importFrom(sn,duplicationMatrix)
 
 importClassesFrom(rrcov,CovControlMcd)
 
-export(IData, RepLOptim, DACrossVal, cnvDPtoCP, cnvCPtoDP, RobEstControl)
+export(IData, RepLOptim, DACrossVal, cnvDPtoCP, cnvCPtoDP, RobEstControl, MCDcnp2, MCDRewcnp2, qHardRoqF, getIdtOutl)
 exportClasses(IData, LRTest, ConfTests, RobEstControl, Idtlda, Idtqda, IdtSNlocda, IdtSNgenda, 
   IdtSngNDE, IdtSngNDRE, IdtMxNDE, IdtMxNDRE, IdtSngSNDE, IdtMxSNDE, IdtSngNandSNDE, IdtMxNandSNDE,
   IdtMANOVA, IdtClMANOVA, IdtHetNMANOVA, IdtLocSNMANOVA, IdtGenSNMANOVA, IdtLocNSNMANOVA, IdtGenNSNMANOVA
   )
 exportPattern("*.IData")
-exportMethods(show, summary, head, tail, nrow, ncol, mle, fulltle, fasttle, coef, stdEr, vcov, testMod, BestModel,
-  CovCase, MANOVA, H0res, H1res, RobMxtDEst, lda, qda, Roblda, Robqda, snda, predict, testMod, ObsLogLiks)
+exportMethods(show, summary, head, tail, nrow, ncol, rownames, colnames, mle, fulltle, fasttle, coef, stdEr, vcov, var, cor, 
+  testMod, BestModel, CovCase, MANOVA, H0res, H1res, RobMxtDEst, lda, qda, Roblda, Robqda, snda, predict, testMod, ObsLogLiks)
 
 S3method(print,summaryIData)
 S3method("[",IData)

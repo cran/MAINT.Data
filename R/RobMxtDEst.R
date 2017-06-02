@@ -138,9 +138,9 @@ setMethod("RobMxtDEst",
         for (g in 1:ngrps)
         {
           if (Mxt=="Hom")  {
-            nOtls <- nOtls + MDOtlDet(X[grouping==grplvls[g],],RobNmuE[g,],CovConfC[[bestmod]]$RobSigE,0.025,onlycnt=TRUE) 
+            nOtls <- nOtls + MDOtlDet(X[grouping==grplvls[g],],RobNmuE[g,],CovConfC[[bestmod]]$RobSigE,0.025,otp="onlycnt") 
           } else if (Mxt=="Het") {
-            nOtls <- nOtls + MDOtlDet(X[grouping==grplvls[g],],RobNmuE[g,],CovConfC[[bestmod]]$RobSigE[,,g],0.025,onlycnt=TRUE) 
+            nOtls <- nOtls + MDOtlDet(X[grouping==grplvls[g],],RobNmuE[g,],CovConfC[[bestmod]]$RobSigE[,,g],0.025,otp="onlycnt") 
           }
         }
         alpha <- 1.-nOtls/n

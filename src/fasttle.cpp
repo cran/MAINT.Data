@@ -44,7 +44,8 @@ SEXP Cfasttle(SEXP X_s, SEXP n_s, SEXP p_s, SEXP Poolm_s, SEXP m_s, SEXP kdblsta
 		trlsolSet.resize(trsolSetsize);
 	}
  
-	NumericVector RepSteps(nrep), RepLogLik(nrep);
+	NumericVector RepLogLik(nrep);
+	IntegerVector RepSteps(nrep);
 	NumericMatrix StpLogLik(nrep,maxrefstps), *StpLogLikpt;
 	if (ClctSt)  {
 		fill(StpLogLik.begin(),StpLogLik.end(),NumericVector::get_na());
@@ -67,10 +68,15 @@ SEXP Cfasttle(SEXP X_s, SEXP n_s, SEXP p_s, SEXP Poolm_s, SEXP m_s, SEXP kdblsta
 		}
 	}
 
-	if (!ClctSt)  return List::create(Named("LogLik")=bestloglik,Named("Set")=bestSet);
+	if (!ClctSt)  return List::create(
+			Named("LogLik")=bestloglik,
+			Named("Set")=bestSet,
+			Named("raw.cov") = tmpsol.SigmaE()
+		);
 	else  return List::create(
 			Named("LogLik")=bestloglik,
 			Named("Set")=bestSet,
+                        Named("raw.cov") = tmpsol.SigmaE(),
 			Named("RepSteps")=RepSteps,
 			Named("RepLogLik")=RepLogLik,
 			Named("StpLogLik")=StpLogLik

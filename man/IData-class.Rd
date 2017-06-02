@@ -29,6 +29,8 @@
     \item{show}{\code{signature(object = "IData")}: show S4 method for the IData-class.}
     \item{nrow}{\code{signature(x = "IData")}: returns the number of entities (observations).}
     \item{ncol}{\code{signature(x = "IData")}: returns the number of Iterval Variables.}
+    \item{rownames}{\code{signature(x = "IData")}: returns the row (entity) names for an object of class IData.}
+    \item{colnames}{\code{signature(x = "IData")}: returns column (variable) names for an object of class IData.}
     \item{show}{\code{signature(object = "IData")}: show S4 method for the IData-class.}
     \item{tail}{\code{signature(x = "IData")}: tail S4 method for the IData-class.}
     \item{mle}{\code{signature(x = "IData")}: Maximum likelihood estimation.}

@@ -14,11 +14,14 @@
 \alias{show,IData-method}
 \alias{nrow,IData-method}
 \alias{ncol,IData-method}
+\alias{rownames,IData-method}
+\alias{colnames,IData-method}
 
 \alias{CovCase-methods}
 \alias{CovCase}
 
 \alias{MCDcnp2}
+\alias{MCDRewcnp2}
 \alias{C1CPgrad}
 \alias{C1CovPar}
 \alias{C2CPgrad}
@@ -97,6 +100,8 @@
 \alias{dvecind}
 \alias{error}
 \alias{fasttle1}
+\alias{fulltle1}
+\alias{GetMD2}
 \alias{fL}
 \alias{fL.grad}
 \alias{fL2}
@@ -160,6 +165,10 @@
 \alias{msn.dp2cp} 
 \alias{msn.moment.fit}
 \alias{mysn.infoMv}
+
+\alias{casy}
+\alias{CHmasy}
+\alias{HDmpred}
 
 \title{Operators, functions and other Internal MAINT.Data objects.}
 \description{Internal MAINT.Data objects.}

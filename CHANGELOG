@@ -1,8 +1,21 @@
-##########  Version 1.0.1  (December 2016) #################
+########## Version 1.1.0 (June 2017) ###################
 
-Version 1.0.1 corrects a C++ bug (leading to possible memory leaks) on the implementation of the function fulltle   
+The following changes were made in Version 1.1.0 of R package MAINT.Data:
 
-########## Version 1.0.0 (October 2016) ###################
+
+1)  The routines for robust estimation and outlier detection were improved and
+    made more flexible. In particular, Version 1.1.0 implements a novel enhanced
+    method for finding bias correction factors for the re-weighted MCD estimator,
+    and adds the function getIdtOutl, that tries to indentify outliers comparing
+    robust Mahalanobis distances with quantiles either from asymptotic chi-square 
+    distribtuions, or from F and Beta approximations that, according to the literature
+    may work better in finite samples.   
+
+2)  The methods rownames and colnames were added to the class IData, and methods
+    var, cor (returning respectivelly matrices of variance-covariance and correlation
+    estimates) were added to all classes derived from the class IdtE. 
+
+########## Versions 1.0.0 and 1.0.1 (October 2016) ###################
 
 This is a major upgrade of the package with several new features and improvements of
 the existing code. The two main extensions of version 1.0.0 are:

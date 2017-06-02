@@ -99,7 +99,8 @@ void msnCP_ll_grad(const NumericVector& mu1, const NumericMatrix& beta2k, const 
 	double lRdet;
 	if ( !pdsolve<SQMATTP>(Sigma,SigmaI,&lRdet) || lRdet < -std::numeric_limits<double>::max() )
 	{
-		warning("Non-positive definite covariance matrix found during gradient computations (which returned 0).\n");
+//		warning("Non-positive definite covariance matrix found during gradient computations (which returned 0).\n");
+		Rprintf("warning: Non-positive definite covariance matrix found during gradient computations (which returned 0).\n");
 		for (int i=0;i<ngradpar;i++) CPgrad(i) = 0.;
 		return;
 	}
@@ -137,8 +138,9 @@ void msnCP_ll_grad(const NumericVector& mu1, const NumericMatrix& beta2k, const 
 	Omega = Sigma+mu0OtP;
 	double logDet;
 	if (!pdsolve<SQMATTP>(Omega,OmegaInv,&logDet)) {
-		warning("Non-positive definite Omega matrix found during gradient computations (which returned 0).\n");
-		for (int i=0;i<p;i++) CPgrad(i) = 0.;
+//		warning("Non-positive definite Omega matrix found during gradient computations (which returned 0).\n");
+	  Rprintf("warning: Non-positive definite Omega matrix found during gradient computations (which returned 0).\n");
+	  for (int i=0;i<p;i++) CPgrad(i) = 0.;
 		return;
 	}
 	for (int i=0;i<p;i++)  {

@@ -12,9 +12,12 @@ Brito, P., Duarte Silva, A. P. (2012), Modelling Interval Data with Normal and S
 
 \section{Methods}{
   \describe{
-    \item{coef}{\code{signature(coef = "IdtSNDE")}: extracts parameter estimates from objects of type IdtSNDE.}
-    \item{stdEr}{\code{signature(x = "IdtSNDE")}: extracts standard errors from objects of type IdtSNDE.}
-    \item{vcov}{\code{signature(x = "IdtSNDE")}: extracts an asymptotic estimate of the variance-covariance matrix of the paramenters estimators for objects of type IdtNDE.}
+    \item{coef}{\code{signature(coef = "IdtSNDE")}: extracts parameter estimates from objects of type IdtSNDE}
+    \item{stdEr}{\code{signature(x = "IdtSNDE")}: extracts standard errors from objects of type IdtSNDE}
+    \item{vcov}{\code{signature(x = "IdtSNDE")}: extracts an asymptotic estimate of the variance-covariance matrix of the paramenters estimators for objects of type IdtSNDE}
+    \item{mean}{\code{signature(x = "IdtSNDE")}: extracts the mean vector estimate from objects of type IdtSNDE}
+    \item{var}{\code{signature(x = "IdtSNDE")}: extracts the variance-covariance matrix estimate from objects of type IdtSNDE}
+    \item{cor}{\code{signature(x = "IdtSNDE")}: extracts the correlation matrix estimate from objects of type IdtSNDE}
  }
 }
 

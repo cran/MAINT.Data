@@ -70,8 +70,6 @@ Rfasttle <- function(Idt,kdblstar=2*Idt@NIVar+1,k=ceiling((Idt@NObs+2*Idt@NIVar+
   trialmethod <- match.arg(trialmethod)
   n <- Idt@NObs	
   p <- 2*Idt@NIVar
-  if (p>=n) 
-    stop("fasttle can only be used when the number of observations is more than twice the number of interval varibles\n")  
   c0 <- -0.5*(p*log(2*pi))
   bestsol <- NULL
   for (rep in 1:nrep)  {

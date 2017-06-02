@@ -24,8 +24,8 @@ Methods for (M)ANOVA and Discriminant Analysis (Duarte Silva and Brito (2015)) o
 \tabular{ll}{
 Package: \tab MAINT.Data\cr
 Type: \tab Package\cr
-Version: \tab 1.0.1\cr
-Date: \tab 2016-12-29\cr
+Version: \tab 1.1.0\cr
+Date: \tab 2017-06-02\cr
 License: \tab GPL-2\cr
 LazyLoad: \tab yes\cr
 LazyData: \tab yes\cr
@@ -146,17 +146,16 @@ print(predict(ChinaWT.rqda,ChinaWT)$class)
 # Create an Interval-Data object containing the intervals for characteristics 
 # of 27 cars models.
 
-Cars <- IData(CarsData[1:8],Seq="MidPLogR_VarbyVar",
-  VarNames=c("Price","EngineCapacity","TopSpeed","Acceleration"))
+CarsIdt <- IData(Cars[1:8],VarNames=c("Price","EngineCapacity","TopSpeed","Acceleration"))
 
 #Display the first and last observations
 
-head(Cars)
-tail(Cars)
+head(CarsIdt)
+tail(CarsIdt)
 
 # Estimate normal distributuion parameters 
 
-CarsNE <- mle(Cars)
+CarsNE <- mle(CarsIdt)
 cat("Cars data -- normal maximum likelhiood estimation results:\n")
 print(CarsNE)
 cat("Standard Errors of Estimators:\n") ; print(stdEr(CarsNE))
@@ -164,13 +163,13 @@ cat("Standard Errors of Estimators:\n") ; print(stdEr(CarsNE))
 # Estimate normal distributuion  parameters robustly by full maximum trimmed likelihood, 
 
 \dontrun{
-CarsTE <- fulltle(Cars)
+CarsTE <- fulltle(CarsIdt)
 cat("Cars data -- normal maximum trimmed likelhiood estimation results:\n")
 print(CarsTE)
 
 # Estimate parameters searching through normal and Skew-Normal distributions.
 
-CarsNSNE <- mle(Cars,Model="NrmandSKN")
+CarsNSNE <- mle(CarsIdt,Model="NrmandSKN")
 cat("Cars data  -- Maximum likelhiood estimation results:\n")
 print(CarsNSNE)
 cat("Standard Errors of Estimators:\n") ; print(stdEr(CarsNSNE))
