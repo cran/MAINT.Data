@@ -1,13 +1,10 @@
+#include "tle.h"
+#include "msnCP_dev.h"
+
 #include <R.h>
 #include <Rinternals.h>
 #include <stdlib.h> // for NULL
 #include <R_ext/Rdynload.h>
-
-/* .Call calls */
-extern SEXP Cfasttle(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
-extern SEXP Cfulltle(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
-extern SEXP msnCP_dev(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
-extern SEXP msnCP_dev_grad(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 
 static const R_CallMethodDef CallEntries[] = {
   {"Cfasttle",       (DL_FUNC) &Cfasttle,       12},

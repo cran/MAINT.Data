@@ -1,5 +1,5 @@
-90589ef5de26683dea52c7e2dbf164d7 *CHANGELOG
-4c39d3044e8562f142b3f9144fdeb171 *DESCRIPTION
+3f782999bf5d3bf2e422610f97c20590 *CHANGELOG
+9c602a261a772272f1d5ca0d3327d414 *DESCRIPTION
 a3eecf426704cbfb0e01572a63b2bc75 *NAMESPACE
 2e3889cb61efdcdbc73b1d8aa323b52e *R/Azzalini_sn_code.R
 522814a14c239342aef323af47236429 *R/CPLogLik.grads.R
@@ -62,7 +62,7 @@ a1d9c98446049b804b431266da6ecebb *man/IdtSngNandSNDE-class.Rd
 627076ec9986098b84eb8d4e0890af25 *man/Idtqda-class.Rd
 844af750b9e466a7d513c3466ae01541 *man/LRTest-class.Rd
 bd4d23f4d72a650e80a83cb335acd115 *man/MAINT.Data-internal.Rd
-7744e408c1621bcc327e41d415602404 *man/MAINT.Data-package.Rd
+663788dbdda97d1675ab34a3c3b36d78 *man/MAINT.Data-package.Rd
 e603bf917f4403897946534af5aaa762 *man/MANOVA-methods.Rd
 727a415bf986a61e227833cf40c21869 *man/RepLOptim.Rd
 2c2d3e578501f894bcc88ea4a9fe849a *man/RobEstControl-class.Rd
@@ -87,12 +87,12 @@ c5b2e716d08ec4cd3ef7ca9d7efa897a *src/AuxTmplFoo.cpp
 d57663a96a71f3a3b769c2eb82664095 *src/EigenTmplFoo.cpp
 9fa6e6def6157ed2469e2837274514e5 *src/fasttle.cpp
 ebca671bc7e00e5d8d8f925c1393b5ef *src/fulltle.cpp
-7aaafcc72f8041f76d5dfac811ef6210 *src/init.c
 0990ff4d04088240641726b667790e62 *src/msnCP_Aux.cpp
 48ed8ba98a0a4ceff63e5662d4fdea58 *src/msnCP_Aux.h
 5c11ab83cc0d5c030939af12966370b0 *src/msnCP_dev.cpp
 79bb6f4dbdb328e2aaf3a948b51be545 *src/msnCP_dev.h
 48d2137cbe325cbd4d3fb33a149fc1a9 *src/msnCP_dev_grad.cpp
+67ccdab6358e9c80ec101e17cb7f3e1b *src/registerDynamicSimbol.cpp
 6cd8c3010b48590a8996391bcd9aeb8e *src/sampleint.cpp
 7d1105136cb64bea7bdd5476b23549ee *src/sampleint.h
-8f9fc11264dc01b19326d0d0d0f17666 *src/tle.h
+0e441f7914c04300dc43f2d78d436feb *src/tle.h

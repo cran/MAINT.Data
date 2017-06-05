@@ -1,6 +1,6 @@
-########## Version 1.1.0 (June 2017) ###################
+########## Version 1.1.0 and 1.1.1 (June 2017) ###################
 
-The following changes were made in Version 1.1.0 of R package MAINT.Data:
+The following changes were made in versions 1.1.0 and 1.1.1 of R package MAINT.Data:
 
 
 1)  The routines for robust estimation and outlier detection were improved and

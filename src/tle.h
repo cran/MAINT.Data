@@ -26,4 +26,11 @@ class Estimate {
 		double logLik_;		
 };
 
+RcppExport SEXP Cfasttle(SEXP X_s, SEXP n_s, SEXP p_s, SEXP Poolm_s, SEXP m_s, SEXP kdblstar_s, SEXP k_s, SEXP nrep_s,
+	SEXP Cnf_s, SEXP c0_s, SEXP maxrefstps_s, SEXP ClctSt_s);
+
+RcppExport SEXP Cfulltle(SEXP X_s, SEXP n_s, SEXP p_s, SEXP k_s, SEXP Cnf_s, SEXP c0_s);
+
+
+
 #endif
