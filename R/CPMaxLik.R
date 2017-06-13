@@ -39,7 +39,8 @@ SNCMaxLik <- function(Data, Config, grouping=NULL, initpar=NULL, prevMod=NULL,
     gamma1 <- ifelse(abs(prevMod$gamma1)<maxsk,prevMod$gamma1,sign(prevMod$gamma1)*maxsk)
     mu0 <- sqrt(diag(Sigma)) * sign(gamma1)*(2*abs(gamma1)/(4.-pi))^(1/3) 
     Beta02 <- mu0 %*% drop(SigmaI %*% mu0)
-    if (Beta02 > ulBeta02) gamma1 <- gamma1 * sqrt(ulBeta02/Beta02)^3 
+#    if (Beta02 > ulBeta02) gamma1 <- gamma1 * sqrt(ulBeta02/Beta02)^3 
+    if (Beta02 > ulBeta02) gamma1 <- gamma1 * rep(sqrt(ulBeta02/Beta02)^3,length(gamma1)) 
     if ( is.null(grouping) ) {
       prevModinitpar <- c(prevMod$mu,Spar,gamma1)
     }  else  {

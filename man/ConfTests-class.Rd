@@ -12,12 +12,12 @@ the four alternative variance-covariance matrix configurations.}
 
 \section{Slots}{
   \describe{
-    \item{\code{TestRes}:}{List of test results; each element is an object of type LRTest, with the following components: \cr \cr
-        QuiSq: Value of the Qui-Square statistics corresponding to the performed test. \cr
-        df: Degrees of freedom of the Qui-Square statistics. \cr
-        pvalue: p-value of the Qui-Square statistics value, obtained from the Qui-Square distribution with df degrees of freedom. \cr
-        H0logLik: Logarithm of the Likelihood function under the null hypothesis. \cr
-        H1logLik: Logarithm of the Likelihood function under the alternative hypothesis. \cr
+    \item{\code{TestRes}:}{List of test results; each element is an object of class LRTest, with the following components: \cr \cr
+        \bold{QuiSq}: Value of the Qui-Square statistics corresponding to the performed test. \cr
+        \bold{df}: Degrees of freedom of the Qui-Square statistics. \cr
+        \bold{pvalue}: p-value of the Qui-Square statistics value, obtained from the Qui-Square distribution with df degrees of freedom. \cr
+        \bold{H0logLik}: Logarithm of the Likelihood function under the null hypothesis. \cr
+        \bold{H1logLik}: Logarithm of the Likelihood function under the alternative hypothesis. \cr
     }
     \item{\code{RestModels}:}{The restrited model (corresponding to the null hypothesis)}
     \item{\code{FullModels}:}{The full model (corresponding to the alternative hypothesis)}

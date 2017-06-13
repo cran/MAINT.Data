@@ -6,34 +6,39 @@ double loglik(const NumericMatrix& X,const int n,const int p,const int Cnf,
 RcppExport
 SEXP Cfulltle(SEXP X_s, SEXP n_s, SEXP p_s, SEXP k_s, SEXP Cnf_s, SEXP c0_s)
 {
-	int n(as<int>(n_s)), p(as<int>(p_s)), k(as<int>(k_s)), Cnf(as<int>(Cnf_s));
-	NumericMatrix X(X_s);
-	Estimate tmpsol(p);
-	vector<int> tmpSet(k),bestSet(k);
-	double c0(as<double>(c0_s)),tmploglik,bestloglik(-Inf);
+  int n(as<int>(n_s)), p(as<int>(p_s)), k(as<int>(k_s)), Cnf(as<int>(Cnf_s));
+  NumericMatrix X(X_s);
+  Estimate tmpsol(p);
+  vector<int> tmpSet(k),bestSet(k);
+  double c0(as<double>(c0_s)),tmploglik,bestloglik(-Inf);
 	
-	bool start(true);
-	while (TRUE)  {
-		if (start) {
-			for (int i=0;i<k;++i) tmpSet[i] = i;
-			start = false;
-		}
-		else {
-			int j(k-1);
-			for (;tmpSet[j]==n-(k-j);--j) 
-				;
-			if (j<0) break;
-			++tmpSet[j];
-			if (j<k-1) for (int j1=j+1;j1<k;j1++)
-				tmpSet[j1] = tmpSet[j1-1]+1;
-		}
-		tmploglik = loglik(X,n,p,Cnf,c0,k,tmpSet,tmpsol);
-		if (tmploglik > bestloglik)  {
-			bestSet = tmpSet;
-			bestloglik = tmploglik;
-		}
-	}
-	return List::create(Named("LogLik")=bestloglik,Named("Set")=bestSet);
+  bool start(true);
+    while (TRUE)  {
+    if (start) {
+      for (int i=0;i<k;++i) tmpSet[i] = i;
+      start = false;
+    }  else {
+      unsigned j(k);
+      bool cont(TRUE);
+      if (tmpSet[k-1]<n-1) cont=FALSE;
+      while (cont) {
+        if (j==0) cont=FALSE;
+        else if  (tmpSet[j-1]<n-(k-(j-1))) cont=FALSE;
+        if (j>0 && cont) --j;
+      }
+      if (j==0) break;
+      ++tmpSet[j-1];
+      if (j-1<k-1) for (int j1=j;j1<k;j1++)
+       tmpSet[j1] = tmpSet[j1-1]+1;
+    }
+
+    tmploglik = loglik(X,n,p,Cnf,c0,k,tmpSet,tmpsol);
+    if (tmploglik > bestloglik)  {
+      bestSet = tmpSet;
+      bestloglik = tmploglik;
+    }
+  }
+  return List::create(Named("LogLik")=bestloglik,Named("Set")=bestSet);
 }
 
 double parcovloglik(const MatrixXd& Xdev,const vector<int>& Set,MatrixXd& Sigma,const double c0);

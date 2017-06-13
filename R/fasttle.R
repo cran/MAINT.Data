@@ -45,7 +45,8 @@ setMethod("fasttle",
       }  else if (MD2Dist=="CerioliBetaF") {
         fstsol <- fasttle1(Idt,CovCase,SelCrit,alpha,nsamp,ncsteps,trace,use.correction,
           rawMD2Dist,eta,multiCmpCor,kdblstar,outlin,trialmethod,m,reweighted,otpType="SetMD2andEst")
-        nOtls <- MDOtlDet(X,coef(fstsol$sol)$mu,coef(fstsol$sol)$Sigma,eta=eta,RefDist="CerioliBetaF",Rewind=fstsol$RewghtdSet,multiCmpCor=multiCmpCor,otp="onlycnt")
+        nOtls <- MDOtlDet(X,coef(fstsol$sol)$mu,coef(fstsol$sol)$Sigma,eta=eta,RefDist="CerioliBetaF",
+          Rewind=fstsol$RewghtdSet,multiCmpCor=multiCmpCor,otp="onlycnt")
       }
       if (nOtls==0) {
         Config <- getConfig(...)

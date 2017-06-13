@@ -49,7 +49,7 @@ distributions, \dQuote{SKNormal} for Skew-Normal and \dQuote{NrmandSKN} for both
   \item{\dots}{Other named arguments.}
 }
 
-\value{An object of type IdtMANOVA, containing the estimation and test results.}
+\value{An object of class IdtMANOVA, containing the estimation and test results.}
 
 
 \keyword{methods}

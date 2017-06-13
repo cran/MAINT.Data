@@ -4,7 +4,7 @@
 \alias{LRTest-class}
 \alias{show,LRTest-method}
 
-\title{Class "LRTest"}
+\title{Class LRTest}
 \description{LRTest contains the results of likelihood ratio tests
 }
 

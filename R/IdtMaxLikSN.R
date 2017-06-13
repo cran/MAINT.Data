@@ -53,7 +53,8 @@ SNCnf1MaxLik <- function(Data,grouping=NULL,initpar=NULL,EPS=1E-6,OptCntrl=list(
   Omegabar <- cov2cor(Omega)
   tmp <- drop(Omegabar%*%alpha)
   c2 <- 1. + alpha%*%tmp
-  delta <- tmp/sqrt(c2)
+#  delta <- tmp/sqrt(c2)
+  delta <- tmp/rep(sqrt(c2),length(tmp))
   if (is.null(grouping))
   {
     CP <- cnvDPtoCP(p,ksi,Omega,alpha)

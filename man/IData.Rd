@@ -3,7 +3,7 @@
 \alias{is.IData}
 \title{Interval Data objects}
 \description{
-\sQuote{IData} creates IData objects from data frames of interval bounds or MidPoint/LogRange values of the interval-valued observations.
+IData creates IData objects from data frames of interval bounds or MidPoint/LogRange values of the interval-valued observations.
 }
 
 \usage{
@@ -28,7 +28,7 @@ VarNames=NULL, ObsNames=row.names(Data))
 
 }
 
-\details{Objects of type \sQuote{IData}, describe a data set of \sQuote{NObs} observations on \sQuote{NIVar} Interval-Valued variables. This function creates an interval-data object from a data-frame with either the lower and upper bounds of the observed intervals or by their midpoints and log-ranges.}
+\details{Objects of class \code{\linkS4class{IData}} describe a data set of \sQuote{NObs} observations on \sQuote{NIVar} Interval-valued variables. This function creates an interval-data object from a data-frame with either the lower and upper bounds of the observed intervals or by their midpoints and log-ranges.}
 
 \seealso{
   \code{\linkS4class{IData}} 

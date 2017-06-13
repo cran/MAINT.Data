@@ -24,8 +24,7 @@
 \arguments{
   \item{object}{ An object representing a model fitted to interval data.}
   \item{selmodel}{Selected model from a list of candidate models saved in object.}
-  \item{ParType}{Parameterization of the Skew-Normal distribution. Alternatives are \dQuote{Centr} for centred parameters,
-\dQuote{Direct} for direct parameters and \dQuote{All}, for both types of parameters. See Arellano-Valle and Azzalini (2008) for details.}
+  \item{ParType}{Parameterization of the Skew-Normal distribution. Only used when object has class \code{\linkS4class{IdtSNDE}} or \code{\linkS4class{IdtNandSNDE}} and in this latter case when argument \dQuote{selmodel} chooses a Skew-Normal model. \cr Alternatives are \dQuote{Centr} for centred parameters, \dQuote{Direct} for direct parameters and \dQuote{All}, for both types of parameters. See Arellano-Valle and Azzalini (2008) for details.}
   \item{\dots}{Additional arguments for method functions.}
 }
 

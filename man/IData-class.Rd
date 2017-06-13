@@ -7,7 +7,7 @@
 \alias{summary,IData-method}
 \alias{tail,IData-method}
 
-\title{Class "IData"}
+\title{Class IData}
 \description{
   A data-array of interval-valued data is an array where each of the NObs rows, corresponding to each entity under analysis, contains the observed intervals of the NIVar descriptive variables.
 }
@@ -25,18 +25,16 @@
 
 \section{Methods}{
   \describe{
-    \item{head}{\code{signature(x = "IData")}: head S4 method for the IData-class.}
     \item{show}{\code{signature(object = "IData")}: show S4 method for the IData-class.}
     \item{nrow}{\code{signature(x = "IData")}: returns the number of entities (observations).}
-    \item{ncol}{\code{signature(x = "IData")}: returns the number of Iterval Variables.}
+    \item{ncol}{\code{signature(x = "IData")}: returns the number of Interval Variables.}
     \item{rownames}{\code{signature(x = "IData")}: returns the row (entity) names for an object of class IData.}
     \item{colnames}{\code{signature(x = "IData")}: returns column (variable) names for an object of class IData.}
-    \item{show}{\code{signature(object = "IData")}: show S4 method for the IData-class.}
+    \item{head}{\code{signature(x = "IData")}: head S4 method for the IData-class.}
     \item{tail}{\code{signature(x = "IData")}: tail S4 method for the IData-class.}
     \item{mle}{\code{signature(x = "IData")}: Maximum likelihood estimation.}
     \item{fasttle}{\code{signature(x = "IData")}: Fast trimmed maximum likelihood estimation.}
     \item{fulltle}{\code{signature(x = "IData")}: Exact trimmed maximum likelihood estimation.}
-    \item{mle}{\code{signature(x = "IData")}: Maximum likelihood estimation.}
     \item{RobMxtDEst}{\code{signature(x = "IData")}: Robust estimation of distribution mixtures for interval-valued data.}
     \item{MANOVA}{\code{signature(x = "IData")}: MANOVA tests on the interval-valued data.}
     \item{lda}{\code{signature(x = "IData")}: Linear Discriminant Analysis using maximum likelihood parameter estimates of Gaussian mixtures.}
@@ -52,6 +50,8 @@
 }
 
 \references{
+Azzalini, A. and Dalla Valle, A. (1996), The multivariate skew-normal distribution. \emph{Biometrika} \bold{83}(4), 715--726.\cr
+
 Brito, P., Duarte Silva, A. P. (2012), Modelling Interval Data with Normal and Skew-Normal Distributions. \emph{Journal of Applied Statistics} \bold{39}(1), 3--20.\cr
 
 Hadi, A. S. and Luceno, A. (1997), Maximum trimmed likelihood estimators: a unified approach, examples, and algorithms.

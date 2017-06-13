@@ -15,7 +15,8 @@ cnvDPtoCP <- function(p,ksi,Omega,alpha)
       omega <- sqrt(diag(Omega)) 
       Omegabar <- cov2cor(Omega)
       tmp <- drop(Omegabar %*% alpha)
-      delta <- tmp/sqrt(1.+alpha%*%tmp)
+#      delta <- tmp/sqrt(1.+alpha%*%tmp)
+      delta <- tmp/sqrt(rep(1.+drop(alpha%*%tmp),length(tmp)))
       muz <-  b*delta
       mu0 <- omega*muz
 
@@ -65,7 +66,8 @@ cnvCPtoDP <- function(p,mu,Sigma,gamma1,silent=FALSE,
              admissible=FALSE,viol=-determinant(Omegabar)$modulus) )
         else stop("Inadmissible centred parameters\n")          
     tmp <- drop(OmgbInv%*%delta)
-    c2 <- drop(1. - delta%*%tmp)
+#    c2 <- drop(1. - delta%*%tmp)
+    c2 <- 1. - drop(delta%*%tmp)
     if (c2<0. || isTRUE(all.equal(c2,0.,tol=tol)))
     {
       if (silent) {
@@ -75,7 +77,8 @@ cnvCPtoDP <- function(p,mu,Sigma,gamma1,silent=FALSE,
         stop("Inadmissible centred parameters\n")
       }
     }      
-    alpha <- tmp/sqrt(c2)
+#    alpha <- tmp/sqrt(c2)
+    alpha <- tmp/rep(sqrt(c2),length(tmp))
   }
   
   list(ksi=ksi,Omega=Omega,omega=omega,alpha=alpha,Omega.cor=Omegabar,delta=delta,c2=c2,

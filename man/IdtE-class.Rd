@@ -7,10 +7,9 @@
 \alias{show,IdtE-method}
 \alias{testMod,IdtE-method}
 
-\title{Class "IdtE"}
-\description{"IdtE" contains the results of model estimation. 
-"IdtSngDE" extends "IdtE" assuming that the data can be carcherizes by a unique distribution (for instances,
-not considering partitions into different groups).
+\title{Class IdtE}
+\description{IdtE contains estimation results for the models assumed for single distributions, or mixtures of distributions, underlying data sets of interval-valued entities. 
+\code{\linkS4class{IdtSngDE}} extends IdtE assuming that the data can be characterized by a unique distribution, \emph{i.e.}, not considering partitions of entities into different classes.
 }
 
 \section{Slots}{

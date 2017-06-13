@@ -7,7 +7,7 @@
 
 \description{\dQuote{extmatrix} is a simple extension of the base matrix class, that that accepts NULL objects as members.}
 
-\section{Extends}{ Class \code{"\link{matrix}"}, directly.}
+\section{Extends}{ Class \code{\link{matrix}}, directly.}
 
 
 

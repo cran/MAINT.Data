@@ -39,7 +39,7 @@ Duarte Silva, A.P. and Brito, P. (2015), Discriminant analysis of interval data:
 }
 
 \seealso{
-  \code{\link{qda}},  \code{\link{MANOVA}}, \code{\link{Roblda}},  \code{\link{Robqda}},  \code{\linkS4class{IData}}
+  \code{\link{qda}},  \code{\link{MANOVA}}, \code{\link{Roblda}},  \code{\link{Robqda}}, \code{\link{snda}}, \code{\linkS4class{IData}}
 }
 
 \keyword{classes}

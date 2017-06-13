@@ -3,7 +3,7 @@
 \alias{Cars}
 \title{Cars Data Set}
 
-\description{This data set consist of the intervals for four characteristics (Price, EngineCapacity, TopSpeed and Acceleration) of 27 cars models partitioned into four diffetent classes (Utilitarian,Berlina,Sportive and Luxury).}
+\description{This data set consist of the intervals for four characteristics (Price, EngineCapacity, TopSpeed and Acceleration) of 27 cars models partitioned into four diffetent classes (Utilitarian, Berlina, Sportive and Luxury).}
 
 \usage{data(Cars)}
 

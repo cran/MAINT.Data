@@ -50,7 +50,6 @@ setMethod("rownames",signature(x = "IData"),function (x) {x@ObsNames})
 
 setMethod("colnames",signature(x = "IData"),function (x) {x@VarNames})
 
-
 setMethod("head",
   signature(x = "IData"),
   function (x,n=6L) 

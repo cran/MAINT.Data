@@ -11,8 +11,8 @@
 \usage{BestModel(ModE,SelCrit=c("IdtCrt","BIC","AIC"))}
 
 \arguments{
-  \item{ModE}{An object of class IdtE representing the estimates of a model fitted to a data set of interval-value variables}
-  \item{SelCrit}{The model selection criterion. \dQuote{dtCrt} stands for the criterion originally, while \dQuote{BIC} and \dQuote{AIC} represent respectivelly the Bayesian and Akaike information criteria.}
+  \item{ModE}{An object of class \code{\linkS4class{IdtE}} representing the estimates of a model fitted to a data set of interval-value variables}
+  \item{SelCrit}{The model selection criterion. \dQuote{IdtCrt} stands for the criterion originally used in the ModE estimation, while \dQuote{BIC} and \dQuote{AIC} represent respectivelly the Bayesian and Akaike information criteria.}
 }
 
 \value{An integer with the index of the model chosen by the selection criterion}
