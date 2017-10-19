@@ -9,7 +9,6 @@ setMethod("Roblda",
     SngDMet <- match.arg(SngDMet)
     if (SngDMet=="fulltle")  { stop("Roblda with fulltle not implemented yet.\n") }
 
-#    if (length(subset) < nrow(x))
     if (length(subset) < x@NObs)
     {
       x <- x[subset,]
@@ -53,7 +52,6 @@ setMethod("Robqda",
     SelCrit <- match.arg(SelCrit)
     SngDMet <- match.arg(SngDMet)
 
-#    if (length(subset) < nrow(x))
     if (length(subset) < x@NObs)
     {
       x <- x[subset,]

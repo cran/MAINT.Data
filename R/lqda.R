@@ -21,10 +21,14 @@ Ilda <- function(Conf,p,nk,prior,means,W,B,egvtol)
     }
     eigvct <- Re(WiBdecp$vectors[,1:r])
     if (r==1) { dim(eigvct) <- c(p,1) }
-    sclvar <- apply(eigvct,2,function(v) v%*%W%*%v)	
-    scaling <- scale(eigvct,center=FALSE,scale=sqrt(sclvar))
-    dimnames(scaling) <- list(rownames(W),paste("LD",1:r,sep=""))	
-    attr(scaling,"scaled:scale") <- NULL	
+    sclvar <- apply(eigvct,2,function(v) v%*%W%*%v)
+    if (r>1) {	
+      scaling <- scale(eigvct,center=FALSE,scale=sqrt(sclvar))
+      dimnames(scaling) <- list(rownames(W),paste("LD",1:r,sep=""))	
+      attr(scaling,"scaled:scale") <- NULL
+    } else {	
+      scaling <- matrix(eigvct/sqrt(sclvar),ncol=1,dimnames=list(rownames(W),"LD1"))
+    }
   }  else  {
     scaling <- diag(1/sqrt(diag(W)))
     dimnames(scaling) <- list(rownames(W),paste("LD",1:p,sep=""))

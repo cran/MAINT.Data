@@ -11,6 +11,9 @@ setMethod("RobMxtDEst",
     SelCrit <- match.arg(SelCrit)
     n <- Idt@NObs  
     p <- 2*Idt@NIVar  
+    if (n <=p) {
+      stop("The number of observations is too small (not larger than the total number of variables) and would lead to singular covariance estimates.\n")
+    }
     q <- p/2
     if (length(grouping)!=n)  {
       stop("The size of the grouping factor does not agree with the number of observations in the data set supplied")
@@ -19,6 +22,9 @@ setMethod("RobMxtDEst",
     grouping <- factor(grouping,exclude=NULL)
     grplvls <- levels(grouping)
     ng <- as.integer(table(grouping))
+    if (Mxt=="Het" && any(ng <=p)) {
+      stop("The number of observations is too small (for some group(s) not larger than the total number of variables) and would lead to singular covariance estimates.\n")
+    }
     ngrps <- length(ng)
     grpRobE <- vector("list",ngrps)
     Xnams <- names(cbind(Idt@MidP,Idt@LogR))

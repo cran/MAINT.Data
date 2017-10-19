@@ -1,5 +1,6 @@
 \name{lda-methods}
 \docType{methods}
+\alias{lda}
 \alias{lda-methods}
 \alias{lda,IData-method}
 \alias{lda,IdtMxtNDE-method}

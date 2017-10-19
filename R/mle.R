@@ -191,8 +191,7 @@ setMethod("testMod",
   signature(ModE = "IdtE"),
   function(ModE, RestMod=ModE@ModelConfig[2]:length(ModE@ModelConfig), FullMod="Next")
   {
-    MInames <- names(ModE@CovConfCases)
-    if ( substr(MInames,2,8) == "ModCovC" || substr(MInames,3,9) == "ModCovC")
+    if ( substr(ModE@ModelNames,2,8) == "ModCovC" || substr(ModE@ModelNames,3,9) == "ModCovC")
     {
       CovCaseArg <- TRUE  
       nCovCases <- 4
@@ -228,8 +227,14 @@ setMethod("testMod",
         "since it is the most general model that has been estimated\n")
     }
     if (EType == "NrmandSKN" && is.element(nCovCases+1,RestMod))  { 
-      stop("Model SNC1 can not be sepecified as a restricted model\n",
-        "since it is the most general model that has been estimated\n")
+#      stop("Model SNC1 can not be sepecified as a restricted model\n",
+#        "since it is the most general model that has been estimated\n")
+      MostGSNInd <- which(RestMod==nCovCases+1)
+      if (is.element(ModE@ModelConfig[1],RestMod)) {
+        RestMod <- RestMod[-MostGSNInd]
+      } else {
+        RestMod[MostGSNInd] <- ModE@ModelConfig[1]
+      }  
     }
     TestRes <- list()
     RestModels <- character()

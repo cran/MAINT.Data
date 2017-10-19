@@ -1,5 +1,6 @@
 \name{snda-methods}
 \docType{methods}
+\alias{snda}
 \alias{snda-methods}
 \alias{snda,IData-method}
 \alias{snda,IdtLocSNMANOVA-method}

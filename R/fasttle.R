@@ -22,6 +22,9 @@ setMethod("fasttle",
     otpType=control@otpType,
     control=RobEstControl(), ...)
   {
+    if (alpha*Idt@NObs <= 2*Idt@NIVar) {
+      stop("The number of observations is too small and would lead to singular covariance estimates.\n")
+    }
     SelCrit <- match.arg(SelCrit)
     if (!requireNamespace("robustbase",quietly=TRUE)) {
       stop("fasttle needs the robustbase package to work. Please install it.\n")
@@ -385,7 +388,7 @@ fasttle1 <- function(data,CovCase,SelCrit,alpha,nsamp,ncsteps,trace,use.correcti
 }
 
 getIdtOutl <- function(Idt,IdtE=NULL,muE=NULL,SigE=NULL,
-  eta=0.025,Rewind=IdtE$RewghtdSet,m=length(Rewind),
+  eta=0.025,Rewind=NULL,m=length(Rewind),
   RefDist=c("ChiSq","HardRockeAdjF","HardRockeAsF","CerioliBetaF"),
   multiCmpCor=c("never","always","iterstep"),outlin=c("MidPandLogR","MidP","LogR"))
 {
@@ -393,18 +396,31 @@ getIdtOutl <- function(Idt,IdtE=NULL,muE=NULL,SigE=NULL,
   multiCmpCor <- match.arg(multiCmpCor)
   outlin <- match.arg(outlin)
 
+  if ( RefDist=="CerioliBetaF" && is.null(Rewind) ) {
+    if ( class(IdtE)!="list" || is.null(IdtE$RewghtdSet) ) {
+      stop(paste("\n\nCerioliBetaF reference distribution with missing information\nabout the observations used in the re-weighted MCD estimator.\n",
+                 "You need to specify this information, either using the Rewind argument,\nor through a list with a RewghtdSet component in the IdtE argument.\n")
+          )
+    }
+    Rewind <- IdtE$RewghtdSet
+  }  
   if ( is.null(muE) || is.null(SigE) ) {
     if (is.null(IdtE)) {
       stop("Missing mean and/or covariance estimates in call to getIdtOutl.\n")
     }  
-    if (!isClass(IdtE$sol,"IdtSngNDE")) {
-      stop("sol component of IdtE argument is not an object of class IdtSngNDRE or IdtSngNDE as required.\n")
+    if (class(IdtE)!="list" && isClass(IdtE,"IdtSngNDE")) {
+      if (is.null(muE)) muE <- coef(IdtE)$mu
+      if (is.null(SigE)) SigE <- coef(IdtE)$Sigma
+    } else {
+      if (class(IdtE)!="list" || !isClass(IdtE$sol,"IdtSngNDE")) {
+        stop("IdtE argument is not of class IdtSngNDRE or IdtSngNDE, or a list with a sol component of class IdtSngNDRE or IdtSngNDE, as required.\n")
+      }
+      if (is.null(muE)) muE <- coef(IdtE$sol)$mu
+      if (is.null(SigE)) SigE <- coef(IdtE$sol)$Sigma
     }
-    if (is.null(muE)) muE <- coef(IdtE$sol)$mu
-    if (is.null(SigE)) SigE <- coef(IdtE$sol)$Sigma
   }
 
-  X <- data.frame(cbind(Idt@MidP,Idt@LogR))
+  X <- data.frame(cbind(Idt@MidP,Idt@LogR),row.names=Idt@ObsNames)
   if (outlin=="MidPandLogR") vind <- 1:(2*Idt@NIVar)
   else if (outlin=="MidP") vind <- 1:Idt@NIVar
   else if (outlin=="LogR") vind <- (Idt@NIVar+1):(2*Idt@NIVar)
@@ -472,6 +488,7 @@ MDOtlDet <- function(Data,muE,SigE,eta,h=NULL,ret=c("Outliers","Regular"),
         otl <- which(MDist>delta)
       } else {
         boolRewind <- sapply(1:n,function(x) is.element(x,Rewind))
+        names(boolRewind) <- names(MDist)
         otl <- which(ifelse(boolRewind,MDist>delta1,MDist>delta2))
       }  
       if (length(otl)==0) {

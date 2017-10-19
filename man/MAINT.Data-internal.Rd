@@ -135,7 +135,6 @@
 \alias{refinementstep}
 \alias{rghtD}
 \alias{safepdwt.solve}
-\alias{snda}
 \alias{Ilocsnda}
 \alias{Igensnda}
 \alias{trialstep}

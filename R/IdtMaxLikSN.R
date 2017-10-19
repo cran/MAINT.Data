@@ -40,7 +40,11 @@ SNCnf1MaxLik <- function(Data,grouping=NULL,initpar=NULL,EPS=1E-6,OptCntrl=list(
     beta2k <- beta[-1,]
     ksi <- matrix(nrow=k,ncol=p)
     ksi[1,] <- beta[1,]
-    ksi[2:k,] <- scale(beta2k,center=-ksi[1,],scale=FALSE)
+    if (k>2) {
+      ksi[2:k,] <- scale(beta2k,center=-ksi[1,],scale=FALSE)
+    } else {
+      ksi[2,] <- beta2k + ksi[1,]
+    }
     dev <- matrix(nrow=n,ncol=p)
     for (g in 1:k)  {
      gind <- which(grouping==lev[g])
@@ -53,7 +57,6 @@ SNCnf1MaxLik <- function(Data,grouping=NULL,initpar=NULL,EPS=1E-6,OptCntrl=list(
   Omegabar <- cov2cor(Omega)
   tmp <- drop(Omegabar%*%alpha)
   c2 <- 1. + alpha%*%tmp
-#  delta <- tmp/sqrt(c2)
   delta <- tmp/rep(sqrt(c2),length(tmp))
   if (is.null(grouping))
   {
@@ -63,7 +66,11 @@ SNCnf1MaxLik <- function(Data,grouping=NULL,initpar=NULL,EPS=1E-6,OptCntrl=list(
     mu <- matrix(nrow=k,ncol=p)
     CP <- cnvDPtoCP(p,ksi[1,],Omega,alpha)
     mu[1,] <- CP$mu
-    mu[2:k,] <- scale(beta2k,center=-mu[1,],scale=FALSE)
+    if (k>2) {
+      mu[2:k,] <- scale(beta2k,center=-mu[1,],scale=FALSE)
+    } else {
+      mu[2,] <- beta2k + mu[1,]
+    }
   }
   list(lnLik=res$val/(-2),ksi=ksi,beta2k=beta2k,Omega=Omega,Omega.cor=Omegabar,alpha=alpha,
     delta=delta,mu=mu,Sigma=CP$Sigma,gamma1=CP$gamma1,admissible=TRUE,c2=c2,optres=res)

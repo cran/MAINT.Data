@@ -1,5 +1,6 @@
 \name{qda-methods}
 \docType{methods}
+\alias{qda}
 \alias{qda-methods}
 \alias{qda,IData-method}
 \alias{qda,IdtMxtNDE-method}

@@ -22,9 +22,13 @@ Ilocsnda <- function(Conf,x,prior,W,B,mu,gamma1,alpha,ksi,egvtol)
   eigvct <- Re(WiBdecp$vectors[,1:r])
   if (r==1) { dim(eigvct) <- c(p,1) }
   sclvar <- apply(eigvct,2,function(v) v%*%W%*%v)	
-  scaling <- scale(eigvct,center=FALSE,scale=sqrt(sclvar))
-  dimnames(scaling) <- list(rownames(W),paste("LD",1:r,sep=""))	
-  attr(scaling,"scaled:scale") <- NULL	
+  if (r>1) {	
+    scaling <- scale(eigvct,center=FALSE,scale=sqrt(sclvar))
+    dimnames(scaling) <- list(rownames(W),paste("LD",1:r,sep=""))	
+    attr(scaling,"scaled:scale") <- NULL
+  } else {	
+    scaling <- matrix(eigvct/sqrt(sclvar),ncol=1,dimnames=list(rownames(W),"LD1"))
+  }
   eta <- alpha / sqrt(diag(W))
   names(eta) <- rownames(W)
 

@@ -39,7 +39,6 @@ SNCMaxLik <- function(Data, Config, grouping=NULL, initpar=NULL, prevMod=NULL,
     gamma1 <- ifelse(abs(prevMod$gamma1)<maxsk,prevMod$gamma1,sign(prevMod$gamma1)*maxsk)
     mu0 <- sqrt(diag(Sigma)) * sign(gamma1)*(2*abs(gamma1)/(4.-pi))^(1/3) 
     Beta02 <- mu0 %*% drop(SigmaI %*% mu0)
-#    if (Beta02 > ulBeta02) gamma1 <- gamma1 * sqrt(ulBeta02/Beta02)^3 
     if (Beta02 > ulBeta02) gamma1 <- gamma1 * rep(sqrt(ulBeta02/Beta02)^3,length(gamma1)) 
     if ( is.null(grouping) ) {
       prevModinitpar <- c(prevMod$mu,Spar,gamma1)
@@ -60,7 +59,11 @@ SNCMaxLik <- function(Data, Config, grouping=NULL, initpar=NULL, prevMod=NULL,
     }  else  {
       mug <- apply(Data,2,function(v) tapply(v,grouping,mean))
       mug1 <- mug[1,]
-      beta2k <- scale(mug[-1,],center=mug1,scale=FALSE)
+      if (k>2) {
+        beta2k <- scale(mug[-1,],center=mug1,scale=FALSE)
+      } else {
+        beta2k <- mug[-1,] - mug1
+      }
       NConfinitpar <- c(mug1,beta2k,SigmaSrpar,rep(0.,p))
     } 
     NConfdev0 <- msnCP.dev(NConfinitpar,y=Data,grpind=grpind,Config=Config,k=k,nopenalty=TRUE)
@@ -109,7 +112,11 @@ SNCMaxLik <- function(Data, Config, grouping=NULL, initpar=NULL, prevMod=NULL,
     DP <- cnvCPtoDP(p,mug1,Sigma,gamma1,silent=TRUE,tol=0.) 
     ksi <- matrix(nrow=k,ncol=p)
     ksi[1,] <- DP$ksi
-    ksi[-1,] <- scale(beta2k,center=-DP$ksi,scale=FALSE)
+    if (k>2) {
+      ksi[-1,] <- scale(beta2k,center=-DP$ksi,scale=FALSE)
+    } else {
+      ksi[-1,] <- beta2k + DP$ksi
+    }
   }  
 
   list(lnLik=lnLik,ksi=ksi,Omega=DP$Omega,Omega.cor=DP$Omega.cor,alpha=DP$alpha,delta=DP$delta,

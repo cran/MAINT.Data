@@ -6,7 +6,7 @@
 \description{Identifies outliers in a data set of Interval-valued variables}
 
 \usage{getIdtOutl(Idt, IdtE=NULL, muE=NULL, SigE=NULL,
-  eta=0.025, Rewind=IdtE$RewghtdSet, m=length(Rewind),
+  eta=0.025, Rewind=NULL, m=length(Rewind),
   RefDist=c("ChiSq","HardRockeAdjF","HardRockeAsF","CerioliBetaF"),
   multiCmpCor=c("never","always","iterstep"), 
   outlin=c("MidPandLogR","MidP","LogR"))
