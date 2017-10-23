@@ -24,8 +24,8 @@ Methods for (M)ANOVA and Discriminant Analysis (Duarte Silva and Brito (2015)) o
 \tabular{ll}{
 Package: \tab MAINT.Data\cr
 Type: \tab Package\cr
-Version: \tab 1.1.3\cr
-Date: \tab 2017-10-19\cr
+Version: \tab 1.1.4\cr
+Date: \tab 2017-10-23\cr
 License: \tab GPL-2\cr
 LazyLoad: \tab yes\cr
 LazyData: \tab yes\cr

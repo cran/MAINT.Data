@@ -5,10 +5,12 @@ setClass("IdtE",slots=c(ModelNames="character",ModelType="character",ModelConfig
 setClass("IdtSngDE",contains=c("IdtE","VIRTUAL"))
 setClass("IdtMxE",slots=c(grouping="factor",Ngrps="numeric"),contains=c("IdtE","VIRTUAL"))
 setClass("IdtSngNDE",slots=c(mleNmuE="numeric",mleNmuEse="numeric",CovConfCases="list"),contains="IdtSngDE")
-setClass("IdtSngNDRE",slots=c(RobNmuE="numeric",CovConfCases="list"),contains="IdtSngDE")
+setClass("IdtSngNDRE",slots=c(RobNmuE="numeric",CovConfCases="list",rawSet="numeric",RewghtdSet="numeric",
+  RobMD2="numeric",cnp2="numeric",raw.cov="matrix",raw.cnp2="numeric",PerfSt="list"),contains="IdtSngDE")
 setClassUnion("extmatrix",c("matrix","NULL"))
 setClass("IdtMxNDE",slots=c(Hmcdt="logical",mleNmuE="matrix",mleNmuEse="extmatrix",CovConfCases="list"),contains="IdtMxE")
-setClass("IdtMxNDRE",slots=c(Hmcdt="logical",RobNmuE="matrix",CovConfCases="list"),contains="IdtMxE")
+setClass("IdtMxNDRE",slots=c(Hmcdt="logical",RobNmuE="matrix",CovConfCases="list",rawSet="numeric",RewghtdSet="numeric",
+  RobMD2="numeric",cnp2="matrix",raw.cov="array",raw.cnp2="matrix",PerfSt="list"),contains="IdtMxE")
 setClassUnion("IdtMxtNDE",c("IdtMxNDE","IdtMxNDRE"))
 setClassUnion("IdtNDE",c("IdtSngNDE","IdtSngNDRE","IdtMxNDE","IdtMxNDRE"))
 setClass("LRTest",slots=c(QuiSq="numeric",df="numeric",pvalue="numeric",H0logLik="numeric",H1logLik="numeric"))
@@ -60,7 +62,7 @@ setClass("RobEstControl",
     trialmethod="simple",
     m=1,
     reweighted=TRUE,
-    otpType="OnlyEst"
+    otpType="SetMD2andEst"
   ),
   contains="CovControlMcd"
 )

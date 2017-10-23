@@ -9,6 +9,20 @@ setMethod("RobMxtDEst",
     Mxt <- match.arg(Mxt)
     CovEstMet <- match.arg(CovEstMet)
     SelCrit <- match.arg(SelCrit)
+
+    getalpha <- Robcontrol@getalpha
+    alpha <- Robcontrol@alpha
+    reweighted <- Robcontrol@reweighted
+    getkdblstar <- Robcontrol@getkdblstar
+    nsamp <- Robcontrol@nsamp
+    ncsteps <- Robcontrol@ncsteps
+    trace <- Robcontrol@trace
+    use.correction <- Robcontrol@use.correction
+    outlin <- Robcontrol@outlin
+    trialmethod <- Robcontrol@trialmethod
+    m <- Robcontrol@m
+    otpType <- Robcontrol@otpType
+
     n <- Idt@NObs  
     p <- 2*Idt@NIVar  
     if (n <=p) {
@@ -28,7 +42,7 @@ setMethod("RobMxtDEst",
     ngrps <- length(ng)
     grpRobE <- vector("list",ngrps)
     Xnams <- names(cbind(Idt@MidP,Idt@LogR))
-    anams <- list(Xnams,Xnams,levels(grouping))
+    anams <- list(Xnams,Xnams,grplvls)
     RobNmuE <- matrix(nrow=ngrps,ncol=p,dimnames=list(grplvls,Xnams))
 
     nCovC <- length(CovCase)
@@ -37,6 +51,26 @@ setMethod("RobMxtDEst",
     AICs <- numeric(nCovC) 
     BICs <- numeric(nCovC) 
     names(logLiks) <- names(AICs) <- names(BICs) <- names(CovConfC) <- modnames <- paste("NModCovC",CovCase,sep="")
+
+    rawSet <- NULL
+    RewghtdSet <- NULL
+    RobMD2 <- NULL
+    cnp2 <- matrix(nrow=ngrps,ncol=2,dimnames=list(grplvls,NULL))
+    raw.cnp2 <- matrix(nrow=ngrps,ncol=2,dimnames=list(grplvls,NULL))
+    raw.cov <- array(dim=c(p,p,ngrps),dimnames=anams)
+    if (otpType!="SetMD2EstandPrfSt") {
+      PerfSt <- list()
+    } else {
+      PerfSt <- list(RepSteps=vector("list",nCovC),RepLogLik=vector("list",nCovC),StpLogLik=vector("list",nCovC))
+      names(PerfSt$RepSteps) <- names(PerfSt$RepLogLik) <- names(PerfSt$StpLogLik) <- modnames 
+      Repnames <- paste("Rep",1:nsamp,sep="")
+      Stepnames <- paste("Stp",1:ncsteps,sep="")
+      for (CovC in 1:nCovC) {
+        PerfSt$RepSteps[[CovC]] <- matrix(nrow=nsamp,ncol=ngrps,dimnames=list(Repnames,grplvls))
+        PerfSt$RepLogLik[[CovC]] <- matrix(nrow=nsamp,ncol=ngrps,dimnames=list(Repnames,grplvls))
+        PerfSt$StpLogLik[[CovC]] <- array(dim=c(nsamp,ncsteps,ngrps),dimnames=list(Repnames,Stepnames,grplvls))
+      }  
+    }
 
     if (Mxt=="Hom" && CovEstMet=="Globdev")
     {
@@ -65,12 +99,12 @@ setMethod("RobMxtDEst",
         Xdev[gind,] <- scale(Xg,center=Xgl1med[g,],scale=FALSE)
       }
     }
-    alpha <- Robcontrol@alpha
-    nSteps <- ifelse(Robcontrol@getalpha=="TwoStep",2,1)
+    nSteps <- ifelse(getalpha=="TwoStep",2,1)
     for (Steps in 1:nSteps)
     {
       for (CovC in 1:nCovC)
       {
+#       maxnSteps <- 0 
         if (Mxt=="Hom")
         {
           CovConfC[[CovC]] <- list(
@@ -82,26 +116,25 @@ setMethod("RobMxtDEst",
             for (g in 1:ngrps)  {      # Things to do: add a fulltle option !!!
               Idtg <- Idt[grouping==grplvls[g],]
               grpRobE[[g]] <- fasttle(Idtg,CovC,SelCrit,
-                 getalpha="NO",otpType="SetMD2andEst",Robcontrol=Robcontrol, ...)
-              RobNmuE[g,] <- grpRobE[[g]]$sol@RobNmuE
+                 getalpha="NO",control=Robcontrol, ...)
+              RobNmuE[g,] <- grpRobE[[g]]@RobNmuE
               CovConfC[[CovC]]$RobSigE <- 
-                CovConfC[[CovC]]$RobSigE + (ng[g]/n) * grpRobE[[g]]$sol@CovConfCases[[CovC]]$RobSigE 
+                CovConfC[[CovC]]$RobSigE + (ng[g]/n) * grpRobE[[g]]@CovConfCases[[CovC]]$RobSigE 
             }
-            regset <- ifelse(Robcontrol@reweighted,grpRobE[[g]]$RewghtdSet,grpRobE[[g]]$rawSet)
+            regset <- ifelse(reweighted,grpRobE[[g]]@RewghtdSet,grpRobE[[g]]@rawSet)
             X <- rbind(X,cbind(Idtg@MidP[regset,],Idtg@LogR[regset,]))
           }
           else if (CovEstMet=="Globdev") {
-            if  (Robcontrol@getkdblstar=="Twopplusone") { 
+            if  (getkdblstar=="Twopplusone") { 
               kdblstar <- 2*Idt@NIVar+1
             }  else {
-              if (!is.finite(Robcontrol@getkdblstar)) {
+              if (!is.finite(getkdblstar)) {
                 stop("Wrong value for Robcontrol parameter getkdblstar\n")
               }
-              kdblstar <- Robcontrol@getkdblstar 
+              kdblstar <- getkdblstar 
             }
-            RobE <- fasttle1(Xdev,CovC,SelCrit,alpha,Robcontrol@nsamp,Robcontrol@ncsteps,Robcontrol@trace,
-              Robcontrol@use.correction,kdblstar,Robcontrol@outlin,Robcontrol@trialmethod,Robcontrol@m,
-              Robcontrol@reweighted,"OnlyEst",Idt@VarNames,...)
+            RobE <- fasttle1(Xdev,CovC,SelCrit,alpha,nsamp,ncsteps,trace,use.correction,kdblstar,outlin,trialmethod,m,
+              reweighted,otpType,Idt@VarNames,...)
             for (g in 1:ngrps)  RobNmuE[g,] <- Xgl1med[g,] + RobE@RobNmuE
             CovConfC[[CovC]]$RobSigE <- RobE@CovConfCases[[CovC]]$RobSigE 
           }
@@ -118,7 +151,7 @@ setMethod("RobMxtDEst",
           CovConfC[[CovC]] <- list( RobSigE=array(dim=c(p,p,ngrps),dimnames=anams),logLik=NULL,AIC=NULL,BIC=NULL )
           for (g in 1:ngrps) {
             grpRobE[[g]] <- fasttle(Idt[grouping==grplvls[g],],CovC,SelCrit,
-              getalpha="NO",otpType="OnlyEst",Robcontrol=Robcontrol, ...)
+              getalpha="NO",control=Robcontrol, ...)
             RobNmuE[g,] <- grpRobE[[g]]@RobNmuE
             CovConfC[[CovC]]$RobSigE[,,g] <- grpRobE[[g]]@CovConfCases[[CovC]]$RobSigE
           } 
@@ -130,6 +163,28 @@ setMethod("RobMxtDEst",
         CovConfC[[CovC]]$AIC <- AICs[CovC] <- -2*logLiks[CovC] + 2*nmodelfreepar
         trmdn <- round(alpha*n)
         CovConfC[[CovC]]$BIC <- BICs[CovC] <- -2*logLiks[CovC] + log(trmdn)*nmodelfreepar
+
+        if (Steps==nSteps) for (g in 1:ngrps)
+        {
+          rawSet <- c(rawSet,grpRobE[[g]]@rawSet)
+          RewghtdSet <- c(RewghtdSet,grpRobE[[g]]@RewghtdSet)
+          RobMD2 <- c(RobMD2,grpRobE[[g]]@RobMD2)
+          cnp2[g,] <- grpRobE[[g]]@cnp2
+          raw.cnp2[g,] <- grpRobE[[g]]@raw.cnp2
+          raw.cov[,,g] <- grpRobE[[g]]@raw.cov
+          if (otpType=="SetMD2EstandPrfSt") {
+            PerfSt$RepSteps[[CovC]][,g] <- grpRobE[[g]]@PerfSt$RepSteps[[CovC]]
+            PerfSt$RepLogLik[[CovC]][,g] <- grpRobE[[g]]@PerfSt$RepLogLik[[CovC]]
+            maxnSteps <- ncol(grpRobE[[g]]@PerfSt$StpLogLik[[CovC]])
+            PerfSt$StpLogLik[[CovC]][,1:maxnSteps,g] <- grpRobE[[g]]@PerfSt$StpLogLik[[CovC]]
+#            nSteps <- ncol(grpRobE[[g]]@PerfSt$StpLogLik[[CovC]])
+#            tmpStpLogLik[,1:nSteps,g] <- grpRobE[[g]]@PerfSt$StpLogLik[[CovC]]
+#            maxnSteps <- max(maxnSteps,nSteps)
+          }
+        }
+#        if (Steps==nSteps && otpType=="SetMD2EstandPrfSt") {
+#          PerfSt$StpLogLik[[CovC]] <- array(tmpStpLogLik[,1:maxnSteps,],dim=c(nsamp,maxnSteps,ngrps),dimnames=list(Repnames,Stepnames[1:maxnSteps],grplvls)
+#        }
       }
       if (SelCrit=="AIC")  {
         bestmod = which.min(AICs)
@@ -137,7 +192,7 @@ setMethod("RobMxtDEst",
         bestmod = which.min(BICs)
       }
 
-      if(Robcontrol@getalpha=="TwoStep" && Steps==1)
+      if(getalpha=="TwoStep" && Steps==1)
       {
         X <- data.frame(cbind(Idt@MidP,Idt@LogR))
         nOtls <- 0.
@@ -156,8 +211,12 @@ setMethod("RobMxtDEst",
 
     new( "IdtMxNDRE", ModelNames=modnames,ModelType=rep("Normal",nCovC),ModelConfig=1:nCovC,
       grouping=grouping,Hmcdt=(Mxt=="Hom"),RobNmuE=RobNmuE,CovConfCases=CovConfC,
-      SelCrit=SelCrit,NIVar=q,logLiks=logLiks,AICs=AICs,BICs=BICs,BestModel=bestmod,SngD=FALSE,Ngrps=ngrps)
-
+      SelCrit=SelCrit,NIVar=q,logLiks=logLiks,AICs=AICs,BICs=BICs,BestModel=bestmod,SngD=FALSE,Ngrps=ngrps,
+      rawSet=rawSet,RewghtdSet=RewghtdSet,RobMD2=RobMD2,cnp2=cnp2,raw.cov=raw.cov,raw.cnp2=raw.cnp2,PerfSt=PerfSt )
   }
 )
+
+
+
+
 

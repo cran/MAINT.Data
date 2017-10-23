@@ -110,12 +110,12 @@ double msnCP_dev1(NumericVector& param, const NumericMatrix& y, const IntegerVec
 
 	double ldR(log(Sigma.determinant()));
 	if ( !(nopenalty) && ldR < ldRtol ) {
-    dbltmp = ldRtol-ldR;
-    penalty = PenF * (PenC+dbltmp*dbltmp);
+    		dbltmp = ldRtol-ldR;
+    		penalty = PenF * (PenC+dbltmp*dbltmp);
 	}
-  else penalty = 0.;
+  	else penalty = 0.;
 	NumericVector mu1(mu1ptr,mu1ptr+p);
-  if (k>1)  beta2k = NumericMatrix(k-1,p,beta2kptr);
+  	if (k>1)  beta2k = NumericMatrix(k-1,p,beta2kptr);
 	NumericVector gamma1(gamma1ptr,gamma1ptr+p);
 
 	cnvCPtoDP<VCTTP,SQMATTP>(p,mu1,Sigma,gamma1,
@@ -123,10 +123,10 @@ double msnCP_dev1(NumericVector& param, const NumericMatrix& y, const IntegerVec
 		MachineEPS,FixedArrays);
 
 	if (!nopenalty && DPc2 < c2tol) {
-    dbltmp = c2tol-DPc2; 
-    penalty += PenF * (PenC + dbltmp*dbltmp); 
-	}
-  if (!DPadmissible)  {
+    		dbltmp = c2tol-DPc2; 
+    		penalty += PenF * (PenC + dbltmp*dbltmp); 
+  	}
+  	if (!DPadmissible)  {
      		if (nopenalty) return INFINITY;  
      		else return penalty;
 	}       

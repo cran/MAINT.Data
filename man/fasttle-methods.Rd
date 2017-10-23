@@ -69,9 +69,9 @@
 
     \item{reweighted}{Should a (Re)weighted estimate of the covariance matrix be used in the computation of the trimmed likelihood or just a \dQuote{raw} covariance estimate; default is (Re)weighting.}
 
-    \item{otpType}{The amount of output returned by fasttle. Current options are \dQuote{OnlyEst} (default) where only an \sQuote{IdtE} object with the fasttle estimates is returned, \cr
-\dQuote{SetMD2andEst} which returns a list with an \sQuote{IdtE} object of fasttle estimates, a vector with the final trimmed subset elements used to compute these estimates and the corresponding robust squared Mahalanobis distances, and \cr
-\dQuote{SetMD2EstandPrfSt} wich returns a list with the previous three components plust a list of some performance statistics concerning the algorithm execution.}
+    \item{otpType}{The amount of output returned by fasttle. Current options are \dQuote{SetMD2andEst} (default) which returns an \sQuote{IdtSngNDRE} object with the fasttle estimates, \cr
+a vector with the final trimmed subset elements used to compute these estimates and the corresponding robust squared Mahalanobis distances, and \cr
+\dQuote{SetMD2EstandPrfSt} wich returns an \sQuote{IdtSngNDRE} object with the previous slots plust a list of some performance statistics concerning the algorithm execution.}
 
   \item{control}{a list with estimation options - this includes those above provided in the function specification. See
 \code{\link{RobEstControl}} for the defaults.  If \code{control} is supplied, the parameters from it will be used.
@@ -80,51 +80,7 @@ If parameters are passed also in the invocation statement, they will override th
   \item{\dots}{Further arguments to be passed to internal functions of \code{fasttle}.} 
 }
 
-\value{
-
-If argument \sQuote{otpType} is set to \dQuote{OnlyEst}, an object of class \code{\linkS4class{IdtE}} with the fasttle estimates, their log-likelihood values, and the value of the comparison criterion used to select the covariance configurations.
-
-If argument \sQuote{otpType} is set to \dQuote{SetMD2andEst} a list with the following components:
-
-\item{sol}{An object of class \code{\linkS4class{IdtE}} with the fasttle estimates, their log-likelihood values, and the value of the comparison criterion used to select the covariance configurations.} 
-
-\item{rawSet}{A vector with the trimmed subset elements used to compute the raw (not reweighted) MCD covariance estimate for the chosen configuration.} 
-
-\item{RewghtdSet}{A vector with the final trimmed subset elements used to compute the fasttle estimates.} 
-
-\item{RobMD2}{A vector with the robust squared Mahalanobis distances used to select the trimmed subset.} 
-
-\item{cnp2}{A vector of length two containing the consistency correction factor and the finite sample correction factor of the final estimate of the covariance matrix.}
-
-\item{raw.cov}{A matrix with the raw MCD estimator used to compute the robust squared Mahalanobis distances of RobMD2.} 
-
-\item{raw.cnp2}{A vector of length two containing the consistency correction factor and the finite sample correction factor of the raw estimate of the covariance matrix.}
-
-If argument \sQuote{otpType} is set to \dQuote{SetMD2EstandPrfSt} a list with the following components:
-
-\item{sol}{An object of class \code{\linkS4class{IdtE}} with the fasttle estimates, their log-likelihood values, and the value of the comparison criterion used to select the covariance configurations.} 
-
-\item{rawSet}{A vector with the trimmed subset elements used to compute the raw (not reweighted) MCD covariance estimate for the chosen configuration.} 
-
-\item{RewghtdSet}{A vector with the final trimmed subset elements used to compute the fasttle estimates.} 
-
-\item{RobMD2}{A vector with the robust squared Mahalanobis distances used to select the trimmed subset.} 
-
-\item{cnp2}{A vector of length two containing the consistency correction factor and the finite sample correction factor of the final estimate of the covariance matrix.}
-
-\item{raw.cov}{A matrix with the raw MCD estimator used to compute the robust squared Mahalanobis distances of RobMD2.} 
-
-\item{raw.cnp2}{A vector of length two containing the consistency correction factor and the finite sample correction factor of the raw estimate of the covariance matrix.}
-
-\item{PerfSt}{A a list with the following components: \cr
-
-    \bold{RepSteps}: A list with one component by Covariance Configuration, containing a vector with the number of refinement steps performed by the fasttle algorithm by replication. \cr
-
-    \bold{RepLogLik}: A list with one component by Covariance Configuration, containing a vector with the best log-likelihood found be fasttle algorithm by replication. \cr
-
-    \bold{StpLogLik}: A list with one component by Covariance Configuration, containing a matrix with the evolution of the log-likelihoods found be fasttle algorithm by replication and refinement step. \cr
-    }
-} 
+\value{An object of class \code{\linkS4class{IdtE}} with the fasttle estimates, the value of the comparison criterion used to select the covariance configurations, the robust squared Mahalanobis distances, and optionally (if argument \sQuote{otpType} is set to true) performance statistics concerning the algorithm execution.} 
 
 \references{
 Brito, P., Duarte Silva, A. P. (2012), Modelling Interval Data with Normal and Skew-Normal Distributions. \emph{Journal of Applied Statistics} \bold{39}(1), 3--20.\cr
@@ -146,7 +102,7 @@ Todorov V. and Filzmoser P. (2009), An Object Oriented Framework for Robust Mult
 \keyword{interval data}
 
 
-\seealso{ \code{\link{fulltle}}, \code{\linkS4class{RobEstControl}}, \code{\link{getIdtOutl}} }
+\seealso{ \code{\link{fulltle}}, \code{\linkS4class{RobEstControl}}, \code{\link{getIdtOutl}}, \code{\linkS4class{IdtSngNDRE}}  }
 
 
 \examples{

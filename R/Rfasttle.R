@@ -79,19 +79,21 @@ Rfasttle <- function(Idt,kdblstar=2*Idt@NIVar+1,k=ceiling((Idt@NObs+2*Idt@NIVar+
       bestsol <- tmpsol
     }
   }
+ 
+#  finalsol <- new("IdtSngNDRE",ModelNames=bestsol@ModelNames,ModelType=bestsol@ModelType,ModelConfig=bestsol@ModelConfig,
+#    NIVar=bestsol@NIVar,SelCrit=bestsol@SelCrit,logLiks=bestsol@logLiks,BICs=bestsol@BICs,AICs=bestsol@AICs,
+#    BestModel=bestsol@BestModel,RobNmuE=bestsol@mleNmuE,CovConfCases=bestsol@CovConfCases,SngD=TRUE)
+#  for (case in 1:length(finalsol@CovConfCases)) {
+#    if (!is.null(finalsol@CovConfCases[[case]])) {
+#      names(finalsol@CovConfCases[[case]])[1] <- "RobSigE"
+#      finalsol@CovConfCases[[case]][2] <- finalsol@CovConfCases[[case]][3] <- NULL
+#    }
+#  }
 
-  finalsol <- new("IdtSngNDRE",ModelNames=bestsol@ModelNames,ModelType=bestsol@ModelType,ModelConfig=bestsol@ModelConfig,
-    NIVar=bestsol@NIVar,SelCrit=bestsol@SelCrit,logLiks=bestsol@logLiks,BICs=bestsol@BICs,AICs=bestsol@AICs,
-    BestModel=bestsol@BestModel,RobNmuE=bestsol@mleNmuE,CovConfCases=bestsol@CovConfCases,SngD=TRUE)
-  for (case in 1:length(finalsol@CovConfCases)) {
-    if (!is.null(finalsol@CovConfCases[[case]])) {
-      names(finalsol@CovConfCases[[case]])[1] <- "RobSigE"
-      finalsol@CovConfCases[[case]][2] <- finalsol@CovConfCases[[case]][3] <- NULL
-    }
-  }
+#  finalsol
 
-  finalsol
+  finalsol <- IdtNmle(Idt[bestsol$Set,],CovCaseArg=FALSE,Config=Config,SelCrit=SelCrit,...)
+  BestModel <- finalsol@BestModel
+
+  list(LogLik=finalsol@logLiks[BestModel],Set=bestsol$Set,raw.cov=finalsol@CovConfCases[BestModel]$mleSigE)
 }
-
-
-

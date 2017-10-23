@@ -50,7 +50,6 @@ setMethod("MANOVA",
   {
     onerror <- match.arg(onerror)
     if (!is.factor(grouping)) { return(error(onerror,"'grouping' is not a factor\n")) }
-#    if ( nrow(Idt) != length(grouping)) { 
     if ( Idt@NObs != length(grouping)) { 
       return(error(onerror,"The numbers of data and partition observations are different\n"))
     }
@@ -227,8 +226,6 @@ setMethod("testMod",
         "since it is the most general model that has been estimated\n")
     }
     if (EType == "NrmandSKN" && is.element(nCovCases+1,RestMod))  { 
-#      stop("Model SNC1 can not be sepecified as a restricted model\n",
-#        "since it is the most general model that has been estimated\n")
       MostGSNInd <- which(RestMod==nCovCases+1)
       if (is.element(ModE@ModelConfig[1],RestMod)) {
         RestMod <- RestMod[-MostGSNInd]

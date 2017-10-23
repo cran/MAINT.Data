@@ -145,17 +145,23 @@ fulltle1 <-  function(Idt,CovCase,SelCrit,alpha,use.correction,rawMD2Dist,eta,mu
     if (outlin=="MidPandLogR") {
       for (Cnf in Config) {
         CvCase <- CovCaseMap[Cnf]	
-        bestsol@CovConfCases[[CvCase]]$mleSigE <- dhn[CvCase] * bestsol@CovConfCases[[CvCase]]$mleSigE
+        bestsol@CovConfCases[[CvCase]]$RobSigE <- dhn[CvCase] * bestsol@CovConfCases[[CvCase]]$mleSigE
+        bestsol@CovConfCases[[CvCase]]$mleSigE <- NULL
       }
     } else {
       for (Cnf in Config) {
-         CvCase <- CovCaseMap[Cnf]	
-         bestsol@CovConfCases[[CvCase]]$mleSigE[Vind,Vind] <- dhn[CvCase] * bestsol@CovConfCases[[CvCase]]$mleSigE[Vind,Vind]
+        CvCase <- CovCaseMap[Cnf]	
+        bestsol@CovConfCases[[CvCase]]$RobSigE <- matrix(nrow=p,ncol=p,dimnames=dimnames(bestsol@CovConfCases[[CvCase]]$mleSigE))
+        bestsol@CovConfCases[[CvCase]]$RobSigE[Vind,Vind] <- dhn[CvCase] * bestsol@CovConfCases[[CvCase]]$mleSigE[Vind,Vind]
+        bestsol@CovConfCases[[CvCase]]$mleSigE <- NULL
       }
     }  
     RewghtdSet <- NULL
   } else {
     rawcov <- bestsol@CovConfCases[[bestsol@BestModel]]$mleSigE
+    for (Cnf in Config) {
+      bestsol@CovConfCases[[CovCaseMap[Cnf]]]$mleSigE <- NULL
+    }
     if (outlin=="MidPandLogR")
     {
       Xdev <- scale(X,center=bestsol@mleNmuE,scale=FALSE)
@@ -209,7 +215,8 @@ fulltle1 <-  function(Idt,CovCase,SelCrit,alpha,use.correction,rawMD2Dist,eta,mu
       }
       for (Cnf in Config) {
         CvCase <- CovCaseMap[Cnf]	
-        bestsol@CovConfCases[[CvCase]]$mleSigE <- rdmhn[CvCase] * bestsol@CovConfCases[[CvCase]]$mleSigE
+        bestsol@CovConfCases[[CvCase]]$RobSigE <- rdmhn[CvCase] * bestsol@CovConfCases[[CvCase]]$mleSigE
+        bestsol@CovConfCases[[CvCase]]$mleSigE <- NULL
       }
     } else {
       if (use.correction) {
@@ -219,29 +226,30 @@ fulltle1 <-  function(Idt,CovCase,SelCrit,alpha,use.correction,rawMD2Dist,eta,mu
       }
       for (Cnf in Config) {
         CvCase <- CovCaseMap[Cnf]	
-        bestsol@CovConfCases[[CvCase]]$mleSigE[Vind,Vind] <- rdmhn[CvCase] * bestsol@CovConfCases[[CvCase]]$mleSigE[Vind,Vind]
+        bestsol@CovConfCases[[CvCase]]$RobSigE <- matrix(nrow=p,ncol=p,dimnames=dimnames(bestsol@CovConfCases[[CvCase]]$mleSigE))
+        bestsol@CovConfCases[[CvCase]]$RobSigE[Vind,Vind] <- rdmhn[CvCase] * bestsol@CovConfCases[[CvCase]]$mleSigE[Vind,Vind]
+        bestsol@CovConfCases[[CvCase]]$mleSigE <- NULL
       }
     }
   }
 
+  rawSet <- sort(bestSet)
+  cnp2 <- c(rdmhn1,rdmhn[bestsol@BestModel]/rdmhn1)
+  raw.cnp2 <- c(dhn1,dhn[bestsol@BestModel]/dhn1)
+  names(cnp2) <- names(raw.cnp2) <- NULL 
+
   finalsol <- new("IdtSngNDRE",ModelNames=bestsol@ModelNames,ModelType=bestsol@ModelType,ModelConfig=bestsol@ModelConfig,
     NIVar=bestsol@NIVar,SelCrit=bestsol@SelCrit,logLiks=bestsol@logLiks,BICs=bestsol@BICs,AICs=bestsol@AICs,
-    BestModel=bestsol@BestModel,RobNmuE=bestsol@mleNmuE,CovConfCases=bestsol@CovConfCases,SngD=TRUE)
+    BestModel=bestsol@BestModel,RobNmuE=bestsol@mleNmuE,CovConfCases=bestsol@CovConfCases,SngD=TRUE,
+    rawSet=rawSet,RewghtdSet=RewghtdSet,RobMD2=MD2,cnp2=cnp2,raw.cov=rawcov,raw.cnp2=raw.cnp2,PerfSt=list()
+  )
   for (case in 1:length(finalsol@CovConfCases)) {
     if (!is.null(finalsol@CovConfCases[[case]])) {
       names(finalsol@CovConfCases[[case]])[1] <- "RobSigE"
       finalsol@CovConfCases[[case]][2] <- finalsol@CovConfCases[[case]][3] <- NULL
     }
   }
-  
-  if (otpType=="OnlyEst") {
-    return(finalsol)
-  }  else {
-    rawSet <- sort(bestSet)
-    cnp2 <- c(rdmhn1,rdmhn[bestsol@BestModel]/rdmhn1)
-    raw.cnp2 <- c(dhn1,dhn[bestsol@BestModel]/dhn1)
-    names(cnp2) <- names(raw.cnp2) <- NULL 
-    return(list(sol=finalsol,rawSet=rawSet,RewghtdSet=RewghtdSet,RobMD2=MD2,cnp2=cnp2,raw.cov=rawcov,raw.cnp2=raw.cnp2))
-  }  
+
+  finalsol  # return(finalsol)
 }
 

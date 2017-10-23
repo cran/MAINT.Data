@@ -85,6 +85,9 @@ Hardin, J. and Rocke, A. (2005), The Distribution of Robust Distances.
 
 \examples{
 
+
+\dontrun{
+
 # Create an Interval-Data object containing the intervals for characteristics 
 # of 27 cars models.
 
@@ -103,8 +106,6 @@ print(tail(CarsIdt))
 CarsTE1 <- fulltle(CarsIdt)
 cat("Cars data -- normal maximum trimmed likelhiood estimation results:\n")
 print(CarsTE1)
-
-\dontrun{
 
 # Estimate parameters by the full trimmed maximum likelihood estimator, using
 # the triming parameter that maximizes breakdown, and a reweighted MCD estimate

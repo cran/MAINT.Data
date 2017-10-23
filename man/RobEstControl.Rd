@@ -12,7 +12,7 @@
 RobEstControl(alpha=0.75, nsamp=500,  seed=NULL, trace=FALSE, use.correction=TRUE,
   ncsteps=200, getalpha="TwoStep", rawMD2Dist="ChiSq", MD2Dist="ChiSq", eta=0.025,
   multiCmpCor="never",  getkdblstar="Twopplusone", outlin="MidPandLogR", 
-  trialmethod="simple", m=1, reweighted=TRUE, otpType="OnlyEst")
+  trialmethod="simple", m=1, reweighted=TRUE, otpType="SetMD2andEst")
 }
 
 \arguments{
@@ -34,8 +34,9 @@ Note that when argument \sQuote{getalpha} is set to \dQuote{TwoStep} the final v
   \item{trialmethod}{The method to find a trial subset used to initialize each replication of the fasttle algorithm. The current options are \dQuote{simple} (default) that simply selects \sQuote{kdblstar} observations at random, and \dQuote{Poolm} that divides the original sample into \sQuote{m} non-overlaping subsets, applies the \sQuote{simple trial} and the refinement methods to each one of them, and merges the results into a trial subset.}
   \item{m}{Number of non-overlaping subsets used by the trial method when the argument of \sQuote{trialmethod} is set to 'Poolm'.}
   \item{reweighted}{Should a (Re)weighted estimate of the covariance matrix be used in the computation of the trimmed likelihood or just a \dQuote{raw} covariance estimate; default is (Re)weighting.}
-  \item{otpType}{The amount of output returned by fasttle. \cr Current options are \dQuote{OnlyEst} (default) where only an \sQuote{IdtE} object with the fasttle estimates is returned,
-\dQuote{SetMD2andEst} which returns a list with an \sQuote{IdtE} object of fasttle estimates, a vector with the final trimmed subset elements used to compute these estimates and the corresponding robust squared Mahalanobis distances, and \dQuote{SetMD2EstandPrfSt} wich returns a list with the previous three components plust a list of some performance statistics concerning the algorithm execution.}
+  \item{otpType}{The amount of output returned by fasttle. \cr Current options are \dQuote{SetMD2andEst} (default) which returns an \sQuote{IdtSngNDRE} object with the fasttle estimates, \cr
+a vector with the final trimmed subset elements used to compute these estimates and the corresponding robust squared Mahalanobis distances, and \cr
+\dQuote{SetMD2EstandPrfSt} wich returns an \sQuote{IdtSngNDRE} object with the previous slots plust a list of some performance statistics concerning the algorithm execution.}
 
 }
 

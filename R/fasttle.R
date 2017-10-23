@@ -111,7 +111,7 @@ RobEstControl <- function (alpha=0.75,
                            trialmethod="simple",
                            m=1,
                            reweighted=TRUE,
-                           otpType="OnlyEst")
+                           otpType="SetMD2andEst")
 {
     new("RobEstControl", alpha = alpha,
                          nsamp = nsamp,
@@ -218,6 +218,10 @@ fasttle1 <- function(data,CovCase,SelCrit,alpha,nsamp,ncsteps,trace,use.correcti
         if (datatype!="IData")  {
           stop("Wrong class for data argument\n")
         }
+        if (ClctSt) {
+          warning("ftle with performance statistics is not implemented for Covariance configuration 2\n")
+          ClctSt <- FALSE
+        }          
         Cftmpsol <- Rfasttle(data,kdblstar,k,nsamp,2,SelCrit,maxrefstps=ncsteps,...)
       }  else {
         Cftmpsol <- .Call( "Cfasttle", X, n, p, Poolm, m, kdblstar, k, nsamp, Cnf,
@@ -280,27 +284,33 @@ fasttle1 <- function(data,CovCase,SelCrit,alpha,nsamp,ncsteps,trace,use.correcti
     if (outlin=="MidPandLogR") {
       for (Cnf in Config) {
         CvCase <- CovCaseMap[Cnf]	
-        bestsol@CovConfCases[[CvCase]]$mleSigE <- dhn[CvCase] * bestsol@CovConfCases[[CvCase]]$mleSigE
+        bestsol@CovConfCases[[CvCase]]$RobSigE <- dhn[CvCase] * bestsol@CovConfCases[[CvCase]]$mleSigE
+        bestsol@CovConfCases[[CvCase]]$mleSigE <- NULL
       }
     } else {
       for (Cnf in Config) {
          CvCase <- CovCaseMap[Cnf]	
-         bestsol@CovConfCases[[CvCase]]$mleSigE[Vind,Vind] <- dhn[CvCase] * bestsol@CovConfCases[[CvCase]]$mleSigE[Vind,Vind]
+         bestsol@CovConfCases[[CvCase]]$RobSigE <- matrix(nrow=p,ncol=p,dimnames=dimnames(bestsol@CovConfCases[[CvCase]]$mleSigE))
+         bestsol@CovConfCases[[CvCase]]$RobSigE[Vind,Vind] <- dhn[CvCase] * bestsol@CovConfCases[[CvCase]]$mleSigE[Vind,Vind]
+         bestsol@CovConfCases[[CvCase]]$mleSigE <- NULL
       }
     }  
     RewghtdSet <- NULL
   } else {
-    corrawcov <- bestsol@CovConfCases[[bestsol@BestModel]]$mleSigE
+    raw.cov <- bestsol@CovConfCases[[bestsol@BestModel]]$mleSigE
+    for (Cnf in Config) {
+      bestsol@CovConfCases[[CovCaseMap[Cnf]]]$mleSigE <- NULL
+    }
     if (outlin=="MidPandLogR")
     {
       Xdev <- scale(X,center=bestsol@mleNmuE,scale=FALSE)
-      Sigma <- corrawcov <- dhn[bestsol@BestModel] * corrawcov       
+      Sigma <- raw.cov <- dhn[bestsol@BestModel] * raw.cov       
     } else { 
       Xdev <- scale(X,center=bestsol@mleNmuE[Vind],scale=FALSE)
-      Sigma <- corrawcov[Vind,Vind] <- dhn[bestsol@BestModel] * corrawcov[Vind,Vind]
+      Sigma <- raw.cov[Vind,Vind] <- dhn[bestsol@BestModel] * raw.cov[Vind,Vind]
     }
     SigmaI <- pdwt.solve(Sigma)
-    MD2 <- apply(Xdev,1,function(x) x%*%SigmaI%*%x)
+    RobMD2 <- apply(Xdev,1,function(x) x%*%SigmaI%*%x)
 
     oneminuseta <- 1-eta
     if (multiCmpCor=="always" || multiCmpCor=="iterstep") {
@@ -319,7 +329,7 @@ fasttle1 <- function(data,CovCase,SelCrit,alpha,nsamp,ncsteps,trace,use.correcti
       } else if (rawMD2Dist=="HardRockeAsF")  {
         MD2trshld <- qHardRoqF(oneminusalpha,n,p,h,adj=FALSE) / dhn[bestsol@BestModel]
       }
-      RewghtdSet <- which(MD2<=MD2trshld)
+      RewghtdSet <- which(RobMD2<=MD2trshld)
       if (multiCmpCor=="iterstep")
       {
         if (length(RewghtdSet)==n) {
@@ -344,7 +354,8 @@ fasttle1 <- function(data,CovCase,SelCrit,alpha,nsamp,ncsteps,trace,use.correcti
       }
       for (Cnf in Config) {
         CvCase <- CovCaseMap[Cnf]	
-        bestsol@CovConfCases[[CvCase]]$mleSigE <- rdmhn[CvCase] * bestsol@CovConfCases[[CvCase]]$mleSigE
+        bestsol@CovConfCases[[CvCase]]$RobSigE <- rdmhn[CvCase] * bestsol@CovConfCases[[CvCase]]$mleSigE
+        bestsol@CovConfCases[[CvCase]]$mleSigE <- NULL
       }
     } else {
       if (use.correction) {
@@ -354,37 +365,36 @@ fasttle1 <- function(data,CovCase,SelCrit,alpha,nsamp,ncsteps,trace,use.correcti
       }
       for (Cnf in Config) {
         CvCase <- CovCaseMap[Cnf]	
-        bestsol@CovConfCases[[CvCase]]$mleSigE[Vind,Vind] <- rdmhn[CvCase] * bestsol@CovConfCases[[CvCase]]$mleSigE[Vind,Vind]
+        bestsol@CovConfCases[[CvCase]]$RobSigE <- matrix(nrow=p,ncol=p,dimnames=dimnames(bestsol@CovConfCases[[CvCase]]$mleSigE))
+        bestsol@CovConfCases[[CvCase]]$RobSigE[Vind,Vind] <- rdmhn[CvCase] * bestsol@CovConfCases[[CvCase]]$mleSigE[Vind,Vind]
+        bestsol@CovConfCases[[CvCase]]$mleSigE <- NULL
       }
     }
   }
 
+  rawSet <- sort(bestSet)
+  cnp2 <- c(rdmhn1,rdmhn[bestsol@BestModel]/rdmhn1)
+  raw.cnp2 <- c(dhn1,dhn[bestsol@BestModel]/dhn1)
+  names(cnp2) <- names(raw.cnp2) <- NULL 
+  if (otpType=="SetMD2EstandPrfSt") {
+    PerfSt <- list(RepSteps=RepSteps,RepLogLik=RepLogLik,StpLogLik=StpLogLik)
+  } else {
+    PerfSt <- list()
+  } 
+
   finalsol <- new("IdtSngNDRE",ModelNames=bestsol@ModelNames,ModelType=bestsol@ModelType,ModelConfig=bestsol@ModelConfig,
     NIVar=bestsol@NIVar,SelCrit=bestsol@SelCrit,logLiks=bestsol@logLiks,BICs=bestsol@BICs,AICs=bestsol@AICs,
-    BestModel=bestsol@BestModel,RobNmuE=bestsol@mleNmuE,CovConfCases=bestsol@CovConfCases,SngD=TRUE)
+    BestModel=bestsol@BestModel,RobNmuE=bestsol@mleNmuE,CovConfCases=bestsol@CovConfCases,SngD=TRUE,
+    rawSet=rawSet,RewghtdSet=RewghtdSet,RobMD2=RobMD2,cnp2=cnp2,raw.cov=raw.cov,raw.cnp2=raw.cnp2,PerfSt=PerfSt
+  )
   for (case in 1:length(finalsol@CovConfCases)) {
     if (!is.null(finalsol@CovConfCases[[case]])) {
       names(finalsol@CovConfCases[[case]])[1] <- "RobSigE"
       finalsol@CovConfCases[[case]][2] <- finalsol@CovConfCases[[case]][3] <- NULL
     }
   }
-  
-  if (otpType=="OnlyEst") {
-    return(finalsol)
-  }  else {
-    rawSet <- sort(bestSet)
-    cnp2 <- c(rdmhn1,rdmhn[bestsol@BestModel]/rdmhn1)
-    raw.cnp2 <- c(dhn1,dhn[bestsol@BestModel]/dhn1)
-    names(cnp2) <- names(raw.cnp2) <- NULL 
-    if (otpType=="SetMD2andEst") { 
-      return(list(sol=finalsol,rawSet=rawSet,RewghtdSet=RewghtdSet,RobMD2=MD2,
-        cnp2=cnp2,raw.cov=corrawcov,raw.cnp2=raw.cnp2))
-    }  else if (otpType=="SetMD2EstandPrfSt") {
-      return(list(sol=finalsol,rawSet=rawSet,RewghtdSet=RewghtdSet,RobMD2=MD2,
-        cnp2=cnp2,raw.cov=corrawcov,raw.cnp2=raw.cnp2,
-        PerfSt=list(RepSteps=RepSteps,RepLogLik=RepLogLik,StpLogLik=StpLogLik)))
-    }
-  }
+
+  finalsol  # return(finalsol)
 }
 
 getIdtOutl <- function(Idt,IdtE=NULL,muE=NULL,SigE=NULL,

@@ -19,6 +19,8 @@ class Estimate {
 		int p(void) { return p_; }
 		VectorXd& muE(void) { return muE_; }
 		MatrixXd& SigmaE(void) { return SigmaE_; }
+		double logLik(void) { return logLik_; }
+		void setlogLik(double LogL) { logLik_ = LogL; } 
 	private:
 		int p_;
 		VectorXd muE_;
