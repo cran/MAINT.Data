@@ -27,15 +27,15 @@ setMethod("show",
     LB <- object@MidP - HalfRange
     UB <- object@MidP + HalfRange
     lobsname <- max(nchar(object@ObsNames))
-    centerp <- lstpos <- 0
-    cat <- "      "
-    flength <- nchar(format(LB[1,1],width=8,digits=5)) + nchar(format(UB[1,1],width=8,digits=5)) + 7 
+    flength <- max(nchar(object@VarNames),nchar(format(LB[1,1],width=8,digits=5))+nchar(format(UB[1,1],width=8,digits=5))) + 6 
     for (j in 1:object@NIVar) {
-      centerp <- centerp + flength
-      hlfname <- nchar(object@VarNames[j])/2
-      cat(rep(" ",centerp-lstpos-hlfname-1),object@VarNames[j],sep="" )
-      lstpos <- centerp + hlfname
-    }
+      if (j>1) {
+        nspaces <- flength-nchar(object@VarNames[j])
+      } else {
+        nspaces <- lobsname+ceiling(flength/2)-ceiling(nchar(object@VarNames[1])/2)+3
+      }  
+      cat(rep(" ",nspaces),object@VarNames[j],sep="" )
+    }  
     cat("\n") 
     apply(cbind(format(object@ObsNames,width=lobsname),LB,UB),1,printrow,NIVar=object@NIVar)
     invisible(object)

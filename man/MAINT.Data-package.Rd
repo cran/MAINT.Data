@@ -4,10 +4,10 @@
 \docType{package}
 \title{Modelling and Analizing Interval Data}
 
-\description{MAINT.DATA implements methodologies for modelling Interval Data by Normal and Skew-Normal distributions,
+\description{MAINT.Data implements methodologies for modelling Interval Data by Normal and Skew-Normal distributions,
 considering four different possible configurations structures for the variance-covariance matrix.
 It introduces a data class for representing interval data and includes functions and methods for parametric modelling and analysing of interval data.
-It performs maximum likelihood and trimmed maximum likelihood estimation, statistical tests, as well as (M)ANOVA and Discriminant Analysis.
+It performs maximum likelihood and trimmed maximum likelihood estimation, statistical tests, as well as (M)ANOVA, Discriminant Analysis and Gaussian Model Based Clustering.
 }
 
 \details{In the classical model of multivariate data analysis, data is represented in a data-array where n ``individuals" (usually in rows) take exactly one value for each variable (usually in columns).
@@ -17,15 +17,15 @@ New variable types - interval, categorical multi-valued and modal variables - ha
 We focus on the analysis of interval data, i.e., where elements are described by variables whose values are intervals.
 Parametric inference methodologies based on probabilistic models for interval variables are developed in Brito and Duarte Silva (2011) where each interval is represented by its midpoint and log-range,for which Normal and Skew-Normal (Azzalini and Dalla Valle (1996)) distributions are assumed.
 The intrinsic nature of the interval variables leads to special structures of the variance-covariance matrix, which are represented by four different possible configurations.\cr
-MAINT.DATA implements the proposed methodologies in R, introducing a data class for representing interval data; it
-includes functions for modelling and analysing interval data, in particular maximum likelihood and trimmed maximum likelihood (see, e.g. Hadi and Luceno (1997)) estimation, and statistical tests for the different considered configurations. 
-Methods for (M)ANOVA and Discriminant Analysis (Duarte Silva and Brito (2015)) of this data class are also provided.
+MAINT.Data implements the proposed methodologies in R, introducing a data class for representing interval data; it
+includes functions for modelling and analysing interval data, in particular maximum likelihood and trimmed maximum likelihood (Duarte Silva, Filzmoser and Brito (forthcoming)) estimation, and statistical tests for the different considered configurations. 
+Methods for (M)ANOVA, Discriminant Analysis (Duarte Silva and Brito (2015)) and model based clustering (Brito, Duarte Silva and Dias (2015))  of this data class are also provided.
 
 \tabular{ll}{
 Package: \tab MAINT.Data\cr
 Type: \tab Package\cr
-Version: \tab 1.1.4\cr
-Date: \tab 2017-10-23\cr
+Version: \tab 1.2.0\cr
+Date: \tab 2017-11-22\cr
 License: \tab GPL-2\cr
 LazyLoad: \tab yes\cr
 LazyData: \tab yes\cr
@@ -41,14 +41,15 @@ Maintainer: Pedro Duarte Silva <psilva@porto.ucp.pt>\cr
 \references{
 Azzalini, A. and Dalla Valle, A. (1996), The multivariate skew-normal distribution. \emph{Biometrika} \bold{83}(4), 715--726.\cr
 
-Brito, P., Duarte Silva, A. P. (2012), Modelling Interval Data with Normal and Skew-Normal Distributions. \emph{Journal of Applied Statistics} \bold{39}(1), 3--20.\cr
+Brito, P. and Duarte Silva, A. P. (2012), Modelling Interval Data with Normal and Skew-Normal Distributions. \emph{Journal of Applied Statistics} \bold{39}(1), 3--20.\cr
+
+Brito, P., Duarte Silva, A. P. and Dias, J. G. (2015), Probabilistic Clustering of Interval Data. \emph{Intelligent Data Analysis} \bold{19}(2), 293--313.\cr
 
 Duarte Silva, A.P. and Brito, P. (2015), Discriminant analysis of interval data: An assessment of parametric and distance-based   approaches. \emph{Journal of Classification} \bold{39}(3), 516--541.\cr
 
-Hadi, A. S. and Luceno, A. (1997), Maximum trimmed likelihood estimators: a unified approach, examples, and algorithms.
-\emph{Computational Statistics and Data Analysis} \bold{25}(3), 251--272.\cr
+Duarte Silva, A.P., Filzmoser, P. and Brito, P. (forthcoming), Outlier detection in interval data. \emph{Advances in Data Analysis and Classification}.\cr
 
-Noirhomme-Fraiture, M., Brito, P. (2011), Far Beyond the Classical Data Models: Symbolic Data Analysis. \emph{Statistical Analysis and Data Mining} \bold{4}(2), 157--170.
+Noirhomme-Fraiture, M. and Brito, P. (2011), Far Beyond the Classical Data Models: Symbolic Data Analysis. \emph{Statistical Analysis and Data Mining} \bold{4}(2), 157--170.
 }
 
 \keyword{MAINT.Data}
@@ -174,5 +175,26 @@ cat("Cars data  -- Maximum likelhiood estimation results:\n")
 print(CarsNSNE)
 cat("Standard Errors of Estimators:\n") ; print(stdEr(CarsNSNE))
 }
+
+# Create an Interval-Data object containing the intervals of loan data
+# (from the Kaggle Data Science platform) aggregated by loan purpose
+
+LbyPIdt <- IData(LoansbyPurpose_minmaxDt,
+  VarNames=c("ln-inc","ln-revolbal","open-acc","total-acc")) 
+
+print(LbyPIdt)
+
+\dontrun{
+
+#Fit homocedastic Gaussian mixtures with up to four components
+
+mclustres <- Idtmclust(LbyPIdt,G=1:4)
+print(mclustres)
+
+#Display the results of the best mixture according to the BIC
+
+summary(mclustres,parameters=TRUE,classification=TRUE)
+}
+
 
 }

@@ -1,13 +1,19 @@
+setClassUnion("extmatrix",c("matrix","NULL"))
+setClassUnion("extnumeric",c("numeric","NULL"))
 setClass("IData",slots=c(MidP="data.frame",LogR="data.frame",ObsNames="character",VarNames="character",
   NObs="numeric",NIVar="numeric"))
 setClass("IdtE",slots=c(ModelNames="character",ModelType="character",ModelConfig="numeric",NIVar="numeric",SelCrit="character",
   logLiks="numeric",BICs="numeric",AICs="numeric",BestModel="numeric",SngD="logical"),contains="VIRTUAL")
+setClass("IdtMclust",slots=c(call="call",data="IData",NObs="numeric",NIVar="numeric",SelCrit="character",Hmcdt="logical",
+   BestG="integer",BestC="integer",logLiks="numeric",logLik="numeric",BICs="numeric",bic="numeric",AICs="numeric",aic="numeric",
+   parameters="list",z="extmatrix",classification="extnumeric",allres="list"))
+setClass("IdtMclustEl",slots=c(NObs="numeric",NIVar="numeric",SelCrit="character",Hmcdt="logical",Conf="integer",nG="integer",
+  logLik="numeric",alllnLik="numeric",bic="numeric",aic="numeric",parameters="list",z="extmatrix",classification="extnumeric"))
 setClass("IdtSngDE",contains=c("IdtE","VIRTUAL"))
 setClass("IdtMxE",slots=c(grouping="factor",Ngrps="numeric"),contains=c("IdtE","VIRTUAL"))
 setClass("IdtSngNDE",slots=c(mleNmuE="numeric",mleNmuEse="numeric",CovConfCases="list"),contains="IdtSngDE")
 setClass("IdtSngNDRE",slots=c(RobNmuE="numeric",CovConfCases="list",rawSet="numeric",RewghtdSet="numeric",
   RobMD2="numeric",cnp2="numeric",raw.cov="matrix",raw.cnp2="numeric",PerfSt="list"),contains="IdtSngDE")
-setClassUnion("extmatrix",c("matrix","NULL"))
 setClass("IdtMxNDE",slots=c(Hmcdt="logical",mleNmuE="matrix",mleNmuEse="extmatrix",CovConfCases="list"),contains="IdtMxE")
 setClass("IdtMxNDRE",slots=c(Hmcdt="logical",RobNmuE="matrix",CovConfCases="list",rawSet="numeric",RewghtdSet="numeric",
   RobMD2="numeric",cnp2="matrix",raw.cov="array",raw.cnp2="matrix",PerfSt="list"),contains="IdtMxE")
@@ -67,6 +73,11 @@ setClass("RobEstControl",
   contains="CovControlMcd"
 )
 
+setClass("EMControl",
+  slots=c(nrep="numeric", maxiter="numeric", convtol="numeric", protol="numeric", seed="extnumeric"),
+  prototype = list(nrep = 1000, maxiter=1000, convtol=0.01, protol=1e-6, seed=NULL)
+)
+
 setGeneric("nrow")
 setGeneric("ncol")
 setGeneric("rownames")
@@ -102,7 +113,8 @@ setGeneric("fulltle",
   function(Idt, CovCase=1:4, SelCrit=c("BIC","AIC"), alpha=0.75, use.correction=TRUE, getalpha="TwoStep", 
     rawMD2Dist=c("ChiSq","HardRockeAsF","HardRockeAdjF"), MD2Dist=c("ChiSq","CerioliBetaF"),
     eta=0.025,multiCmpCor=c("never","always","iterstep"), outlin=c("MidPandLogR","MidP","LogR"), reweighted=TRUE, 
-    otpType=c("OnlyEst","SetMD2andEst"), force=FALSE, ...)
+#    otpType=c("OnlyEst","SetMD2andEst"), force=FALSE, ...)
+    force=FALSE, ...)
   standardGeneric("fulltle"))
 
 setGeneric("fasttle",
@@ -143,3 +155,8 @@ setGeneric("Robqda",
     CovCase=1:4, SelCrit=c("BIC","AIC"), silent=FALSE, SngDMet=c("fasttle","fulltle"),
       Robcontrol=RobEstControl(), ...) 
   standardGeneric("Robqda"))
+
+setGeneric("Idtmclust",
+  function(Idt, G=1:9, CovCase=1:4, SelCrit=c("BIC","AIC"), Mxt=c("Hom","Het","HomandHet"), control=EMControl())
+  standardGeneric("Idtmclust"))
+

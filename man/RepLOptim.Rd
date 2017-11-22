@@ -69,45 +69,45 @@ A list with the following components: \cr
 The starting point used in the first call the the local optimizer is the value of the argument \sQuote{start}. Subsquent calls
 use starting points generated from uniform distributions of independent variates with means equal to the current best
 parameter values and standard deviations equal to the values of the argument \sQuote{parsd}.
-If parameter bounds are specified and the uniform limits implied by \sQuote{parsd} violate those bounds, these limits are replaced by the corresponding bounds. \cr \cr
+If parameter bounds are specified and the uniform limits implied by \sQuote{parsd} violate those bounds, these limits are replaced by the corresponding bounds.
 
 The choice of the local optimizer is made by value of the \sQuote{method} argument. This argument can be a function object implementing the optimizer or a string describing an available R method. In the latter case current alternatives are:  
 \dQuote{nlminb} (default) for the \sQuote{nlminb} port routine, \dQuote{nlm} for the \sQuote{nlm} function and \dQuote{Nelder-Mead}, \dQuote{L-BFGS-B}, \dQuote{CG}, \dQuote{L-BFGS-B} and \dQuote{SANN} for the corresponding methods of the \sQuote{optim} function.
-\cr \cr
+
 
 Arguments for controling the behaviour of the local optimizer can be specified as components of \code{control} list. This list can include any of the following components: 
 \describe{
-  \item{\code{maxrepet}}{Maximum time of repetions of the same minimum objective value, before
-RepLOptim is stoped and the current best solution is returned. By default set to 2.\cr} 
+  \item{maxrepet}{Maximum time of repetions of the same minimum objective value, before
+RepLOptim is stoped and the current best solution is returned. By default set to 2.} 
 
-  \item{\code{maxnoimprov}}{Maximum number of times the local optimizer is called without improvements
+  \item{maxnoimprov}{Maximum number of times the local optimizer is called without improvements
 in the minimum objective value, before RepLOptim is stoped and the current best solution is returned.
-By default set to 50.\cr} 
+By default set to 50.} 
 
-  \item{\code{maxreplic}}{Maximum number of times the local optimizer is called and returns a valid solution
-before RepLOptim is stoped and the current best solution is returned. By default set to 250.\cr}
+  \item{maxreplic}{Maximum number of times the local optimizer is called and returns a valid solution
+before RepLOptim is stoped and the current best solution is returned. By default set to 250.}
 
-  \item{\code{allrep}}{Total maximum number of replications (including those leading to non-valid solutions)
-performed. By default equals ten times the value of maxreplic. Ignored when objbnd is set to \sQuote{Inf}.\cr}
+  \item{allrep}{Total maximum number of replications (including those leading to non-valid solutions)
+performed. By default equals ten times the value of maxreplic. Ignored when objbnd is set to \sQuote{Inf}.}
 
-  \item{\code{maxiter}}{Maximum number of iterations performed in each call to the local optimizer. By default
-set to 500 except with the \dQuote{SANN} mehtod, when by default is set to 1500.\cr}
+  \item{maxiter}{Maximum number of iterations performed in each call to the local optimizer. By default
+set to 500 except with the \dQuote{SANN} mehtod, when by default is set to 1500.}
 
-  \item{\code{maxeval}}{Maximum number of function evaluations (nlminb method only) performed in each call
-to the nlminb optimizer. By defaults set to 1000.\cr}
+  \item{maxeval}{Maximum number of function evaluations (nlminb method only) performed in each call
+to the nlminb optimizer. By defaults set to 1000.}
 
-  \item{\code{RLOtol}}{The relative convergence tolerance of the local optimizer.  The local optimizer
+  \item{RLOtol}{The relative convergence tolerance of the local optimizer.  The local optimizer
 stops if it is unable to reduce the value by a factor of \sQuote{RLOtol *(abs(val) + reltol)}
 at a step. Ignored when method is set to \dQuote{nlm}. By default set to the square root of the
-computer precision, i.e. to \sQuote{sqrt(.Machine$double.eps)}.\cr}
+computer precision, i.e. to \sQuote{sqrt(.Machine$double.eps)}.}
 
-  \item{\code{HesEgtol}}{Numerical tolerance used to ensure that the hessian is non-singular. If the last
+  \item{HesEgtol}{Numerical tolerance used to ensure that the hessian is non-singular. If the last
 eigenvalue of the hessian is positive but the ratio between it and the first eigenvalue is below
 HesEgtol the hessian is considered to be semi-definite and the parameter assymptotic standard
 errors are not computed. By default set to the square root of the computer precision, i.e. to 
-\sQuote{sqrt(.Machine$double.eps)}.\cr}
+\sQuote{sqrt(.Machine$double.eps)}.}
 
-  \item{\code{objbnd}}{Upper bound for the objective. Only solutions leading to objective values below
+  \item{objbnd}{Upper bound for the objective. Only solutions leading to objective values below
 objbnd are considered as valid.}
 }
 }

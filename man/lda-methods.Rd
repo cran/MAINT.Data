@@ -53,8 +53,9 @@ present, the probabilities should be specified in the order of the factor levels
 }
 
 \references{
-Duarte Silva, A.P. and Brito, P. (2015), Discriminant analysis of interval data: An assessment of parametric and distance-based   approaches. \emph{Journal of Classification} \bold{39}(3), 516--541.\cr
-t Multivariate Analysis. \emph{Journal of Statistical Software} \bold{32}(3), 1--47.
+Brito, P., Duarte Silva, A. P. (2012), Modelling Interval Data with Normal and Skew-Normal Distributions. \emph{Journal of Applied Statistics} \bold{39}(1), 3--20.\cr
+
+Duarte Silva, A.P. and Brito, P. (2015), Discriminant analysis of interval data: An assessment of parametric and distance-based   approaches. \emph{Journal of Classification} \bold{39}(3), 516--541.
 }
 
 \seealso{ \code{\link{qda}}, \code{\link{snda}}, \code{\link{Roblda}}, \code{\link{Robqda}}, \code{\linkS4class{IData}}, \code{\linkS4class{IdtMxtNDE}}, \code{\linkS4class{IdtClMANOVA}}, 

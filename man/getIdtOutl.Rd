@@ -28,7 +28,7 @@
 
     \item{m}{Number of entities used to compute trimmed mean and covariance estimates when using a reweighted MCD. Not used when the \sQuote{RefDist} argument is set to \dQuote{ChiSq.}}
 
-    \item{multiCmpCor}{Whether a multicomparison correction of the nominal size (eta) for the outliers tests should be performed. Alternatives are: \sQuote{never} -- ignoring the multicomparisons and testing all entities at the \sQuote{eta} nominal level. \sQuote{always} -- testing all n entitites at 1.- (1.-\sQuote{eta}^(1/n); and \sQuote{iterstep} -- use the iterated rule proposed by  Cerioli (2010), \emph{i.e.}, make an initial set of tests using the nominal size 1.- (1-\sQuote{eta}^(1/n), and if no outliers are detected stop. Otherwise, make a second step testing for outliers at the \sQuote{eta} nominal level.}   
+    \item{multiCmpCor}{Whether a multicomparison correction of the nominal size (eta) for the outliers tests should be performed. Alternatives are: \sQuote{never} -- ignoring the multicomparisons and testing all entities at the \sQuote{eta} nominal level. \sQuote{always} -- testing all n entitites at 1.- (1.-\sQuote{eta}^(1/n)); and \sQuote{iterstep} -- use the iterated rule proposed by  Cerioli (2010), \emph{i.e.}, make an initial set of tests using the nominal size 1.- (1-\sQuote{eta}^(1/n)), and if no outliers are detected stop. Otherwise, make a second step testing for outliers at the \sQuote{eta} nominal level.}   
 
     \item{RefDist}{The assumed reference distributions used to find cutoffs defining the observations assumed as outliers. Alternatives are \dQuote{ChiSq},\dQuote{HardRockeAsF}, \dQuote{HardRockeAdjF} and \dQuote{CerioliBetaF}, respectivelly for the usual Qui-squared, the asymptotic and adjusted scaled F distributions proposed by Hardin and Rocke (2005), and the Beta and F distributions proposed by Cerioli (2010).}    
 
@@ -39,10 +39,12 @@
 
 \references{
 Cerioli, A. (2010), Multivariate Outlier Detection with High-Breakdown Estimators.
-\emph{Journal of the American Statistical Association} \bold{105} (489), 147--156. 
+\emph{Journal of the American Statistical Association} \bold{105} (489), 147--156.\cr 
+
+Duarte Silva, A.P., Filzmoser, P. and Brito, P. (forthcoming), Outlier detection in interval data. \emph{Advances in Data Analysis and Classification}.\cr
 
 Hardin, J. and Rocke, A. (2005), The Distribution of Robust Distances.
-\emph{Journal of Computational and Graphical Statistics} \bold{14}, 910--927.\cr
+\emph{Journal of Computational and Graphical Statistics} \bold{14}, 910--927.
 }
 
 \seealso{ \code{\link{fasttle}}, \code{\link{fulltle} }

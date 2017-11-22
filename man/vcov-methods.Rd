@@ -30,8 +30,9 @@
 
   \item{selmodel}{Selected model from a list of candidate models saved in object.}
 
-  \item{group}{Ther group for each the estimated parameter variance-covariance will be returned. If NULL (default),
-\dQuote{vcov} will return a three-dimensional array with a matrix of the estimated covariances between the parameter estimates for each group at each level of the third dimension.}
+  \item{group}{The group for each the estimated parameter variance-covariance will be returned. If NULL (default),
+\dQuote{vcov} will return a three-dimensional array with a matrix of the estimated covariances between the parameter estimates for each group at each level of the third dimension.
+Note that this argument is only used in heterocedastic models, i.e. in the \code{\linkS4class{IdtMxNDE}}, \code{\linkS4class{IdtMxSNDE}} methods when the object slot \dQuote{Hmcdt} is set to to FALSE.}
 
   \item{\dots}{ Additional arguments for method functions.}
 }

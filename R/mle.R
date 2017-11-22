@@ -519,6 +519,9 @@ setMethod("show",
     cat("Selected Model:\n")
     print(names(object@H1res@BestModel))
     cat("\n")
+    cat("Qui-squared statistic:",object@QuiSq,"\n")
+    cat("degrees of freedom:",object@df,"\n")
+    cat("p-value:",object@pvalue,"\n\n")
   }
 )
 

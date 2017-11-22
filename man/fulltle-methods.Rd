@@ -13,7 +13,7 @@
   MD2Dist=c("ChiSq","CerioliBetaF"),
   eta=0.025,multiCmpCor=c("never","always","iterstep"),    
   outlin=c("MidPandLogR","MidP","LogR"), reweighted=TRUE, 
-  otpType=c("OnlyEst","SetMD2andEst"), force=FALSE, \dots)
+  force=FALSE, \dots)
 }
 
 \arguments{
@@ -35,39 +35,26 @@
 
     \item{eta}{Nominal size of the null hypothesis that a given observation is not an outlier. Defines the raw MCD Mahalanobis distances cutoff used to choose the observations kept in the reweightening step.}
 
-    \item{multiCmpCor}{Whether a multicomparison correction of the nominal size (eta) for the outliers tests should be performed. Alternatives are: \sQuote{never} -- ignoring the multicomparisons and testing all entities at the \sQuote{eta} nominal level. \sQuote{always} -- testing all n entitites at 1.- (1.-\sQuote{eta}^(1/n); and \sQuote{iterstep} -- use the iterated rule proposed by  Cerioli (2010), \emph{i.e.}, make an initial set of tests using the nominal size 1.- (1-\sQuote{eta}^(1/n), and if no outliers are detected stop. Otherwise, make a second step testing for outliers at the \sQuote{eta} nominal level.}   
+    \item{multiCmpCor}{Whether a multicomparison correction of the nominal size (eta) for the outliers tests should be performed. Alternatives are: \sQuote{never} -- ignoring the multicomparisons and testing all entities at the \sQuote{eta} nominal level. \sQuote{always} -- testing all n entitites at 1.- (1.-\sQuote{eta}^(1/n)); and \sQuote{iterstep} -- use the iterated rule proposed by  Cerioli (2010), \emph{i.e.}, make an initial set of tests using the nominal size 1.- (1-\sQuote{eta}^(1/n)), and if no outliers are detected stop. Otherwise, make a second step testing for outliers at the \sQuote{eta} nominal level.}   
 
     \item{outlin}{The type of outliers to be consideres. \dQuote{MidPandLogR} if outliers may be present in both MidPpoints and LogRanges, \dQuote{MidP} if outliers are only present in MidPpoints, or \dQuote{LogR} if outliers are only present in LogRanges.}
 
     \item{reweighted}{should a (Re)weighted estimate of the covariance matrix be used in the computation of the trimmed likelihood or just a \dQuote{raw} covariance estimate; default is (Re)weighting.}
-
-    \item{otpType}{The amount of output returned by fulltle. Current options are \dQuote{OnlyEst} (default) where only an \sQuote{IdtE} object with the fulltle estimates is returned and \dQuote{SetMD2andEst} which returns a list with an \sQuote{IdtE} object of fulltle estimates, a vector with the final trimmed subset elements used to compute these estimates and the corresponding robust squared Mahalanobis distances.}
 
     \item{force}{A boolean flag indicating whether, for moderate or large data sets the algorithm should proceed anyway, regardless of an expected long excution time, due to exponential explosions in the number of different subsets that need to be avaluated by fulltle}
 
     \item{\dots}{Further arguments to be passed to internal functions of \sQuote{fulltle}.} 
 }
 
-\value{
-
-If argument \sQuote{otpType} is set to \dQuote{OnlyEst}, an object of class \code{\linkS4class{IdtE}} with the fulltle estimates, their log-likelihood values, and the value of the comparison criterion used to select the covariance configurations.
-
-If argument \sQuote{otpType} is set to \dQuote{SetMD2andEst} a list with the following components:
-
-\item{sol}{An object of class \code{\linkS4class{IdtE}} with the fulltle estimates, their log-likelihood values, and the value of the comparison criterion used to select the covariance configurations.} 
-\item{RewghtdSet}{A vector with the final trimmed subset elements used to compute the fasttle estimates.} 
-\item{RobMD2}{A vector with the robust squared Mahalanobis distances used to select the trimmed subset.} 
-\item{cnp2}{A vector of length two containing the consistency correction factor and the finite sample correction factor of the final estimate of the covariance matrix.}
-\item{raw.cov}{A matrix with the raw MCD estimator used to compute the robust squared Mahalanobis distances of RobMD2.} 
-\item{raw.cnp2}{A vector of length two containing the consistency correction factor and the finite sample correction factor of the raw estimate of the covariance matrix.}
-
-} 
+\value{An object of class \code{\linkS4class{IdtE}} with the fasttle estimates, the value of the comparison criterion used to select the covariance configurations and the robust squared Mahalanobis distances.} 
 
 \references{
 Brito, P., Duarte Silva, A. P. (2012), Modelling Interval Data with Normal and Skew-Normal Distributions. \emph{Journal of Applied Statistics} \bold{39}(1), 3--20.\cr
 
 Cerioli, A. (2010), Multivariate Outlier Detection with High-Breakdown Estimators.
-\emph{Journal of the American Statistical Association} \bold{105} (489), 147--156. 
+\emph{Journal of the American Statistical Association} \bold{105} (489), 147--156.\cr 
+
+Duarte Silva, A.P., Filzmoser, P. and Brito, P. (forthcoming), Outlier detection in interval data. \emph{Advances in Data Analysis and Classification}.\cr
 
 Hadi, A. S. and Luceno, A. (1997), Maximum trimmed likelihood estimators: a unified approach, examples, and algorithms.
 \emph{Computational Statistics and Data Analysis} \bold{25}(3), 251--272.\cr

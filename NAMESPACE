@@ -13,19 +13,23 @@ importFrom(robustbase,.MCDcnp2)
 importFrom(pcaPP,l1median)
 importFrom(sn,zeta)
 importFrom(sn,duplicationMatrix)
+importFrom(mclust,hclass)
+importFrom(mclust,hcEEE)
+importFrom(mclust,hcVVV)
 
 importClassesFrom(rrcov,CovControlMcd)
 
-export(IData, RepLOptim, DACrossVal, cnvDPtoCP, cnvCPtoDP, RobEstControl, MCDcnp2, MCDRewcnp2, qHardRoqF, getIdtOutl)
+export(IData, RepLOptim, DACrossVal, cnvDPtoCP, cnvCPtoDP, RobEstControl, MCDcnp2, MCDRewcnp2, qHardRoqF, getIdtOutl, EMControl)
 exportClasses(IData, LRTest, ConfTests, RobEstControl, Idtlda, Idtqda, IdtSNlocda, IdtSNgenda, 
   IdtSngNDE, IdtSngNDRE, IdtMxNDE, IdtMxNDRE, IdtSngSNDE, IdtMxSNDE, IdtSngNandSNDE, IdtMxNandSNDE,
   IdtMANOVA, IdtClMANOVA, IdtHetNMANOVA, IdtLocSNMANOVA, IdtGenSNMANOVA, IdtLocNSNMANOVA, IdtGenNSNMANOVA
   )
 exportPattern("*.IData")
-exportMethods(show, summary, head, tail, nrow, ncol, rownames, colnames, mle, fulltle, fasttle, coef, stdEr, vcov, var, cor, 
+exportMethods(show, summary, head, tail, nrow, ncol, rownames, colnames, mle, fulltle, fasttle, coef, stdEr, vcov, var, cor, Idtmclust,
   testMod, BestModel, CovCase, MANOVA, H0res, H1res, RobMxtDEst, lda, qda, Roblda, Robqda, snda, predict, testMod, ObsLogLiks)
 
 S3method(print,summaryIData)
+S3method(print,summaryIdtMclust)
 S3method("[",IData)
 S3method("[<-",IData)
 S3method("==",IData)

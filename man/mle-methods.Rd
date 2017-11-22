@@ -3,7 +3,7 @@
 \alias{mle-methods}
 \alias{mle,IData-method}
 \alias{mle}   
-\title{ Methods for Function mle in Package `MAINT.Data'}
+\title{ Methods for function mle in Package `MAINT.Data'}
 
 \description{Performs maximum likelihood estimation for parametric models of interval data}
 
@@ -30,7 +30,9 @@ distributions, \dQuote{SNNormal} for Skew-Normal and \dQuote{NrmandSKN} for both
 }
 
 \references{
-Brito, P., Duarte Silva, A. P.  (2012): "Modelling Interval Data with Normal and Skew-Normal Distributions". Journal of Applied Statistics, Volume 39, Issue 1, 3-20.\cr
+Azzalini, A. and Dalla Valle, A. (1996), The multivariate skew-normal distribution. \emph{Biometrika} \bold{83}(4), 715--726.\cr
+
+Brito, P., Duarte Silva, A. P.  (2012): "Modelling Interval Data with Normal and Skew-Normal Distributions". Journal of Applied Statistics, Volume 39, Issue 1, 3-20.
 }
 
 \seealso{

@@ -45,7 +45,7 @@ present, the probabilities should be specified in the order of the factor levels
 
   \item{silent}{A boolean flag indicating wether a warning message should be printed if the method fails.}
  
-  \item{CovEstMet}{Method used to estimate the common covariance matrix in \code{Roblda} (Robust linear discriminant analysis). Alternatives are \dQuote{Pooled} (default) for a pooled average of the the robust within-groups covariance estimates, and \dQuote{Globdev} for a global estimate based on all deviations from the groups multivariate l1 medians. See Todorov and Filzmoser (2009) for details.}
+  \item{CovEstMet}{Method used to estimate the common covariance matrix in \code{Roblda} (Robust linear discriminant analysis). Alternatives are \dQuote{Pooled} (default) for a pooled average of the the robust within-groups covariance estimates, and \dQuote{Globdev} for a global estimate based on all deviations from the groups multivariate l_1 medians. See Todorov and Filzmoser (2009) for details.}
  
   \item{SngDMet}{Algorithm used to find the robust estimates of location and scatter. Alternatives are \dQuote{fasttle} (default) and \dQuote{fulltle}.}
  
@@ -61,7 +61,7 @@ present, the probabilities should be specified in the order of the factor levels
 \references{
 Duarte Silva, A.P. and Brito, P. (2015), Discriminant analysis of interval data: An assessment of parametric and distance-based approaches. \emph{Journal of Classification} \bold{39}(3), 516--541.\cr
 
-Todorov V. and Filzmoser P. (2009), An Object Oriented Framework for Robust Multivariate Analysis. \emph{Journal of Statistical Software} \bold{32}(3), 1--47.
+Duarte Silva, A.P., Filzmoser, P. and Brito, P. (forthcoming), Outlier detection in interval data. \emph{Advances in Data Analysis and Classification}.\cr
 }
 
 \seealso{\code{\link{lda}}, \code{\link{qda}}, \code{\link{snda}}, \code{\linkS4class{IData}}, \code{\linkS4class{RobEstControl}}}

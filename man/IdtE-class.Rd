@@ -3,14 +3,12 @@
 \docType{class}
 \alias{IdtE-class}
 \alias{IdtSngDE-class}
-\alias{BestModel,IdtE-method}
 \alias{show,IdtE-method}
+\alias{BestModel,IdtE-method}
 \alias{testMod,IdtE-method}
 
 \title{Class IdtE}
-\description{IdtE contains estimation results for the models assumed for single distributions, or mixtures of distributions, underlying data sets of interval-valued entities. 
-\code{\linkS4class{IdtSngDE}} extends IdtE assuming that the data can be characterized by a unique distribution, \emph{i.e.}, not considering partitions of entities into different classes.
-}
+\description{IdtE contains estimation results for the models assumed for single distributions, or mixtures of distributions, underlying data sets of interval-valued entities.}
 
 \section{Slots}{
   \describe{

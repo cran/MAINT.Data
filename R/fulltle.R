@@ -3,7 +3,8 @@ setMethod("fulltle",
   function(Idt, CovCase=1:4, SelCrit=c("BIC","AIC"), alpha=0.75, use.correction=TRUE, getalpha="TwoStep", 
     rawMD2Dist=c("ChiSq","HardRockeAsF","HardRockeAdjF"), MD2Dist=c("ChiSq","CerioliBetaF"),
     eta=0.025, multiCmpCor=c("never","always","iterstep"), outlin=c("MidPandLogR","MidP","LogR"), reweighted=TRUE, 
-    otpType=c("OnlyEst","SetMD2andEst"), force=FALSE, ...)
+#    otpType=c("OnlyEst","SetMD2andEst"), force=FALSE, ...)
+    force=FALSE, ...)
   {
     if (!requireNamespace("robustbase",quietly=TRUE)) 
       stop("fulltle needs the robustbase package to work. Please install it.\n")
@@ -13,18 +14,21 @@ setMethod("fulltle",
     MD2Dist <- match.arg(MD2Dist)
     multiCmpCor <- match.arg(multiCmpCor)
     outlin <- match.arg(outlin)
-    otpType <- match.arg(otpType)
+#    otpType <- match.arg(otpType)
     q <- Idt@NIVar
 
     if (getalpha=="TwoStep")
     {
       X <- cbind(Idt@MidP,Idt@LogR)
       if (MD2Dist=="ChiSq") {
-        fstsol <- fulltle1(Idt,CovCase,SelCrit,alpha,use.correction,rawMD2Dist,eta,multiCmpCor,outlin,reweighted,otpType="OnlyEst",force=force)
+#        fstsol <- fulltle1(Idt,CovCase,SelCrit,alpha,use.correction,rawMD2Dist,eta,multiCmpCor,outlin,reweighted,otpType="OnlyEst",force=force)
+        fstsol <- fulltle1(Idt,CovCase,SelCrit,alpha,use.correction,rawMD2Dist,eta,multiCmpCor,outlin,reweighted,force=force)
         nOtls <- MDOtlDet(X,coef(fstsol)$mu,coef(fstsol)$Sigma,eta=eta,RefDist="ChiSq",multiCmpCor=multiCmpCor,otp="onlycnt")
       }  else if (MD2Dist=="CerioliBetaF")  {
-        fstsol <- fulltle1(Idt,CovCase,SelCrit,alpha,use.correction,rawMD2Dist,eta,multiCmpCor,outlin,reweighted,otpType="SetMD2andEst",force=force)
-        nOtls <- MDOtlDet(X,coef(fstsol$sol)$mu,coef(fstsol$sol)$Sigma,eta=eta,RefDist="CerioliBetaF",Rewind=fstsol$RewghtdSet,multiCmpCor=multiCmpCor,otp="onlycnt")
+#        fstsol <- fulltle1(Idt,CovCase,SelCrit,alpha,use.correction,rawMD2Dist,eta,multiCmpCor,outlin,reweighted,otpType="SetMD2andEst",force=force)
+        fstsol <- fulltle1(Idt,CovCase,SelCrit,alpha,use.correction,rawMD2Dist,eta,multiCmpCor,outlin,reweighted,force=force)
+#        nOtls <- MDOtlDet(X,coef(fstsol$sol)$mu,coef(fstsol$sol)$Sigma,eta=eta,RefDist="CerioliBetaF",Rewind=fstsol$RewghtdSet,multiCmpCor=multiCmpCor,otp="onlycnt")
+        nOtls <- MDOtlDet(X,coef(fstsol)$mu,coef(fstsol)$Sigma,eta=eta,RefDist="CerioliBetaF",Rewind=fstsol@RewghtdSet,multiCmpCor=multiCmpCor,otp="onlycnt")
       }
       if (nOtls==0) {
         Config <- getConfig(...)
@@ -38,9 +42,9 @@ setMethod("fulltle",
         finalsol <- IdtNmle(Idt,CovCaseArg=CovCaseArg,Config=Config,SelCrit=SelCrit)
         warning(paste("fasttle returned the classical maximum likelihood estimates because the data does not appear to include any outlier.\n",
           "If you want to force a trimmed likelihood estimator run fasttle with the argument getalpha=FALSE.\n"))
-        if (otpType=="OnlyEst") {
-          return(finalsol)
-        }  else {
+#        if (otpType=="OnlyEst") {
+#          return(finalsol)
+#        }  else {
           rawSet <- RewghtdSet <- 1: Idt@NObs
           names(rawSet) <- names(RewghtdSet) <- Idt@ObsNames
           if (outlin=="MidPandLogR") {
@@ -52,17 +56,20 @@ setMethod("fulltle",
           } 
           return(list(sol=finalsol,rawSet=rawSet,RewghtdSet=RewghtdSet,RobMD2=RobMD2,
               cnp2=c(1.,1.),raw.cov=coef(fstsol)$Sigma,raw.cnp2=c(1.,1.)))
-        }
+#        }
       }  
       newalpha <- 1. - nOtls/Idt@NObs
-      return( fulltle1(Idt,CovCase,SelCrit,newalpha,use.correction,rawMD2Dist,eta,multiCmpCor,outlin,reweighted,otpType,force) )
+#      return( fulltle1(Idt,CovCase,SelCrit,newalpha,use.correction,rawMD2Dist,eta,multiCmpCor,outlin,reweighted,otpType,force) )
+      return( fulltle1(Idt,CovCase,SelCrit,newalpha,use.correction,rawMD2Dist,eta,multiCmpCor,outlin,reweighted,force) )
     }  else {
-      return( fulltle1(Idt,CovCase,SelCrit,alpha,use.correction,rawMD2Dist,eta,multiCmpCor,outlin,reweighted,otpType,force) )
+#      return( fulltle1(Idt,CovCase,SelCrit,alpha,use.correction,rawMD2Dist,eta,multiCmpCor,outlin,reweighted,otpType,force) )
+      return( fulltle1(Idt,CovCase,SelCrit,alpha,use.correction,rawMD2Dist,eta,multiCmpCor,outlin,reweighted,force) )
     } 
   }
 )
 
-fulltle1 <-  function(Idt,CovCase,SelCrit,alpha,use.correction,rawMD2Dist,eta,multiCmpCor,outlin,reweighted,otpType,force,...)
+#fulltle1 <-  function(Idt,CovCase,SelCrit,alpha,use.correction,rawMD2Dist,eta,multiCmpCor,outlin,reweighted,otpType,force,...)
+fulltle1 <-  function(Idt,CovCase,SelCrit,alpha,use.correction,rawMD2Dist,eta,multiCmpCor,outlin,reweighted,force,...)
 {
   Config <- getConfig(...)
   if (is.null(Config))  
@@ -117,8 +124,8 @@ fulltle1 <-  function(Idt,CovCase,SelCrit,alpha,use.correction,rawMD2Dist,eta,mu
       }  else {
         Cftmpsol <- .Call("Cfulltle", X, n, p, k, Cnf, c0, PACKAGE = "MAINT.Data" )
       }
-      CmpCrt <- -2*Cftmpsol$LogLik + penC*npar(Cnf,p,p/2)
-      Cftmpsol$Set <- Cftmpsol$Set + 1 # Conversion of C 0-ind convention to R 1-ind convention
+     CmpCrt <- -2*Cftmpsol$LogLik + penC*npar(Cnf,p,p/2)
+     Cftmpsol$Set <- Cftmpsol$Set + 1 # Conversion of C 0-ind convention to R 1-ind convention
       if (CmpCrt < bestCrt) {
         bestCrt <- CmpCrt
         bestSet <- Cftmpsol$Set
@@ -171,8 +178,8 @@ fulltle1 <-  function(Idt,CovCase,SelCrit,alpha,use.correction,rawMD2Dist,eta,mu
       Sigma <- rawcov[Vind,Vind] <- dhn[bestsol@BestModel] * rawcov[Vind,Vind]
     }
     SigmaI <- pdwt.solve(Sigma)
+    oneminuseta <- 1-eta
     MD2 <- apply(Xdev,1,function(x) x%*%SigmaI%*%x)
-
     oneminuseta <- 1-eta
     if (multiCmpCor=="always" || multiCmpCor=="iterstep") {
       oneminusalpha <- oneminuseta^(1/n)
@@ -203,8 +210,8 @@ fulltle1 <-  function(Idt,CovCase,SelCrit,alpha,use.correction,rawMD2Dist,eta,mu
         findotl <- FALSE
       }
     }
-
     bestsol <- IdtNmle(Idt[RewghtdSet,],CovCaseArg=CovCaseArg,Config=Config,SelCrit=SelCrit)
+
     m <- length(RewghtdSet)
     rdmhn1 <- robustbase::.MCDcons(p,m/n)
     if (outlin=="MidPandLogR")  {
@@ -215,8 +222,7 @@ fulltle1 <-  function(Idt,CovCase,SelCrit,alpha,use.correction,rawMD2Dist,eta,mu
       }
       for (Cnf in Config) {
         CvCase <- CovCaseMap[Cnf]	
-        bestsol@CovConfCases[[CvCase]]$RobSigE <- rdmhn[CvCase] * bestsol@CovConfCases[[CvCase]]$mleSigE
-        bestsol@CovConfCases[[CvCase]]$mleSigE <- NULL
+        bestsol@CovConfCases[[CvCase]]$mleSigE <- rdmhn[CvCase] * bestsol@CovConfCases[[CvCase]]$mleSigE
       }
     } else {
       if (use.correction) {
@@ -226,9 +232,7 @@ fulltle1 <-  function(Idt,CovCase,SelCrit,alpha,use.correction,rawMD2Dist,eta,mu
       }
       for (Cnf in Config) {
         CvCase <- CovCaseMap[Cnf]	
-        bestsol@CovConfCases[[CvCase]]$RobSigE <- matrix(nrow=p,ncol=p,dimnames=dimnames(bestsol@CovConfCases[[CvCase]]$mleSigE))
-        bestsol@CovConfCases[[CvCase]]$RobSigE[Vind,Vind] <- rdmhn[CvCase] * bestsol@CovConfCases[[CvCase]]$mleSigE[Vind,Vind]
-        bestsol@CovConfCases[[CvCase]]$mleSigE <- NULL
+        bestsol@CovConfCases[[CvCase]]$mleSigE[Vind,Vind] <- rdmhn[CvCase] * bestsol@CovConfCases[[CvCase]]$mleSigE[Vind,Vind]
       }
     }
   }
