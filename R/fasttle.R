@@ -48,8 +48,6 @@ setMethod("fasttle",
       }  else if (MD2Dist=="CerioliBetaF") {
         fstsol <- fasttle1(Idt,CovCase,SelCrit,alpha,nsamp,ncsteps,trace,use.correction,
           rawMD2Dist,eta,multiCmpCor,kdblstar,outlin,trialmethod,m,reweighted,otpType="SetMD2andEst")
-#        nOtls <- MDOtlDet(X,coef(fstsol$sol)$mu,coef(fstsol$sol)$Sigma,eta=eta,RefDist="CerioliBetaF",
-#          Rewind=fstsol$RewghtdSet,multiCmpCor=multiCmpCor,otp="onlycnt")
         nOtls <- MDOtlDet(X,coef(fstsol)$mu,coef(fstsol)$Sigma,eta=eta,RefDist="CerioliBetaF",
           Rewind=fstsol@RewghtdSet,multiCmpCor=multiCmpCor,otp="onlycnt")
       }
@@ -78,12 +76,6 @@ setMethod("fasttle",
             RobMD2 <- GetMD2(X[,(q+1):(2*q)],coef(finalsol)$mu[(q+1):(2*q)],coef(finalsol)$Sigma[(q+1):(2*q),(q+1):(2*q)])
           } 
           if (otpType=="SetMD2andEst") { 
-#            return(list(sol=finalsol,rawSet=rawSet,RewghtdSet=RewghtdSet,RobMD2=RobMD2,
-#              cnp2=c(1.,1.),raw.cov=coef(fstsol)$Sigma,raw.cnp2=c(1.,1.)))
-#          }  else if (otpType=="SetMD2EstandPrfSt") {
-#            return(list(sol=finalsol,rawSet=rawSet,RewghtdSet=RewghtdSet,RobMD2=RobMD2,
-#              cnp2=c(1.,1.),raw.cov=coef(fstsol)$Sigma,raw.cnp2=c(1.,1.),
-#              PerfSt=list(RepSteps=NULL,RepLogLik=NULL,StpLogLik=NULL)))
             return(new("IdtSngNDRE",ModelNames=finalsol@ModelNames,ModelType=finalsol@ModelType,ModelConfig=finalsol@ModelConfig,
               NIVar=finalsol@NIVar,SelCrit=finalsol@SelCrit,logLiks=finalsol@logLiks,BICs=finalsol@BICs,AICs=finalsol@AICs,
               BestModel=finalsol@BestModel,RobNmuE=finalsol@mleNmuE,CovConfCases=finalsol@CovConfCases,SngD=TRUE,
@@ -428,17 +420,7 @@ getIdtOutl <- function(Idt,IdtE=NULL,muE=NULL,SigE=NULL,
     if (is.null(IdtE)) {
       stop("Missing mean and/or covariance estimates in call to getIdtOutl.\n")
     }  
-#    if (class(IdtE)!="list" && isClass(IdtE,"IdtSngNDE")) {
-#      if (is.null(muE)) muE <- coef(IdtE)$mu
-#      if (is.null(SigE)) SigE <- coef(IdtE)$Sigma
-#    } else {
-#      if (class(IdtE)!="list" || !isClass(IdtE$sol,"IdtSngNDE")) {
-#        stop("IdtE argument is not of class IdtSngNDRE or IdtSngNDE, or a list with a sol component of class IdtSngNDRE or IdtSngNDE, as required.\n")
-#     }
-#      if (is.null(muE)) muE <- coef(IdtE$sol)$mu
-#      if (is.null(SigE)) SigE <- coef(IdtE$sol)$Sigma
-#    }
-     if (!isClass(IdtE$sol,"IdtSngNDE")) {
+     if (!isClass(IdtE,"IdtSngNDE")) {
         stop("IdtE argument is not of class IdtSngNDRE or IdtSngNDE as required.\n")
      }
      if (is.null(muE)) muE <- coef(IdtE)$mu

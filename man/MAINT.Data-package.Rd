@@ -18,14 +18,14 @@ We focus on the analysis of interval data, i.e., where elements are described by
 Parametric inference methodologies based on probabilistic models for interval variables are developed in Brito and Duarte Silva (2011) where each interval is represented by its midpoint and log-range,for which Normal and Skew-Normal (Azzalini and Dalla Valle (1996)) distributions are assumed.
 The intrinsic nature of the interval variables leads to special structures of the variance-covariance matrix, which are represented by four different possible configurations.\cr
 MAINT.Data implements the proposed methodologies in R, introducing a data class for representing interval data; it
-includes functions for modelling and analysing interval data, in particular maximum likelihood and trimmed maximum likelihood (Duarte Silva, Filzmoser and Brito (forthcoming)) estimation, and statistical tests for the different considered configurations. 
+includes functions for modelling and analysing interval data, in particular maximum likelihood and trimmed maximum likelihood (Duarte Silva, Filzmoser and Brito (2017)) estimation, and statistical tests for the different considered configurations. 
 Methods for (M)ANOVA, Discriminant Analysis (Duarte Silva and Brito (2015)) and model based clustering (Brito, Duarte Silva and Dias (2015))  of this data class are also provided.
 
 \tabular{ll}{
 Package: \tab MAINT.Data\cr
 Type: \tab Package\cr
-Version: \tab 1.2.0\cr
-Date: \tab 2017-11-22\cr
+Version: \tab 1.2.1\cr
+Date: \tab 2018-01-7\cr
 License: \tab GPL-2\cr
 LazyLoad: \tab yes\cr
 LazyData: \tab yes\cr
@@ -47,7 +47,7 @@ Brito, P., Duarte Silva, A. P. and Dias, J. G. (2015), Probabilistic Clustering 
 
 Duarte Silva, A.P. and Brito, P. (2015), Discriminant analysis of interval data: An assessment of parametric and distance-based   approaches. \emph{Journal of Classification} \bold{39}(3), 516--541.\cr
 
-Duarte Silva, A.P., Filzmoser, P. and Brito, P. (forthcoming), Outlier detection in interval data. \emph{Advances in Data Analysis and Classification}.\cr
+Duarte Silva, A.P., Filzmoser, P. and Brito, P. (2017), Outlier detection in interval data. \emph{Advances in Data Analysis and Classification}, 1--38.\cr
 
 Noirhomme-Fraiture, M. and Brito, P. (2011), Far Beyond the Classical Data Models: Symbolic Data Analysis. \emph{Statistical Analysis and Data Mining} \bold{4}(2), 157--170.
 }

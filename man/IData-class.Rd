@@ -54,7 +54,7 @@ Azzalini, A. and Dalla Valle, A. (1996), The multivariate skew-normal distributi
 
 Brito, P., Duarte Silva, A. P. (2012), Modelling Interval Data with Normal and Skew-Normal Distributions. \emph{Journal of Applied Statistics} \bold{39}(1), 3--20.\cr
 
-Duarte Silva, A.P., Filzmoser, P. and Brito, P. (forthcoming), Outlier detection in interval data. \emph{Advances in Data Analysis and Classification}.\cr
+Duarte Silva, A.P., Filzmoser, P. and Brito, P. (2017), Outlier detection in interval data. \emph{Advances in Data Analysis and Classification}, 1--38.\cr
 
 Noirhomme-Fraiture, M., Brito, P. (2011), Far Beyond the Classical Data Models: Symbolic Data Analysis. \emph{Statistical Analysis and Data Mining} \bold{4}(2), 157--170.
 }

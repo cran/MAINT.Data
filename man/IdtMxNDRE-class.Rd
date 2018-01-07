@@ -54,7 +54,7 @@ No methods defined with class IdtMxNDRE in the signature.
 \references{
 Brito, P., Duarte Silva, A. P. (2012), Modelling Interval Data with Normal and Skew-Normal Distributions. \emph{Journal of Applied Statistics} \bold{39}(1), 3--20.\cr
 
-Duarte Silva, A.P., Filzmoser, P. and Brito, P. (forthcoming), Outlier detection in interval data. \emph{Advances in Data Analysis and Classification}.\cr
+Duarte Silva, A.P., Filzmoser, P. and Brito, P. (2017), Outlier detection in interval data. \emph{Advances in Data Analysis and Classification}, 1--38.\cr
 }
 
 \seealso{

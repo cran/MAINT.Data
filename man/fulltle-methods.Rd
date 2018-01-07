@@ -54,7 +54,7 @@ Brito, P., Duarte Silva, A. P. (2012), Modelling Interval Data with Normal and S
 Cerioli, A. (2010), Multivariate Outlier Detection with High-Breakdown Estimators.
 \emph{Journal of the American Statistical Association} \bold{105} (489), 147--156.\cr 
 
-Duarte Silva, A.P., Filzmoser, P. and Brito, P. (forthcoming), Outlier detection in interval data. \emph{Advances in Data Analysis and Classification}.\cr
+Duarte Silva, A.P., Filzmoser, P. and Brito, P. (2017), Outlier detection in interval data. \emph{Advances in Data Analysis and Classification}, 1--38.\cr
 
 Hadi, A. S. and Luceno, A. (1997), Maximum trimmed likelihood estimators: a unified approach, examples, and algorithms.
 \emph{Computational Statistics and Data Analysis} \bold{25}(3), 251--272.\cr

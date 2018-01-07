@@ -37,7 +37,7 @@ If kept at NULL (default) the defaults of \code{pcaPP::l1median} will be used.}
 \references{
 Brito, P., Duarte Silva, A. P. (2012), Modelling Interval Data with Normal and Skew-Normal Distributions. \emph{Journal of Applied Statistics} \bold{39}(1), 3--20.\cr
 
-Duarte Silva, A.P., Filzmoser, P. and Brito, P. (forthcoming), Outlier detection in interval data. \emph{Advances in Data Analysis and Classification}.\cr
+Duarte Silva, A.P., Filzmoser, P. and Brito, P. (2017), Outlier detection in interval data. \emph{Advances in Data Analysis and Classification}, 1--38.\cr
 
 Todorov V. and Filzmoser P. (2009), An Object Oriented Framework for Robust Multivariate Analysis. \emph{Journal of Statistical Software} \bold{32}(3), 1--47.
 }
