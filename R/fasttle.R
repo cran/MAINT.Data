@@ -64,7 +64,7 @@ setMethod("fasttle",
         warning(paste("fasttle returned the classical maximum likelihood estimates because the data does not appear to include any outlier.\n",
           "If you want to force a trimmed likelihood estimator run fasttle with the argument getalpha=FALSE.\n"))
         if (otpType=="OnlyEst") {
-          return(finalsol)
+           stop("otpType argument 'OnlyEst' has beed decrepated\n")
         }  else {
           rawSet <- RewghtdSet <- 1:Idt@NObs
           names(rawSet) <- names(RewghtdSet) <- Idt@ObsNames
@@ -75,6 +75,12 @@ setMethod("fasttle",
           } else if (outlin=="LogR") {
             RobMD2 <- GetMD2(X[,(q+1):(2*q)],coef(finalsol)$mu[(q+1):(2*q)],coef(finalsol)$Sigma[(q+1):(2*q),(q+1):(2*q)])
           } 
+          for (case in 1:length(finalsol@CovConfCases)) {
+            if (!is.null(finalsol@CovConfCases[[case]])) {
+              names(finalsol@CovConfCases[[case]])[1] <- "RobSigE"
+              finalsol@CovConfCases[[case]][2] <- finalsol@CovConfCases[[case]][3] <- NULL
+            }
+          }
           if (otpType=="SetMD2andEst") { 
             return(new("IdtSngNDRE",ModelNames=finalsol@ModelNames,ModelType=finalsol@ModelType,ModelConfig=finalsol@ModelConfig,
               NIVar=finalsol@NIVar,SelCrit=finalsol@SelCrit,logLiks=finalsol@logLiks,BICs=finalsol@BICs,AICs=finalsol@AICs,
