@@ -415,12 +415,14 @@ getIdtOutl <- function(Idt,IdtE=NULL,muE=NULL,SigE=NULL,
   outlin <- match.arg(outlin)
 
   if ( RefDist=="CerioliBetaF" && is.null(Rewind) ) {
-    if ( class(IdtE)!="list" || is.null(IdtE$RewghtdSet) ) {
+#    if ( class(IdtE)!="list" || is.null(IdtE$RewghtdSet) ) {
+    if ( class(IdtE)!="IdtSngNDRE" || is.null(IdtE@RewghtdSet) ) {
       stop(paste("\n\nCerioliBetaF reference distribution with missing information\nabout the observations used in the re-weighted MCD estimator.\n",
                  "You need to specify this information, either using the Rewind argument,\nor through a list with a RewghtdSet component in the IdtE argument.\n")
           )
     }
-    Rewind <- IdtE$RewghtdSet
+#    Rewind <- IdtE$RewghtdSet
+    Rewind <- IdtE@RewghtdSet
   }  
   if ( is.null(muE) || is.null(SigE) ) {
     if (is.null(IdtE)) {

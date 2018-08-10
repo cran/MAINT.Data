@@ -1,8 +1,8 @@
 Package: MAINT.Data
 Type: Package
 Title: Model and Analyse Interval Data
-Version: 1.2.2
-Date: 2018-07-1
+Version: 1.2.3
+Date: 2018-08-10
 Author: Pedro Duarte Silva <psilva@porto.ucp.pt>, Paula Brito
     <mpbrito.fep.up.pt>
 Maintainer: Pedro Duarte Silva <psilva@porto.ucp.pt>
@@ -21,5 +21,5 @@ Imports: MASS, methods, miscTools, robustbase, rrcov, pcaPP, mclust
 LinkingTo: Rcpp, RcppEigen
 NeedsCompilation: yes
 Repository: CRAN
-Packaged: 2018-06-30 16:24:48 UTC; antonio
-Date/Publication: 2018-06-30 17:04:32 UTC
+Packaged: 2018-08-10 17:01:03 UTC; antonio
+Date/Publication: 2018-08-10 23:00:02 UTC

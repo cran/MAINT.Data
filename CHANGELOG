@@ -1,6 +1,17 @@
+########## Version 1.2.3 (August 2018) ###################
+
+Version 1.2.3 fixes a small bug in the interface of getIdtOutl.
+In previous versions the getIdtOutl argument IdtE was wrongly assumed to be a list instead
+of an object of class IdtSngNDE (single distribution classical normal estimators) or IdtSngNDRE 
+(single distribution robust normal estimators), as required.
+This problem prevented getIdtOutl from automatically recovering the list of observations used 
+in the re-weighted MCD estimator, from the RewghtdSet slot (when not NULL) of the IdtE argument, 
+as originally intended.  
+The problem was fixed in version 1.2.3
+
 ########## Version 1.2.2 (July 2018) ###################
 
-Version 1.2.1 fixes a bug in function fasttle that occurred when this procedure was called with
+Version 1.2.2 fixes a bug in function fasttle that occurred when this procedure was called with
 argument getalpha="TwoStep” and in the first step no outlier was detected. In this situation
 versions 1.2.1 and older failed to distinguish between objects of class IdtSngNDE (single
 distribution classical normal estimators) and IdtSngNDRE (single distribution robust normal estimators).

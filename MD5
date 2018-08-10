@@ -1,5 +1,5 @@
-4b13493cac87c462fca69fd2e9b8f7a0 *CHANGELOG
-690b524e3232a1c3c7bade184a1aae15 *DESCRIPTION
+c654de634c27265d2dde4216ef6a981b *CHANGELOG
+8df68e7f533d0dc69c6effd8f353e42f *DESCRIPTION
 524bca415c72015675ece5501317d8c1 *NAMESPACE
 2e3889cb61efdcdbc73b1d8aa323b52e *R/Azzalini_sn_code.R
 522814a14c239342aef323af47236429 *R/CPLogLik.grads.R
@@ -23,7 +23,7 @@ a41dc0b8baa76da16d74a1d89bb584c4 *R/RobMxtDEst.R
 8f4426bed69b30a1d725c7a6a4ccbdeb *R/Robldaqda.R
 8f032c01c2656a8e104488d035b90d38 *R/SNmle.R
 ab1fa125fe7183bea9137f80bbf700ea *R/SkNObsLikGradients.R
-e85820f034cecd8483588789c3a2a40b *R/fasttle.R
+3dd4694332a2ac5d3323da15471784e4 *R/fasttle.R
 4ef62467fa7675282091ca660e7572f7 *R/feasmu0.R
 c906017857ccc67d455f826f2916947c *R/fulltle.R
 451b76a415af39e1a65e695dd0fd4554 *R/lqda.R
@@ -74,7 +74,7 @@ e9c0985b8a951a3b688c0829169a8836 *man/Idtlda-class.Rd
 504dc3b9209665c32c3493a6499e8ad5 *man/LoansbyRskLvs_minmaxDt.Rd
 8fba1fb23080c8a71253e9d08dd5f0bf *man/LoansbyRskLvs_qntlDt.Rd
 c9efadc3626ac4c5d07fc237f776dcdf *man/MAINT.Data-internal.Rd
-943e96a72096a3ffb381dd4fd925984d *man/MAINT.Data-package.Rd
+b6432cc73dee874e0b57db658f1dea17 *man/MAINT.Data-package.Rd
 79841e58641f4858b2364ccd20fc1ba7 *man/MANOVA-methods.Rd
 777d2d2f270428fb3bc8344042fb5f23 *man/RepLOptim.Rd
 8b2d0c6bec4e307039e0c361c6f7d07c *man/RobEstControl-class.Rd
