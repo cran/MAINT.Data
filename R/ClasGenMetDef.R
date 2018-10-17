@@ -85,6 +85,7 @@ setGeneric("colnames")
 setGeneric("var")
 setGeneric("cor")
 setGeneric("mean",signature="x")
+setGeneric("plot",signature=c("x","y"))
 setGeneric("summary",signature="object")
 setGeneric("head",package="utils",signature="x")
 setGeneric("tail",package="utils",signature="x")
@@ -113,7 +114,6 @@ setGeneric("fulltle",
   function(Idt, CovCase=1:4, SelCrit=c("BIC","AIC"), alpha=0.75, use.correction=TRUE, getalpha="TwoStep", 
     rawMD2Dist=c("ChiSq","HardRockeAsF","HardRockeAdjF"), MD2Dist=c("ChiSq","CerioliBetaF"),
     eta=0.025,multiCmpCor=c("never","always","iterstep"), outlin=c("MidPandLogR","MidP","LogR"), reweighted=TRUE, 
-#    otpType=c("OnlyEst","SetMD2andEst"), force=FALSE, ...)
     force=FALSE, ...)
   standardGeneric("fulltle"))
 
@@ -159,4 +159,6 @@ setGeneric("Robqda",
 setGeneric("Idtmclust",
   function(Idt, G=1:9, CovCase=1:4, SelCrit=c("BIC","AIC"), Mxt=c("Hom","Het","HomandHet"), control=EMControl())
   standardGeneric("Idtmclust"))
+
+
 

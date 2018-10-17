@@ -10,6 +10,8 @@
 \alias{!=.IData}
 \alias{[.IData}
 \alias{[<-.IData}
+\alias{rbind.IData}
+\alias{cbind.IData}
 
 \alias{show,IData-method}
 \alias{nrow,IData-method}

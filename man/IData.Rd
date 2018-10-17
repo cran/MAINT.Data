@@ -27,7 +27,7 @@ VarNames=NULL, ObsNames=row.names(Data))
 \details{Objects of class \code{\linkS4class{IData}} describe a data set of \sQuote{NObs} observations on \sQuote{NIVar} Interval-valued variables. This function creates an interval-data object from a data-frame with either the lower and upper bounds of the observed intervals or by their midpoints and log-ranges.}
 
 \seealso{
-  \code{\linkS4class{IData}} 
+  \code{\linkS4class{IData}}, \code{\link{AgrMcDt}}
 }
 
 \keyword{interval data}

@@ -74,6 +74,96 @@ setMethod("tail",
   }
 )
 
+setMethod("plot",
+  signature(x = "IData",y = "IData"),
+  function(x, y, ...)
+  {
+    if (x@NIVar > 1) stop("Currently IData method plot can plot only one integer variable on the horizontal axis\n")
+    if (y@NIVar > 1) stop("Currently IData method plot can plot only one integer variable on the vertical axis\n")
+    if (x@NObs != y@NObs) stop("Arguments x and y have a different number of elements\n")
+  
+    par <- match.call(expand.dots = TRUE)
+    if (is.null(par$type)) {
+      type <- "crosses"
+    } else {
+      type <- par$type
+    }
+    if (type!="crosses" && type!="rectangles") stop("Wrong value for type argument\n")
+    if (is.null(par$main)) {
+      main <- paste(y@VarNames,"vs.",x@VarNames)
+    } else {
+      main <- par$main
+    }
+    sub <- par$sub 
+    if (is.null(par$xlab)) {
+      xlab <- x@VarNames
+    } else {
+      xlab <- par$xlab
+    }
+    if (is.null(par$ylab)) {
+      ylab <- y@VarNames
+    } else {
+      ylab <- par$ylab
+    }
+  
+    HlfRngx <- exp(x@LogR[,1])/2
+    Lbx <- x@MidP[,1] - HlfRngx 
+    Ubx <- x@MidP[,1] + HlfRngx 
+    HlfRngy <- exp(y@LogR[,1])/2
+    Lby <- y@MidP[,1] - HlfRngy 
+    Uby <- y@MidP[,1] + HlfRngy 
+  
+    minvx <- min(Lbx)
+    maxvx <-max(Ubx)
+    minvy <- min(Lby)
+    maxvy <-max(Uby)
+    plot(c(minvx-0.5,maxvx+0.5),c(minvy-0.5,maxvy+0.5),type="n",
+         xlab=xlab,ylab=ylab,main=main,sub=sub)
+    if (type=="crosses") {
+      segments(x0=Lbx,y0=y@MidP[,1],x1=Ubx,y1=y@MidP[,1])
+      segments(x0=x@MidP[,1],y0=Lby,x1=x@MidP[,1],y1=Uby)
+    } else if (type=="rectangles") {
+      for (i in 1:x@NObs) rect(Lbx[i],Lby[i],Ubx[i],Uby[i],lty=1)
+    }
+  }
+)
+
+setMethod("plot",
+  signature(x = "IData",y = "missing"),
+  function(x, ...)
+  {
+    if (x@NIVar > 1) stop("Currently method plot can plot only one integer variable on the horizontal axis\n")
+  
+    par <- match.call(expand.dots = TRUE)
+    if (is.null(par$main)) {
+      main <- x@VarNames
+    } else {
+      main <- par$main
+    }
+    sub <- par$sub 
+    if (is.null(par$xlab)) {
+      xlab <- x@VarNames
+    } else {
+      xlab <- par$xlab
+    }
+    if (is.null(par$ylab)) {
+      ylab <- "Case numbers"
+    } else {
+      ylab <- par$ylab
+    }
+    
+    HlfRngx <- exp(x@LogR[,1])/2
+    Lbx <- x@MidP[,1] - HlfRngx 
+    Ubx <- x@MidP[,1] + HlfRngx 
+    ycord <- 1:x@NObs
+  
+    minvx <- min(Lbx)
+    maxvx <-max(Ubx)
+    plot(c(minvx-0.5,maxvx+0.5),c(0,x@NObs+1),type="n",xlab=xlab,ylab=ylab,main=main,sub=sub)
+    segments(x0=Lbx,y0=ycord,x1=Ubx,y1=ycord)
+  }
+)
+
 print.summaryIData <- function(x,...) 
 {
   cat("Mid-Points summary:\n") ; print(x$MidPsumar)
@@ -153,6 +243,57 @@ IData <- function(Data,
   if ( x@NObs != y@NObs || x@NIVar != y@NIVar )
     stop("!= only defined for equally-sized IData objects\n")
   !(x==y)
+}
+
+rbind.IData <- function(x, y, ...)
+{
+  if (class(x)!="IData") stop("Argument x is not an object of class IData\n")
+  if (class(y)!="IData") stop("Argument y is not an object of class IData\n")
+  if (x@NIVar != y@NIVar) stop("Arguments x and y have a different number of interval-valued variables\n")
+  dataDF <- rbind(cbind(x@MidP,x@LogR),cbind(y@MidP,y@LogR))
+  if (x@NIVar==1) {
+    ONames <- c(x@ObsNames,y@ObsNames)
+  } else {
+    ONames <- rownames(dataDF)
+  }
+  par <- match.call()
+  lpar <- length(par)
+  if (lpar>4) for (i in 3:(lpar-2))  {
+    newIDtObj <- eval(par[[i]])
+    if (i==3) auxtxt <- "rd " else auxtxt <- "-th "
+    if (class(newIDtObj)!="IData") stop("The ",i,auxtxt,"argument is not an object of class IData\n")
+    if (x@NIVar != newIDtObj@NIVar) stop("First and ",i,auxtxt,"argument have a different number of interval-valued variables\n")
+    dataDF <- rbind(dataDF,cbind(newIDtObj@MidP,newIDtObj@LogR))
+    if (x@NIVar==1) {
+      ONames <- c(ONames,newIDtObj@ObsNames)
+    } else {
+      ONames <- rownames(dataDF)
+    }
+  }  
+  IData(dataDF,Seq="AllMidP_AllLogR",ObsNames=ONames,VarNames=x@VarNames)
+}
+
+cbind.IData <- function(x, y, ...)
+{
+  if (class(x)!="IData") stop("Argument x is not an object of class IData\n")
+  if (class(y)!="IData") stop("Argument y is not an object of class IData\n")
+  if (x@NObs != y@NObs) stop("Arguments x and y have a different number of rows\n")
+  dataDF <- cbind(x@MidP,y@MidP,x@LogR,y@LogR)
+  if (x@NIVar==1 && y@NIVar==1) rownames(dataDF) <- x@ObsNames
+  VNames <- c(x@VarNames,y@VarNames)
+  par <- match.call()
+  lpar <- length(par)
+  curnIvar <- x@NIVar + y@NIVar
+  if (lpar>4) for (i in 3:(lpar-2))  {
+    newIDtObj <- eval(par[[i]])
+    if (i==3) auxtxt <- "rd " else auxtxt <- "-th "
+    if (class(newIDtObj)!="IData") stop("The ",i,auxtxt,"argument is not an object of class IData\n")
+    if (x@NObs != newIDtObj@NObs) stop("First and ",i,auxtxt,"argument have a different number of rows\n")
+    dataDF <- cbind(dataDF[,1:curnIvar],newIDtObj@MidP,dataDF[,(curnIvar+1):(2*curnIvar)],newIDtObj@LogR)
+    VNames <- c(VNames,newIDtObj@VarNames)
+    curnIvar <- curnIvar + newIDtObj@NIVar
+  }  
+  IData(dataDF,Seq="AllMidP_AllLogR",VarNames=VNames)
 }
 
 

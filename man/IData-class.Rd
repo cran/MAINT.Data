@@ -32,6 +32,7 @@
     \item{colnames}{\code{signature(x = "IData")}: returns column (variable) names for an object of class IData.}
     \item{head}{\code{signature(x = "IData")}: head S4 method for the IData-class.}
     \item{tail}{\code{signature(x = "IData")}: tail S4 method for the IData-class.}
+    \item{plot}{\code{signature(x = "IData")}: plot S4 methods for the IData-class.}
     \item{mle}{\code{signature(x = "IData")}: Maximum likelihood estimation.}
     \item{fasttle}{\code{signature(x = "IData")}: Fast trimmed maximum likelihood estimation.}
     \item{fulltle}{\code{signature(x = "IData")}: Exact trimmed maximum likelihood estimation.}
@@ -60,7 +61,7 @@ Noirhomme-Fraiture, M., Brito, P. (2011), Far Beyond the Classical Data Models: 
 }
 
 \seealso{
-\code{\link{IData}}, \code{\link{mle}}, \code{\link{fasttle}}, \code{\link{fulltle}}, \code{\link{RobMxtDEst}}, 
+\code{\link{IData}}, \code{\link{AgrMcDt}}, \code{\link{mle}}, \code{\link{fasttle}}, \code{\link{fulltle}}, \code{\link{RobMxtDEst}}, 
 \code{\link{MANOVA}}, \code{\link{lda}}, \code{\link{qda}}, \code{\link{Roblda}}, \code{\link{Robqda}}
 }
 
