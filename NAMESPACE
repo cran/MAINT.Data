@@ -21,7 +21,7 @@ importFrom(mclust,hcVVV)
 
 importClassesFrom(rrcov,CovControlMcd)
 
-export(IData, RepLOptim, DACrossVal, cnvDPtoCP, cnvCPtoDP, RobEstControl, MCDcnp2, MCDRewcnp2, qHardRoqF, getIdtOutl, EMControl)
+export(AgrMcDt, IData, RepLOptim, DACrossVal, cnvDPtoCP, cnvCPtoDP, RobEstControl, MCDcnp2, MCDRewcnp2, qHardRoqF, getIdtOutl, EMControl)
 exportClasses(IData, LRTest, ConfTests, RobEstControl, Idtlda, Idtqda, IdtSNlocda, IdtSNgenda, 
   IdtSngNDE, IdtSngNDRE, IdtMxNDE, IdtMxNDRE, IdtSngSNDE, IdtMxSNDE, IdtSngNandSNDE, IdtMxNandSNDE,
   IdtMANOVA, IdtClMANOVA, IdtHetNMANOVA, IdtLocSNMANOVA, IdtGenSNMANOVA, IdtLocNSNMANOVA, IdtGenNSNMANOVA

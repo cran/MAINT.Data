@@ -1,6 +1,12 @@
-DACrossVal <- function(data,grouping,TrainAlg,EvalAlg=EvalClrule,Strfolds=TRUE,kfold=10,CVrep=20,prior="proportions",loo=FALSE,...)
+DACrossVal <- function(data,grouping,TrainAlg,EvalAlg=EvalClrule,Strfolds=TRUE,kfold=10,CVrep=20,
+  prior="proportions",loo=FALSE,...)
 {
-  fold <- function(n,kfold,fi) return((round((fi-1)*n/kfold)+1):round(fi*n/kfold))
+  fold <- function(n,kfold,fi) {
+    lb <- floor((fi-1)*n/kfold) + 1
+    ub <- floor(fi*n/kfold)
+    if (lb>ub) return(NULL)
+    lb:ub  # return(lb:ub)
+  }   
 
   codes <- levels(grouping)
   nk <- table(grouping)
@@ -34,10 +40,11 @@ DACrossVal <- function(data,grouping,TrainAlg,EvalAlg=EvalClrule,Strfolds=TRUE,k
         if (Strfolds) {
           out <- which(grouping==codes[1])[permut[[1]]][fold(nk[1],kfold,j)]
           for (grp in 2:k) out <- c(out,which(grouping==codes[grp])[permut[[grp]]][fold(nk[grp],kfold,j)])
-	} else {
+        } else {
           out <- permut[fold(n,kfold,j)]
         }
       }
+      if (length(out)==0) next
       tres <- try(TrainAlg(data[-out,,drop=FALSE],grouping[-out],prior=prior,...))
       if (is.null(tres) || class(tres) == "try-error")
       {
@@ -46,12 +53,30 @@ DACrossVal <- function(data,grouping,TrainAlg,EvalAlg=EvalClrule,Strfolds=TRUE,k
       }  else {
         EvalResij <- EvalAlg(tres,data[out,],grouping[out],k=k)
         rep <- (i-1)*kfold+j
-        EvalRes[rep,,"Clerr"] <- EvalResij$err
+        EvalRes[rep,,"Clerr"] <- ifelse(EvalResij$Nk>0.,EvalResij$err,NA)
         EvalRes[rep,,"Nk"] <- EvalResij$Nk
       }
     }
   }
-  EvalRes  # return(EvalRes)
+
+  glberr <- sum(EvalRes[,,"Nk"]*EvalRes[,,"Clerr"],na.rm=TRUE)/sum(EvalRes[,,"Nk"],na.rm=TRUE)
+  errestimates <- c(colMeans(EvalRes[,,"Clerr"],na.rm=TRUE),Global=glberr)
+  
+  mcall <- match.call(expand.dots=FALSE)
+  msg <- paste("Error rate estimates of algorithm",mcall[[4]])
+  ndotargs <- length(mcall$...)
+  if (ndotargs>0) {
+    msg <- paste(msg,"with argument")
+    if(ndotargs>1) msg <- paste(msg,"s",sep="")
+    for (i in 1:ndotargs) {
+      msg <- paste(msg," ",names(mcall$...)[i],"=",mcall$...[[i]],sep="")
+    }
+  }
+
+  cat(msg,"\n")
+  print(errestimates)
+  attr(EvalRes,"errestimates") <- errestimates
+  invisible(EvalRes)  # returns EvalRes silently
 }
 
 EvalClrule <- function(darule,VData,Vgrp,k)

@@ -88,13 +88,7 @@ print(ChinaT.rlda)
 
 CVrlda <- DACrossVal(ChinaT,ChinaTemp$GeoReg,TrainAlg=Roblda,CovCase=CovCase(ChinaT.rlda),
    CVrep=5)
-
 summary(CVrlda[,,"Clerr"])
-
-glberrors <- 
-  apply(CVrlda[,,"Nk"]*CVrlda[,,"Clerr"],1,sum)/apply(CVrlda[,,"Nk"],1,sum)
-
-cat("Average global classification error =",mean(glberrors),"\n")
 
 #Robust Quadratic Discriminant Analysis
 
@@ -106,13 +100,7 @@ print(ChinaT.rqda)
 
 CVrqda <- DACrossVal(ChinaT,ChinaTemp$GeoReg,TrainAlg=Robqda,CovCase=CovCase(ChinaT.rqda),
    CVrep=5)
-
 summary(CVrqda[,,"Clerr"])
-
-glberrors <- 
-  apply(CVrqda[,,"Nk"]*CVrqda[,,"Clerr"],1,sum)/apply(CVrqda[,,"Nk"],1,sum)
-
-cat("Average global classification error =",mean(glberrors),"\n")
 
 }
 

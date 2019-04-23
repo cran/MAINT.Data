@@ -1,4 +1,27 @@
+########## Versions 2.1.0 and 2.1.1(April 2019) ###################
+
+Versions 2.1.0 and 2.1.1 implement the follwoing changes:
+
+1) Improved plot methods and new extractors (e.g. colnames, rownames, MidPoints, LogRanges,
+   Lbounds, Ubounds, for objects of class IData).
+
+2) The value returned from function DACrossVal when argument LOO is set to FALSE now returns 
+   N.A. (instead of 0.) for combinations of folders and classes where no observation was evaluated.
+   Furthemore, when LOO is set to TRUE DACrossVal now returns by default a vector with the estimates 
+   of the error rate by class, and not a three-dimensional array with a the individual results for
+   each combination of observation and class (which can still be returned with LOO=TRUE, but now
+   only if the argument fullresults is also set to TRUE).
+
 ########## Version 2.0.0 (September 2018) ###################
+
+This is a major upgrade of the package. The most important extensions of version 2.0.0 are:
+
+1) A new function (AgrMcDt) for the cretation of IData objectos from the agregation of microdata 
+
+2)  
+
+Furthermore, among other new features, version 2.0.0 also includes...   
+
 
 ########## Version 1.2.3 (August 2018) ###################
 

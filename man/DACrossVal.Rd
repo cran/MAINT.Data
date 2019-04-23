@@ -63,29 +63,21 @@ ChinaT <- IData(ChinaTemp[1:8])
 
 CVldaC1 <- DACrossVal(ChinaT,ChinaTemp$GeoReg,TrainAlg=lda,CovCase=1,kfold=5,CVrep=2)
 summary(CVldaC1[,,"Clerr"])
-glberrors <- apply(CVldaC1[,,"Nk"]*CVldaC1[,,"Clerr"],1,sum)/apply(CVldaC1[,,"Nk"],1,sum)
-cat("Average global classification error =",mean(glberrors),"\n")
 
 # Linear Discriminant Analysis with covariance case 3
 
 CVldaC4 <- DACrossVal(ChinaT,ChinaTemp$GeoReg,TrainAlg=lda,CovCase=3,kfold=5,CVrep=2)
 summary(CVldaC4[,,"Clerr"])
-glberrors <- apply(CVldaC4[,,"Nk"]*CVldaC4[,,"Clerr"],1,sum)/apply(CVldaC4[,,"Nk"],1,sum)
-cat("Average global classification error =",mean(glberrors),"\n")
 
 # Classical (configuration 1) Quadratic Discriminant Analysis 
 
 CVqdaC1 <- DACrossVal(ChinaT,ChinaTemp$GeoReg,TrainAlg=qda,CovCase=1,kfold=5,CVrep=2)
 summary(CVqdaC1[,,"Clerr"])
-glberrors <- apply(CVqdaC1[,,"Nk"]*CVqdaC1[,,"Clerr"],1,sum)/apply(CVqdaC1[,,"Nk"],1,sum)
-cat("Average global classification error =",mean(glberrors),"\n")
 
 # Quadratic Discriminant Analysis with covariance case 3
 
 CVqdaC4 <- DACrossVal(ChinaT,ChinaTemp$GeoReg,TrainAlg=qda,CovCase=3,kfold=5,CVrep=2)
 summary(CVqdaC4[,,"Clerr"])
-glberrors <- apply(CVqdaC4[,,"Nk"]*CVqdaC4[,,"Clerr"],1,sum)/apply(CVqdaC4[,,"Nk"],1,sum)
-cat("Average global classification error =",mean(glberrors),"\n")
 
 }
 

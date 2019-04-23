@@ -80,9 +80,6 @@ print(ChinaT.qda)
 
 CVqda <- DACrossVal(ChinaT,ChinaTemp$GeoReg,TrainAlg=qda,CovCase=CovCase(ChinaT.qda))
 summary(CVqda[,,"Clerr"])
-glberrors <- 
-  apply(CVqda[,,"Nk"]*CVqda[,,"Clerr"],1,sum)/apply(CVqda[,,"Nk"],1,sum)
-cat("Average global classification error =",mean(glberrors),"\n")
 
 }
 

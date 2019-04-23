@@ -76,36 +76,27 @@ setMethod("tail",
 
 setMethod("plot",
   signature(x = "IData",y = "IData"),
-  function(x, y, ...)
+  function(x, y, type=c("crosses","rectangles"), append=FALSE,  ...)
   {
     if (x@NIVar > 1) stop("Currently IData method plot can plot only one integer variable on the horizontal axis\n")
     if (y@NIVar > 1) stop("Currently IData method plot can plot only one integer variable on the vertical axis\n")
     if (x@NObs != y@NObs) stop("Arguments x and y have a different number of elements\n")
-  
-    par <- match.call(expand.dots = TRUE)
-    if (is.null(par$type)) {
-      type <- "crosses"
-    } else {
-      type <- par$type
-    }
-    if (type!="crosses" && type!="rectangles") stop("Wrong value for type argument\n")
-    if (is.null(par$main)) {
-      main <- paste(y@VarNames,"vs.",x@VarNames)
-    } else {
-      main <- par$main
-    }
-    sub <- par$sub 
-    if (is.null(par$xlab)) {
-      xlab <- x@VarNames
-    } else {
-      xlab <- par$xlab
-    }
-    if (is.null(par$ylab)) {
-      ylab <- y@VarNames
-    } else {
-      ylab <- par$ylab
-    }
-  
+
+    type <- match.arg(type)
+    
+    dotarguments <- match.call(expand.dots=FALSE)$...
+
+    if (is.null(dotarguments$main)) {
+      dotarguments$main <- paste(y@VarNames,"vs.",x@VarNames)
+    }  
+    if (is.null(dotarguments$xlab)) {
+      dotarguments$xlab <- x@VarNames
+    }  
+    if (is.null(dotarguments$ylab)) {
+      dotarguments$ylab <- y@VarNames
+    }  
+    
+      
     HlfRngx <- exp(x@LogR[,1])/2
     Lbx <- x@MidP[,1] - HlfRngx 
     Ubx <- x@MidP[,1] + HlfRngx 
@@ -113,15 +104,24 @@ setMethod("plot",
     Lby <- y@MidP[,1] - HlfRngy 
     Uby <- y@MidP[,1] + HlfRngy 
   
-    minvx <- min(Lbx)
-    maxvx <-max(Ubx)
-    minvy <- min(Lby)
-    maxvy <-max(Uby)
-    plot(c(minvx-0.5,maxvx+0.5),c(minvy-0.5,maxvy+0.5),type="n",
-         xlab=xlab,ylab=ylab,main=main,sub=sub)
+    if (is.null(dotarguments$xlim)) {
+      minvx <- min(Lbx)
+      maxvx <-max(Ubx)
+      dotarguments$xlim <- c(0.95*minvx,1.05*maxvx)
+    }  
+    if (is.null(dotarguments$ylim)) {
+      minvy <- min(Lby)
+      maxvy <-max(Uby)
+      dotarguments$ylim <- c(0.95*minvy,1.05*maxvy)
+    }  
+    
+    if (!append) {
+      do.call("plot",c(list(x=0.,y=0.,type="n"),dotarguments))
+    }  
+
     if (type=="crosses") {
-      segments(x0=Lbx,y0=y@MidP[,1],x1=Ubx,y1=y@MidP[,1])
-      segments(x0=x@MidP[,1],y0=Lby,x1=x@MidP[,1],y1=Uby)
+      do.call("segments",c(list(x0=Lbx,y0=y@MidP[,1],x1=Ubx,y1=y@MidP[,1]),dotarguments))
+      do.call("segments",c(list(x0=x@MidP[,1],y0=Lby,x1=x@MidP[,1],y1=Uby),dotarguments))
     } else if (type=="rectangles") {
       for (i in 1:x@NObs) rect(Lbx[i],Lby[i],Ubx[i],Uby[i],lty=1)
     }
@@ -130,37 +130,62 @@ setMethod("plot",
 
 setMethod("plot",
   signature(x = "IData",y = "missing"),
-  function(x, ...)
+  function(x, casen=NULL, layout=c("vertical","horizontal"), append=FALSE,  ...)
   {
-    if (x@NIVar > 1) stop("Currently method plot can plot only one integer variable on the horizontal axis\n")
-  
-    par <- match.call(expand.dots = TRUE)
-    if (is.null(par$main)) {
-      main <- x@VarNames
-    } else {
-      main <- par$main
-    }
-    sub <- par$sub 
-    if (is.null(par$xlab)) {
-      xlab <- x@VarNames
-    } else {
-      xlab <- par$xlab
-    }
-    if (is.null(par$ylab)) {
-      ylab <- "Case numbers"
-    } else {
-      ylab <- par$ylab
-    }
+    if (x@NIVar > 1) {
+      if (x@NIVar==2) {
+        plot(x[,1],x[,2],...)
+        return()
+      } else {
+        stop("Currently method plot can only plot at most tow interval variables simultaneously\n")
+      }
+    }  
     
-    HlfRngx <- exp(x@LogR[,1])/2
-    Lbx <- x@MidP[,1] - HlfRngx 
-    Ubx <- x@MidP[,1] + HlfRngx 
-    ycord <- 1:x@NObs
+    layout <- match.arg(layout)
+
+    dotarguments <- match.call(expand.dots=FALSE)$...
+    if (is.null(dotarguments$main)) {
+      dotarguments$main <- x@VarNames
+    }  
+    if (is.null(dotarguments$ylab)) {
+      dotarguments$ylab <- x@VarNames
+    }  
+    if (is.null(dotarguments$xlab)) {
+        dotarguments$xlab <- "Case numbers"
+    }  
+
+    HlfRngy <- exp(x@LogR[,1])/2
+    Lby <- x@MidP[,1] - HlfRngy 
+    Uby <- x@MidP[,1] + HlfRngy 
+    xcord <- 1:x@NObs
   
-    minvx <- min(Lbx)
-    maxvx <-max(Ubx)
-    plot(c(minvx-0.5,maxvx+0.5),c(0,x@NObs+1),type="n",xlab=xlab,ylab=ylab,main=main,sub=sub)
-    segments(x0=Lbx,y0=ycord,x1=Ubx,y1=ycord)
+    if (is.null(dotarguments$ylim) && layout=="vertical") {
+      minvy <- min(Lby)
+      maxvy <-max(Uby)
+      dotarguments$ylim <- c(0.95*minvy,1.05*maxvy)
+    }  
+    if (is.null(dotarguments$xlim) && layout=="horizontal") {
+      minvy <- min(Lby)
+      maxvy <-max(Uby)
+      dotarguments$xlim <- c(0.95*minvy,1.05*maxvy)
+    }  
+    
+    if (is.null(casen)) {
+      casen <- c(0,x@NObs+1)
+    } else {
+      casen <- factor(eval(casen))
+    } 
+    if (layout=="vertical") {
+      if (!append) {
+        do.call("plot",c(list(x=casen,y=rep(0.,length(casen)),type="n"),dotarguments))
+      }  
+      do.call("segments",c(list(x0=xcord,y0=Lby,x1=xcord,y1=Uby),dotarguments))
+    } else  {
+      if (!append) {
+        do.call("plot",c(list(x=rep(0.,length(casen)),y=casen,type="n"),dotarguments))
+      }  
+      do.call("segments",c(list(y0=xcord,x0=Lby,y1=xcord,x1=Uby),dotarguments))
+    }  
   }
 )
 

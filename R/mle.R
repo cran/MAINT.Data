@@ -190,7 +190,7 @@ setMethod("testMod",
   signature(ModE = "IdtE"),
   function(ModE, RestMod=ModE@ModelConfig[2]:length(ModE@ModelConfig), FullMod="Next")
   {
-    if ( substr(ModE@ModelNames,2,8) == "ModCovC" || substr(ModE@ModelNames,3,9) == "ModCovC")
+    if ( substr(ModE@ModelNames[1],2,8) == "ModCovC" || substr(ModE@ModelNames[1],3,9) == "ModCovC")
     {
       CovCaseArg <- TRUE  
       nCovCases <- 4
