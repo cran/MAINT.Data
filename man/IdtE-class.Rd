@@ -3,9 +3,11 @@
 \docType{class}
 \alias{IdtE-class}
 \alias{IdtSngDE-class}
+\alias{summary,IdtE-method}
 \alias{show,IdtE-method}
 \alias{BestModel,IdtE-method}
 \alias{testMod,IdtE-method}
+\alias{sd,IdtE-method}
 
 \title{Class IdtE}
 \description{IdtE contains estimation results for the models assumed for single distributions, or mixtures of distributions, underlying data sets of interval-valued entities.}
@@ -30,7 +32,12 @@ and the configuration (Case 1 through Case 4)}
   \describe{
     \item{BestModel}{\code{signature(Idt = "IdtE")}: Selects the best model according to the chosen selection criterion (currently, AIC or BIC) }
     \item{show}{\code{signature(object = "IdtE")}: show S4 method for the IDtE-class}
+    \item{summary}{\code{signature(object = "IdtE")}: summary S4 method for the IDtE-class}
     \item{testMod}{\code{signature(Idt = "IdtE")}: Performs statistical likelihood-ratio tests that evaluate the goodness-of-fit of a nested model against a more general one.}
+    \item{sd}{\code{signature(Idt = "IdtE")}: extracts the standard deviation estimates from objects of class IdtE.}
+    \item{mean}{\code{signature(x = "IdtE")}: extracts the mean vector estimate from objects of class IdtE}
+    \item{var}{\code{signature(x = "IdtE")}: extracts the variance-covariance matrix estimate from objects of class IdtE}
+    \item{cor}{\code{signature(x = "IdtE")}: extracts the correlation matrix estimate from objects of class IdtE}
   }
 }
 

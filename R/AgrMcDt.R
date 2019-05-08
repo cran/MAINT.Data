@@ -29,6 +29,28 @@ AgrMcDt <- function(MicDtDF,agrby,agrcrt="minmax")
       }
     }  
   }
-  IData(bndsDF,Seq="AllLb_AllUb",VarNames=names(MicDtDF),ObsNames=grplvls) 
+  res <- IData(bndsDF,Seq="AllLb_AllUb",VarNames=names(MicDtDF),ObsNames=grplvls) 
+  DegInT <- which(apply(res@LogR,1,function(v) any(!is.finite(v))))
+  nDegInT <- length(DegInT)
+  if (nDegInT>0) {
+    if (nDegInT==res@NObs) {
+      warning("No Idata object was created because all units had some degenerate intervals")
+      return(NULL)
+    }
+    if (nDegInT<10) {
+      if (nDegInT==1) {
+        wmsg <- paste("Data unit",res@ObsNames[DegInT],"was eliminated because it lead to some degenerate intervals")
+      } else {
+        wmsg <- paste(
+          "Data units",paste(res@ObsNames[DegInT],collapse=", "),"were eliminated because they lead to some degenerate intervals",sep="\n"
+        )
+      }  
+    } else {
+      wmsg <- paste(nDegInT,"data units were eliminated because they lead to some degenerate intervals")
+    }
+    warning(wmsg)
+    return(res[-DegInT,])
+  }
+  res
 }
 

@@ -1,4 +1,5 @@
 setClassUnion("extmatrix",c("matrix","NULL"))
+setClassUnion("extlogical",c("logical","NULL"))
 setClassUnion("extnumeric",c("numeric","NULL"))
 setClass("IData",slots=c(MidP="data.frame",LogR="data.frame",ObsNames="character",VarNames="character",
   NObs="numeric",NIVar="numeric"))
@@ -40,6 +41,7 @@ setClassUnion("IdtSNDE",c("IdtSngSNDE","IdtMxSNDE"))
 setClass("IdtSngNandSNDE",slots=c(NMod="IdtSngNDE",SNMod="IdtSngSNDE"),contains="IdtSngDE")
 setClass("IdtMxNandSNDE",slots=c(NMod="IdtMxNDE",SNMod="IdtMxSNDE"),contains="IdtMxE")
 setClassUnion("IdtNandSNDE",c("IdtSngNandSNDE","IdtMxNandSNDE"))
+setClassUnion("IdtSNda",c("IdtSNlocda","IdtSNgenda"))
 
 setClass("RobEstControl",
   slots=c(
@@ -77,14 +79,18 @@ setClass("EMControl",
   slots=c(nrep="numeric", maxiter="numeric", convtol="numeric", protol="numeric", seed="extnumeric"),
   prototype = list(nrep = 1000, maxiter=1000, convtol=0.01, protol=1e-6, seed=NULL)
 )
+setClass("IdtOutl",slots=c(outliers="integer", MD2="numeric",eta="numeric",RefDist="character",
+  multiCmpCor="character",NObs="numeric",p="numeric",h="numeric",boolRewind="extlogical"))
 
 setGeneric("nrow")
 setGeneric("ncol")
 setGeneric("rownames")
 setGeneric("colnames")
+setGeneric("names")
 setGeneric("var")
 setGeneric("cor")
 setGeneric("mean",signature="x")
+setGeneric("sd",signature="x")
 setGeneric("plot",signature=c("x","y"))
 setGeneric("summary",signature="object")
 setGeneric("head",package="utils",signature="x")
@@ -95,6 +101,9 @@ setGeneric("vcov",package="stats",signature="object")
 setGeneric("predict",package="stats",signature="object")
 setGeneric("lda",package="MASS",signature="x")
 setGeneric("qda",package="MASS",signature="x")
+setGeneric("MidPoints",function(Idt) standardGeneric("MidPoints"))
+setGeneric("LogRanges",function(Idt) standardGeneric("LogRanges"))
+setGeneric("Ranges",function(Idt) standardGeneric("Ranges"))
 setGeneric("mle",
   function(Idt, Model="Normal", CovCase=1:4, SelCrit=c("BIC","AIC"), OptCntrl=list() ,... )
   standardGeneric("mle"))
@@ -141,6 +150,11 @@ setGeneric("fasttle",
     control=RobEstControl(), ...)
   standardGeneric("fasttle"))
 
+setGeneric("getMahaD2",function(IdtOtl) standardGeneric("getMahaD2")) 
+setGeneric("geteta",function(IdtOtl) standardGeneric("geteta")) 
+setGeneric("getRefDist",function(IdtOtl) standardGeneric("getRefDist")) 
+setGeneric("getmultiCmpCor",function(IdtOtl) standardGeneric("getmultiCmpCor")) 
+
 setGeneric("RobMxtDEst",
   function(Idt,grouping,Mxt=c("Hom","Het"),CovEstMet=c("Pooled","Globdev"),
     CovCase=1:4,SelCrit=c("BIC","AIC"),Robcontrol=RobEstControl(), l1medpar=NULL, ...)
@@ -159,6 +173,20 @@ setGeneric("Robqda",
 setGeneric("Idtmclust",
   function(Idt, G=1:9, CovCase=1:4, SelCrit=c("BIC","AIC"), Mxt=c("Hom","Het","HomandHet"), control=EMControl())
   standardGeneric("Idtmclust"))
+
+
+setGeneric("parameters",function(x) standardGeneric("parameters"))
+setGeneric("pro",function(x) standardGeneric("pro"))
+setGeneric("classification",function(x) standardGeneric("classification"))
+setGeneric("SelCrit",function (x) standardGeneric("SelCrit"))
+setGeneric("Hmcdt",function (x) standardGeneric("Hmcdt"))
+setGeneric("BestG",function (x) standardGeneric("BestG"))
+setGeneric("BestC",function (x) standardGeneric("BestC"))
+setGeneric("PostProb",function(x) standardGeneric("PostProb"))
+setGeneric("logLik",function(x) standardGeneric("logLik"))
+setGeneric("BIC",function(x) standardGeneric("BIC"))
+setGeneric("AIC",function(x) standardGeneric("AIC"))
+
 
 
 

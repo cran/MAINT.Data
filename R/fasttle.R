@@ -415,15 +415,18 @@ getIdtOutl <- function(Idt,IdtE=NULL,muE=NULL,SigE=NULL,
   outlin <- match.arg(outlin)
 
   if ( RefDist=="CerioliBetaF" && is.null(Rewind) ) {
-#    if ( class(IdtE)!="list" || is.null(IdtE$RewghtdSet) ) {
     if ( class(IdtE)!="IdtSngNDRE" || is.null(IdtE@RewghtdSet) ) {
       stop(paste("\n\nCerioliBetaF reference distribution with missing information\nabout the observations used in the re-weighted MCD estimator.\n",
                  "You need to specify this information, either using the Rewind argument,\nor through a list with a RewghtdSet component in the IdtE argument.\n")
           )
     }
-#    Rewind <- IdtE$RewghtdSet
     Rewind <- IdtE@RewghtdSet
-  }  
+  } 
+  if (!is.null(Rewind)) {  
+    boolRewind <- sapply(1:nrow(Idt),function(x) is.element(x,Rewind))
+  } else {
+    boolRewind <- NULL
+  }
   if ( is.null(muE) || is.null(SigE) ) {
     if (is.null(IdtE)) {
       stop("Missing mean and/or covariance estimates in call to getIdtOutl.\n")
@@ -440,7 +443,8 @@ getIdtOutl <- function(Idt,IdtE=NULL,muE=NULL,SigE=NULL,
   else if (outlin=="MidP") vind <- 1:Idt@NIVar
   else if (outlin=="LogR") vind <- (Idt@NIVar+1):(2*Idt@NIVar)
 
-  MDOtlDet(X[vind],muE[vind],SigE[vind,vind],eta,m,ret="Outliers",RefDist=RefDist,Rewind=Rewind,multiCmpCor=multiCmpCor)
+  otl <- MDOtlDet(X[vind],muE[vind],SigE[vind,vind],eta,m,ret="Outliers",RefDist=RefDist,Rewind=Rewind,multiCmpCor=multiCmpCor,otp="indandMD2")
+  new("IdtOutl",outliers=otl$outliers,MD2=otl$MD2,eta=eta,RefDist=RefDist,multiCmpCor=multiCmpCor,NObs=Idt@NObs,p=length(vind),h=m,boolRewind=boolRewind)
 }
 
 GetMD2 <- function(Data,muE,SigE)

@@ -25,7 +25,7 @@
 
   \item{\dots}{ Graphical arguments to be passed to methods. Currently the following arguments are allowed: }
   \describe{
-    \item{type}{What type of plot should de drawn. Alternatives are "crosses" (default) and "rectangle".}
+    \item{type}{What type of plot should de drawn. Alternatives are "crosses" (default) and "rectangles".}
     \item{main}{An overall title for the plot. }
     \item{sub}{A subtitle for the plot. }
     \item{xlab}{A title for the x axis.}

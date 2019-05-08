@@ -18,6 +18,18 @@
 \alias{ncol,IData-method}
 \alias{rownames,IData-method}
 \alias{colnames,IData-method}
+\alias{names,IData-method}
+
+\alias{summary,IdtMANOVA-method}
+
+\alias{show,IdtOutl-method}
+
+
+\alias{sd}
+\alias{MidPoints}
+\alias{LogRanges}
+\alias{Ranges}
+
 
 \alias{CovCase-methods}
 \alias{CovCase}

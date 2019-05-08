@@ -22,6 +22,7 @@ Brito, P., Duarte Silva, A. P. (2012), Modelling Interval Data with Normal and S
     \item{mean}{\code{signature(x = "IdtNDE")}: extracts the mean vector estimate from objects of class IdtNDE}
     \item{var}{\code{signature(x = "IdtNDE")}: extracts the variance-covariance matrix estimate from objects of class IdtNDE}
     \item{cor}{\code{signature(x = "IdtNDE")}: extracts the correlation matrix estimate from objects of class IdtNDE}
+    \item{sd}{\code{signature(Idt = "IdtNDE")}: extracts the standard deviation estimates from objects of class IdtNDE.}
  }
 }
 

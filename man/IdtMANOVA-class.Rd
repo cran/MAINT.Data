@@ -43,6 +43,7 @@ distribution in each group. In paticular, the following specializations of IdtMA
 \section{Methods}{
   \describe{
     \item{show}{\code{signature(object = "IdtMANOVA")}: show S4 method for the IdtMANOVA-classes.}
+    \item{summary}{\code{signature(object = "IdtMANOVA")}: summary S4 method for the IdtMANOVA-classes.}
     \item{H0res}{\code{signature(object = "IdtMANOVA")}: retrieves the model estimates under the null hypothesis.}
     \item{H1res}{\code{signature(object = "IdtMANOVA")}: retrieves the model estimates under the alternative hypothesis.}
     \item{lda}{\code{signature(x = "IdtClMANOVA")}: Linear Discriminant Analysis using the estimated model parameters.}

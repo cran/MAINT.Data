@@ -46,7 +46,7 @@
     \item{\dots}{Further arguments to be passed to internal functions of \sQuote{fulltle}.} 
 }
 
-\value{An object of class \code{\linkS4class{IdtE}} with the fasttle estimates, the value of the comparison criterion used to select the covariance configurations and the robust squared Mahalanobis distances.} 
+\value{An object of class \code{\linkS4class{IdtE}} with the fulltle estimates, the value of the comparison criterion used to select the covariance configurations and the robust squared Mahalanobis distances.} 
 
 \references{
 Brito, P., Duarte Silva, A. P. (2012), Modelling Interval Data with Normal and Skew-Normal Distributions. \emph{Journal of Applied Statistics} \bold{39}(1), 3--20.\cr

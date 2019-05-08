@@ -42,18 +42,21 @@ setMethod("show",
   }
 )
 
-setMethod("nrow",signature(x = "IData"),function (x) {x@NObs})
+setMethod("nrow",signature(x = "IData"),function(x) x@NObs)
+setMethod("ncol",signature(x = "IData"),function(x) x@NIVar)
+setMethod("rownames",signature(x = "IData"),function(x) x@ObsNames)
+setMethod("colnames",signature(x = "IData"),function(x) x@VarNames)
+setMethod("names",signature(x = "IData"),function(x) x@VarNames)
+setMethod("MidPoints",signature(Idt = "IData"),function(Idt) Idt@MidP)
+setMethod("LogRanges",signature(Idt = "IData"),function(Idt) Idt@LogR)
+setMethod("Ranges",signature(Idt = "IData"),function(Idt) exp(Idt@LogR))
 
-setMethod("ncol",signature(x = "IData"),function (x) {x@NIVar})
-
-setMethod("rownames",signature(x = "IData"),function (x) {x@ObsNames})
-
-setMethod("colnames",signature(x = "IData"),function (x) {x@VarNames})
 
 setMethod("head",
   signature(x = "IData"),
-  function (x,n=6L) 
+  function (x,n=min(nrow(x),6L)) 
   {
+    
     if (n>0) {
       x[1:n,] 
     } else {
@@ -64,7 +67,7 @@ setMethod("head",
 
 setMethod("tail",
   signature(x = "IData"),
-  function (x,n=6L) 
+  function (x,n=min(nrow(x),6L)) 
   {
     if (n>0) {
       x[(x@NObs-n+1):x@NObs,] 
@@ -221,6 +224,7 @@ IData <- function(Data,
   if (!is.data.frame(LogR)) LogR <- as.data.frame(LogR)
   names(MidP) <- paste(VarNames,".MidP",sep="")
   names(LogR) <- paste(VarNames,".LogR",sep="")
+  rownames(MidP) <- rownames(LogR) <- ObsNames
 
   new("IData",MidP=MidP,LogR=LogR,ObsNames=ObsNames,VarNames=VarNames,NObs=nrow(MidP),NIVar=q)
 }
@@ -231,6 +235,8 @@ IData <- function(Data,
 
 "[.IData" <- function(x,rowi=1:x@NObs,coli=1:x@NIVar,...)
 {
+  if (class(rowi)=="character") rowi <- sapply(rowi,function(ri) which(ri==x@ObsNames))
+  if (class(coli)=="character") coli <- sapply(coli,function(ci) which(ci==x@VarNames))
   IData(cbind(x@MidP[rowi,coli,drop=FALSE],x@LogR[rowi,coli,drop=FALSE]),
     Seq="AllMidP_AllLogR",VarNames=x@VarNames[coli],ObsNames=x@ObsNames[rowi])
 }
@@ -238,6 +244,8 @@ IData <- function(Data,
 "[<-.IData" <- function(x,rowi=1:x@NObs,coli=1:x@NIVar,value)
 {
   if (!is(value,"IData")) stop("Argument value is not an IData object\n")
+  if (class(rowi)=="character") rowi <- sapply(rowi,function(ri) which(ri==x@ObsNames))
+  if (class(coli)=="character") coli <- sapply(coli,function(ci) which(ci==x@VarNames))
   x@MidP[rowi,coli] <- value@MidP
   x@LogR[rowi,coli] <- value@LogR
   x

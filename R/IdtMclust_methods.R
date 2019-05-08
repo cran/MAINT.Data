@@ -83,4 +83,41 @@ print.summaryIdtMclust <- function(x, digits = getOption("digits"), ...)
   invisible(x)
 }
 
+#Accessor methods
+
+setMethod("parameters",signature(x = "IdtMclust"),function(x) x@parameters)
+setMethod("pro",signature(x = "IdtMclust"),function(x) x@parameters$pro)
+setMethod("mean",signature(x = "IdtMclust"),function(x) x@parameters$mean)
+setMethod("var",signature(x = "IdtMclust"),function(x) x@parameters$covariance)
+setMethod("classification",signature(x = "IdtMclust"),function(x) x@classification)
+
+setMethod("SelCrit",signature(x = "IdtMclust"),function (x) x@SelCrit)
+setMethod("Hmcdt",signature(x = "IdtMclust"),function (x) x@Hmcdt)
+setMethod("BestG",signature(x = "IdtMclust"),function (x) x@BestG)
+setMethod("BestC",signature(x = "IdtMclust"),function (x) x@BestC)
+setMethod("PostProb",signature(x = "IdtMclust"),function(x) x@z)
+
+setMethod("logLik",signature(x = "IdtMclust"),function(x) x@logLik)
+setMethod("BIC",signature(x = "IdtMclust"),function(x) x@bic)
+setMethod("AIC",signature(x = "IdtMclust"),function(x) x@aic)
+
+setMethod("cor",signature(x ="IdtMclust"),
+  function(x)
+ {
+    if (x@Hmcdt==TRUE) {
+      ncov <- 1 
+    } else {
+      ncov <- x@BestG
+    }
+
+    covdim <- 2*x@NIVar
+    covnames <- dimnames(x@parameters$covariance)[[1]]   
+    res <- array(dim=c(covdim,covdim,ncov),dimnames=list(covnames,covnames,NULL))
+    for (g in 1:ncov) res[,,g] <- cov2cor(x@parameters$covariance[,,g])
+
+    res
+  }
+) 
+
+
 

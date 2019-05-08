@@ -166,7 +166,7 @@ setMethod("MANOVA",
   }
 )
 
-setMethod("show",					
+setMethod("summary",					
   signature(object = "IdtE"),
   function(object)
   {
@@ -181,6 +181,14 @@ setMethod("show",
     }
     cat("Selected model:\n")
     print(names(object@BestModel))
+  }
+)
+
+setMethod("show",					
+  signature(object = "IdtE"),
+  function(object)
+  {
+    summary(object)
     cat("\nSelected model parameter estimates:\n")
     print(coef(object))
   }
@@ -433,8 +441,12 @@ setMethod("vcov",
   }
 )
 
-setMethod("mean", signature(x = "IdtNDE"), function(x,...) { coef(x)$mu } )
-setMethod("var", signature(x ="IdtNDE"), function(x) { coef(x)$Sigma } )
+setMethod("mean", signature(x = "IdtNDE"), function(x) coef(x)$mu )
+setMethod("var", signature(x ="IdtNDE"), function(x) coef(x)$Sigma )
+setMethod("sd", signature(x ="IdtE"), function(x) sqrt(diag(var(x))) )
+setMethod("BIC", signature(x ="IdtE"), function(x) x@BICs[x@BestModel] )
+setMethod("AIC", signature(x ="IdtE"), function(x) x@AICs[x@BestModel] )
+setMethod("logLik", signature(x ="IdtE"), function(x) x@logLiks[x@BestModel] )
 
 setMethod("cor",
   signature(x ="IdtNDE"),
@@ -501,7 +513,7 @@ setMethod("H1res", signature(object = "IdtMANOVA"), function(object) object@H1re
 
 setMethod("H0res", signature(object = "IdtMANOVA"), function(object) object@H0res)
 
-setMethod("show",					
+setMethod("summary",					
   signature(object = "IdtMANOVA"),
   function(object)
   {
@@ -523,5 +535,13 @@ setMethod("show",
     cat("degrees of freedom:",object@df,"\n")
     cat("p-value:",object@pvalue,"\n\n")
   }
+)
+
+setMethod("show",					
+  signature(object = "IdtMANOVA"),
+  function(object) {
+    summary(object)
+    invisible()
+  } 
 )
 

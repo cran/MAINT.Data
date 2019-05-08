@@ -21,7 +21,7 @@
     \item{\code{BestModel}:}{Inherited from class \code{\linkS4class{IdtE}}. Bestmodel indicates the best model according to the chosen selection criterion}
     \item{\code{SngD}:}{Inherited from class \code{\linkS4class{IdtE}}. Boolean flag indicating whether a single or a mixture of distribution were estimated. Always set to TRUE in objects of class IdtSngNDRE }
     \item{\code{rawSet}}{A vector with the trimmed subset elements used to compute the raw (not reweighted) MCD covariance estimate for the chosen configuration.} 
-    \item{\code{RewghtdSet}}{A vector with the final trimmed subset elements used to compute the fasttle estimates.} 
+    \item{\code{RewghtdSet}}{A vector with the final trimmed subset elements used to compute the tle estimates.} 
     \item{\code{RobMD2}}{A vector with the robust squared Mahalanobis distances used to select the trimmed subset.} 
     \item{\code{cnp2}}{A vector of length two containing the consistency correction factor and the finite sample correction factor of the final estimate of the covariance matrix.}
     \item{\code{raw.cov}}{A matrix with the raw MCD estimator used to compute the robust squared Mahalanobis distances of RobMD2.} 
