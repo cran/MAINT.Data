@@ -32,9 +32,9 @@ distribution in each group. In paticular, the following specializations of IdtMA
     \item{\code{grouping}:}{Factor indicating the group to which each observation belongs to.}
     \item{\code{H0res}:}{Model estimates under the null hypothesis.}
     \item{\code{H1res}:}{Model estimates under the alternative hypothesis.}
-    \item{\code{QuiSq}:}{Inherited from class \code{\linkS4class{LRTest}}. Value of the Qui-Square statistics corresponding to the performed test.}
-    \item{\code{df}:}{Inherited from class \code{\linkS4class{LRTest}}. Degrees of freedom of the Qui-Square statistics.}
-    \item{\code{pvalue}:}{Inherited from class \code{\linkS4class{LRTest}}. p-value of the Qui-Square statistics value, obtained from the Qui-Square distribution with df degrees of freedom.}
+    \item{\code{ChiSq}:}{Inherited from class \code{\linkS4class{LRTest}}. Value of the Chi-Square statistics corresponding to the performed test.}
+    \item{\code{df}:}{Inherited from class \code{\linkS4class{LRTest}}. Degrees of freedom of the Chi-Square statistics.}
+    \item{\code{pvalue}:}{Inherited from class \code{\linkS4class{LRTest}}. p-value of the Chi-Square statistics value, obtained from the Chi-Square distribution with df degrees of freedom.}
     \item{\code{H0logLik}:}{Inherited from class \code{\linkS4class{LRTest}}. Logarithm of the Likelihood function under the null hypothesis.}
     \item{\code{H1logLik}:}{Inherited from class \code{\linkS4class{LRTest}}. Logarithm of the Likelihood function under the alternative hypothesis.}
   }

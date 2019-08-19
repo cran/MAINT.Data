@@ -38,6 +38,7 @@ setMethod("fasttle",
       kdblstar <- getkdblstar 
     }
     q <- Idt@NIVar
+    if (q==1) CovCase <- q1CovCase(CovCase) 
     if (getalpha=="TwoStep")
     {
       X <- cbind(Idt@MidP,Idt@LogR)

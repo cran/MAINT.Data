@@ -16,6 +16,10 @@ setMethod("mle",
     } else {
       CovCaseArg <- FALSE
     }	
+    if (Idt@NIVar==1) {
+      CovCase <- q1CovCase(CovCase) 
+      Config <- q1Config(Config)
+    }  
     if (Model!="SKNormal") { 
       Nres <- IdtNmle(Idt,OptCntrl=OptCntrl,CovCaseArg=CovCaseArg,Config=Config,SelCrit=SelCrit)
     }
@@ -67,6 +71,10 @@ setMethod("MANOVA",
     } else {  
       CovCaseArg <- FALSE
     }	
+    if (Idt@NIVar==1) {
+      CovCase <- q1CovCase(CovCase) 
+      Config <- q1Config(Config)
+    }  
 
     grouping <- factor(grouping,exclude=NULL)
     nk <- as.numeric(table(grouping))
@@ -122,8 +130,8 @@ setMethod("MANOVA",
     }
     H0Ll <- H0res@logLiks[H1res@BestModel]
     H1Ll <- H1res@logLiks[H1res@BestModel]
-    QuiSq <- 2*(H1Ll-H0Ll)
-    names(H0Ll) <- names(H1Ll) <- names(QuiSq) <- NULL
+    ChiSq <- 2*(H1Ll-H0Ll)
+    names(H0Ll) <- names(H1Ll) <- names(ChiSq) <- NULL
 
     if (Mxt=="Hom" || Mxt=="Loc")  {
       df <- p*(k-1)
@@ -143,28 +151,65 @@ setMethod("MANOVA",
         df <- SKnpar(BestConf,p,q,Ngrps=k,Mxt="GenMod") - SKnpar(BestConf,p,q,Ngrps=1)
       }
     } 
-    pvalue <- pchisq(QuiSq,df,lower.tail=FALSE)
+    pvalue <- pchisq(ChiSq,df,lower.tail=FALSE)
     if (Model=="Normal" && (Mxt=="Hom" || Mxt=="Loc") )  { 
       return( new("IdtClMANOVA",NIVar=Idt@NIVar,grouping=grouping,H0res=H0res,H1res=H1res,
-        QuiSq=QuiSq,df=df,pvalue=pvalue,H0logLik=H0Ll,H1logLik=H1Ll)  )
+        ChiSq=ChiSq,df=df,pvalue=pvalue,H0logLik=H0Ll,H1logLik=H1Ll)  )
     }  else if (Model=="Normal" && (Mxt=="Het" || Mxt=="Gen") )  { 
       return( new("IdtHetNMANOVA",NIVar=Idt@NIVar,grouping=grouping,H0res=H0res,H1res=H1res,
-        QuiSq=QuiSq,df=df,pvalue=pvalue,H0logLik=H0Ll,H1logLik=H1Ll)  )
+        ChiSq=ChiSq,df=df,pvalue=pvalue,H0logLik=H0Ll,H1logLik=H1Ll)  )
     }  else if (Model=="SKNormal" && (Mxt=="Hom" || Mxt=="Loc") )  { 
       return( new("IdtLocSNMANOVA",NIVar=Idt@NIVar,grouping=grouping,H0res=H0res,H1res=H1res,
-        QuiSq=QuiSq,df=df,pvalue=pvalue,H0logLik=H0Ll,H1logLik=H1Ll)  )
+        ChiSq=ChiSq,df=df,pvalue=pvalue,H0logLik=H0Ll,H1logLik=H1Ll)  )
     }  else if (Model=="SKNormal" && (Mxt=="Het" || Mxt=="Gen") )  { 
       return( new("IdtGenSNMANOVA",NIVar=Idt@NIVar,grouping=grouping,H0res=H0res,H1res=H1res,
-        QuiSq=QuiSq,df=df,pvalue=pvalue,H0logLik=H0Ll,H1logLik=H1Ll)  )
+        ChiSq=ChiSq,df=df,pvalue=pvalue,H0logLik=H0Ll,H1logLik=H1Ll)  )
     }  else if (Model=="NrmandSKN" && (Mxt=="Hom" || Mxt=="Loc") )  { 
       return( new("IdtLocNSNMANOVA",NIVar=Idt@NIVar,grouping=grouping,H0res=H0res,H1res=H1res,
-        QuiSq=QuiSq,df=df,pvalue=pvalue,H0logLik=H0Ll,H1logLik=H1Ll)  )
+        ChiSq=ChiSq,df=df,pvalue=pvalue,H0logLik=H0Ll,H1logLik=H1Ll)  )
     }  else if (Model=="NrmandSKN" && (Mxt=="Het" || Mxt=="Gen") )  { 
       return( new("IdtGenNSNMANOVA",NIVar=Idt@NIVar,grouping=grouping,H0res=H0res,H1res=H1res,
-        QuiSq=QuiSq,df=df,pvalue=pvalue,H0logLik=H0Ll,H1logLik=H1Ll)  )
+        ChiSq=ChiSq,df=df,pvalue=pvalue,H0logLik=H0Ll,H1logLik=H1Ll)  )
     }
   }
 )
+
+MANOVAPermTest <- function(MANOVAres, Idt, grouping, nrep=200,
+    Model=c("Normal","SKNormal","NrmandSKN"), CovCase=1:4,
+    SelCrit=c("BIC","AIC"), Mxt=c("Hom","Het","Loc","Gen"), CVtol=1.0e-5, 
+    OptCntrl=list(), onerror=c("stop","warning","silentNull"), ...)
+{
+   if (inherits(MANOVAres,"IdtMANOVA")==FALSE) stop("Argument MANOVAres is not of class IdtMANOVA\n")
+   ChiSq <- MANOVAres@ChiSq
+   if (class(Idt)!="IData") stop("Argument Idt is not of class IData\n")
+   if (!is.factor(grouping)) stop("Argument rouping is not a factor\n")
+   n <- Idt@NObs
+   if (length(grouping) != n) stop("The numbers of data and partition observations are different\n")
+   Mxt <- match.arg(Mxt)
+   Model <- match.arg(Model)
+   SelCrit <- match.arg(SelCrit)
+   
+   grouping <- factor(grouping,exclude=NULL)
+   grplvls <- levels(grouping)
+   nk <- as.numeric(table(grouping))
+   k <- length(nk)
+   cumsumnk <- cumsum(nk)
+   curgrouping <- grouping
+   empdist <- numeric(nrep)
+   for (rep in 1:nrep) {
+     permut <- sort.int(runif(n),index.return=TRUE)$ix
+     lstind <- 0
+     for (g in 1:k) {
+       frstind <- lstind+1
+       lstind <- cumsumnk[g] 
+       curgrouping[permut[frstind:lstind]] <- grplvls[g]
+     }
+     empdist[rep] <- MANOVA(Idt,curgrouping,Model,CovCase,SelCrit,Mxt,CVtol,OptCntrl,onerror,...)@ChiSq
+   }
+   pvalue <- length(which(ChiSq<empdist))/nrep
+   cat("Permutation p-value of MANOVA statistic",ChiSq,":\n")
+   pvalue 
+} 
 
 setMethod("summary",					
   signature(object = "IdtE"),
@@ -255,7 +300,7 @@ setMethod("testMod",
       for (FMind in FMindices)  {
         H0Ll <- ModE@logLiks[RMind]
         H1Ll <- ModE@logLiks[FMind]
-        QuiSq <- 2*(H1Ll-H0Ll)
+        ChiSq <- 2*(H1Ll-H0Ll)
         q <- ModE@NIVar
 
         RConfig <- ModE@ModelConfig[RMind]
@@ -289,8 +334,8 @@ setMethod("testMod",
         }
 
         df <-  FMnpar - RMnpar
-        pvalue <- pchisq(QuiSq,df,lower.tail=FALSE)
-        resi <- new("LRTest",H0logLik=H0Ll,H1logLik=H1Ll,QuiSq=QuiSq,df=df,pvalue=pvalue)
+        pvalue <- pchisq(ChiSq,df,lower.tail=FALSE)
+        resi <- new("LRTest",H0logLik=H0Ll,H1logLik=H1Ll,ChiSq=ChiSq,df=df,pvalue=pvalue)
         TestRes <- c(TestRes,resi)
         RestModels <- c(RestModels,ModE@ModelNames[RMind])
         FullModels <- c(FullModels,ModE@ModelNames[FMind])
@@ -389,7 +434,7 @@ setMethod("show",
   function(object)
   {
     for (i in 1:length(object@TestRes))  {
-      if (!is.na(object@TestRes[[i]]@QuiSq)) 
+      if (!is.na(object@TestRes[[i]]@ChiSq)) 
       {
         cat("Testing Model",object@RestModels[i],"against alternative",object@FullModels[i],":\n")
         print(object@TestRes[[i]])
@@ -503,7 +548,7 @@ setMethod("show",
   {
     cat("Null Model log-likelihood:",object@H0logLik,"\n")
     cat("Full Model log-likelihood:",object@H1logLik,"\n")
-    cat("Qui-squared statistic:",object@QuiSq,"\n")
+    cat("Chi-squared statistic:",object@ChiSq,"\n")
     cat("degrees of freedom:",object@df,"\n")
     cat("p-value:",object@pvalue,"\n\n")
   }
@@ -531,9 +576,12 @@ setMethod("summary",
     cat("Selected Model:\n")
     print(names(object@H1res@BestModel))
     cat("\n")
-    cat("Qui-squared statistic:",object@QuiSq,"\n")
+    cat("Chi-squared statistic:",object@ChiSq,"\n")
     cat("degrees of freedom:",object@df,"\n")
     cat("p-value:",object@pvalue,"\n\n")
+    if ( length(object@grouping)<=30 ) { 
+      cat("Note: Given the small sample size, the use of the Chi-square distribution may not be appropriate.\nAlternatively, consider using the permutation test implemented in function MANOVAPermTest.\nNote that this may take a long time.\n")
+    } 
   }
 )
 

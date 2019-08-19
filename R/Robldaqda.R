@@ -18,6 +18,7 @@ setMethod("Roblda",
     grplvls <- levels(grouping)
     n <- x@NObs
     p <- 2*x@NIVar
+    if (p==2) CovCase <- q1CovCase(CovCase) 
     k <- length(grplvls)
     if (length(grplvls)==1)
     { 
@@ -51,6 +52,7 @@ setMethod("Robqda",
   {
     SelCrit <- match.arg(SelCrit)
     SngDMet <- match.arg(SngDMet)
+    if (x@NIVar==1) CovCase <- q1CovCase(CovCase)
 
     if (length(subset) < x@NObs)
     {

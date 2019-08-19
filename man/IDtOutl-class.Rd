@@ -22,7 +22,7 @@
     \item{\code{outliers}:}{A vector of indices of the interval data units flaged as outliers.}
     \item{\code{MD2}:}{A vector of squared robust Mahalanobis distances for all interval data units.}
     \item{eta}{Nominal size of the null hypothesis that a given observation is not an outlier.}
-    \item{RefDist}{The assumed reference distributions used to find cutoffs defining the observations assumed as outliers. Alternatives are \dQuote{ChiSq} and \dQuote{CerioliBetaF} respectivelly for the usual Qui-squared, and the Beta and F distributions proposed by Cerioli (2010).}    
+    \item{RefDist}{The assumed reference distributions used to find cutoffs defining the observations assumed as outliers. Alternatives are \dQuote{ChiSq} and \dQuote{CerioliBetaF} respectivelly for the usual Chi-squared, and the Beta and F distributions proposed by Cerioli (2010).}    
     \item{multiCmpCor}{Whether a multicomparison correction of the nominal size (eta) for the outliers tests was performed. Alternatives are: \sQuote{never} -- ignoring the multicomparisons and testing all entities at the \sQuote{eta} nominal level. \sQuote{always} -- testing all n entitites at 1.- (1.-\sQuote{eta}^(1/n)).}
     \item{NObs}{Number of original observations in the original data set.}
     \item{p}{Number of total numerical variables (MidPoints and/or LogRanges) that may be responsible for the outliers.}
@@ -34,7 +34,7 @@
 \section{Methods}{
   \describe{
     \item{show}{\code{signature(object = "IdtOutl")}: show S4 method for the IdtOutl-class.}
-    \item{plot}{\code{signature(x = "IdtOutl")}: plot S4 methods for the IdtOutl-class.}
+%    \item{plot}{\code{signature(x = "IdtOutl")}: plot S4 methods for the IdtOutl-class.}
     \item{getMahaD2}{\code{signature(x = "IdtOutl")}: retrieves the vector of squared robust Mahalanobis distances for all data units.}
     \item{geteta}{\code{signature(x = "IdtOutl")}: retrieves the nominal size of the null hypothesis used to flag observations as outliers.}
     \item{getRefDist}{\code{signature(x = "IdtOutl")}: retrieves the assumed reference distributions used to find cutoffs defining the observations assumed as outliers.}

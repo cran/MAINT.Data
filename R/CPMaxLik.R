@@ -6,7 +6,7 @@ SNCMaxLik <- function(Data, Config, grouping=NULL, initpar=NULL, prevMod=NULL,
 {
 #  Note: The Data argument should be a matrix containing the mid-points in the first columns and the log-ranges in the latter columns 
 
-  if (!is.element(Config,2:5)) stop("Wrong value for Config argument\n") 
+  if (!is.element(Config,2:5)) stop("Wrong value for Config argument\n")   
   maxsk <- 0.99527
   ulBeta02 <- b2/(1.-b2) - Beta02tol
 
@@ -14,6 +14,7 @@ SNCMaxLik <- function(Data, Config, grouping=NULL, initpar=NULL, prevMod=NULL,
   n <- nrow(Data)		    # number of observations
   p <- ncol(Data)		    # total number of variables (mid-points + log-ranges)
   q <- p/2			    # number of interval variables
+  if (q==1) Config <- q1Config(Config) 
   if ( !is.null(grouping) )
   {                                                # Convert grouping factor into vector of integer indices with the second group
     grpind <- as.integer(grouping)-as.integer(2)   # indexed as 0 (for improved efficiency in C management of the beta2k matrix)

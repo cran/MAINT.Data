@@ -1,15 +1,16 @@
 setClassUnion("extmatrix",c("matrix","NULL"))
 setClassUnion("extlogical",c("logical","NULL"))
 setClassUnion("extnumeric",c("numeric","NULL"))
+setClassUnion("extcharacter",c("character","NULL"))
 setClass("IData",slots=c(MidP="data.frame",LogR="data.frame",ObsNames="character",VarNames="character",
   NObs="numeric",NIVar="numeric"))
 setClass("IdtE",slots=c(ModelNames="character",ModelType="character",ModelConfig="numeric",NIVar="numeric",SelCrit="character",
   logLiks="numeric",BICs="numeric",AICs="numeric",BestModel="numeric",SngD="logical"),contains="VIRTUAL")
 setClass("IdtMclust",slots=c(call="call",data="IData",NObs="numeric",NIVar="numeric",SelCrit="character",Hmcdt="logical",
    BestG="integer",BestC="integer",logLiks="numeric",logLik="numeric",BICs="numeric",bic="numeric",AICs="numeric",aic="numeric",
-   parameters="list",z="extmatrix",classification="extnumeric",allres="list"))
+   parameters="list",z="extmatrix",classification="extcharacter",allres="list"))
 setClass("IdtMclustEl",slots=c(NObs="numeric",NIVar="numeric",SelCrit="character",Hmcdt="logical",Conf="integer",nG="integer",
-  logLik="numeric",alllnLik="numeric",bic="numeric",aic="numeric",parameters="list",z="extmatrix",classification="extnumeric"))
+  logLik="numeric",alllnLik="numeric",bic="numeric",aic="numeric",parameters="list",z="extmatrix",classification="extcharacter"))
 setClass("IdtSngDE",contains=c("IdtE","VIRTUAL"))
 setClass("IdtMxE",slots=c(grouping="factor",Ngrps="numeric"),contains=c("IdtE","VIRTUAL"))
 setClass("IdtSngNDE",slots=c(mleNmuE="numeric",mleNmuEse="numeric",CovConfCases="list"),contains="IdtSngDE")
@@ -20,7 +21,7 @@ setClass("IdtMxNDRE",slots=c(Hmcdt="logical",RobNmuE="matrix",CovConfCases="list
   RobMD2="numeric",cnp2="matrix",raw.cov="array",raw.cnp2="matrix",PerfSt="list"),contains="IdtMxE")
 setClassUnion("IdtMxtNDE",c("IdtMxNDE","IdtMxNDRE"))
 setClassUnion("IdtNDE",c("IdtSngNDE","IdtSngNDRE","IdtMxNDE","IdtMxNDRE"))
-setClass("LRTest",slots=c(QuiSq="numeric",df="numeric",pvalue="numeric",H0logLik="numeric",H1logLik="numeric"))
+setClass("LRTest",slots=c(ChiSq="numeric",df="numeric",pvalue="numeric",H0logLik="numeric",H1logLik="numeric"))
 setClass("ConfTests",slots=c(TestRes="list",RestModels="character",FullModels="character"))
 setClass("IdtMANOVA",slots=c(NIVar="numeric",grouping="factor",H0res="IdtSngDE",H1res="IdtMxE"),contains="LRTest")
 setClass("IdtClMANOVA",contains="IdtMANOVA")
@@ -77,7 +78,7 @@ setClass("RobEstControl",
 
 setClass("EMControl",
   slots=c(nrep="numeric", maxiter="numeric", convtol="numeric", protol="numeric", seed="extnumeric"),
-  prototype = list(nrep = 1000, maxiter=1000, convtol=0.01, protol=1e-6, seed=NULL)
+  prototype = list(nrep = 100, maxiter=1000, convtol=0.01, protol=1e-6, seed=NULL)
 )
 setClass("IdtOutl",slots=c(outliers="integer", MD2="numeric",eta="numeric",RefDist="character",
   multiCmpCor="character",NObs="numeric",p="numeric",h="numeric",boolRewind="extlogical"))
@@ -173,6 +174,10 @@ setGeneric("Robqda",
 setGeneric("Idtmclust",
   function(Idt, G=1:9, CovCase=1:4, SelCrit=c("BIC","AIC"), Mxt=c("Hom","Het","HomandHet"), control=EMControl())
   standardGeneric("Idtmclust"))
+
+setGeneric("pcoordplot",
+  function(x,title="Parallel Coordinate Plot",Seq=c("AllMidP_AllLogR","MidPLogR_VarbyVar"),G=BestG(x),...)
+  standardGeneric("pcoordplot"))
 
 
 setGeneric("parameters",function(x) standardGeneric("parameters"))

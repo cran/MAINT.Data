@@ -13,9 +13,9 @@ the four alternative variance-covariance matrix configurations.}
 \section{Slots}{
   \describe{
     \item{\code{TestRes}:}{List of test results; each element is an object of class LRTest, with the following components: \cr \cr
-        \bold{QuiSq}: Value of the Qui-Square statistics corresponding to the performed test. \cr
-        \bold{df}: Degrees of freedom of the Qui-Square statistics. \cr
-        \bold{pvalue}: p-value of the Qui-Square statistics value, obtained from the Qui-Square distribution with df degrees of freedom. \cr
+        \bold{ChiSq}: Value of the Chi-Square statistics corresponding to the performed test. \cr
+        \bold{df}: Degrees of freedom of the Chi-Square statistics. \cr
+        \bold{pvalue}: p-value of the Chi-Square statistics value, obtained from the Chi-Square distribution with df degrees of freedom. \cr
         \bold{H0logLik}: Logarithm of the Likelihood function under the null hypothesis. \cr
         \bold{H1logLik}: Logarithm of the Likelihood function under the alternative hypothesis. \cr
     }

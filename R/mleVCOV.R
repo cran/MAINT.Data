@@ -91,7 +91,7 @@ HetSNmleVCov <- function(nk,p,k,Config,SigmaE,HomSNvcov,grpnames)
 #  k           -  Number of different groups
 #  Config      -  Configuration of the Var-Covariance matrix
 #  SigmaE      -  Matrix with covariance estimates
-#  HomSNvcov   -  The parameter vcov matrix for the homecedastic SkewNormal vector of residuals
+#  HomSNvcov   -  The parameter vcov matrix for the homoscedastic SkewNormal vector of residuals
 #  grpnames    -  Vector with the group names
 
 #  Value     - The Var-Cov matrix of the maximum likelihood estimators   

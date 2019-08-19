@@ -16,6 +16,7 @@ setMethod("fulltle",
     outlin <- match.arg(outlin)
 #    otpType <- match.arg(otpType)
     q <- Idt@NIVar
+    if (q==1) CovCase <- q1CovCase(CovCase) 
 
     if (getalpha=="TwoStep")
     {

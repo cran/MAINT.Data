@@ -13,8 +13,8 @@
 
 \usage{
 
-\S4method{plot}{IData}(x, y, \dots)
-\S4method{plot}{IData}(x, \dots)
+\S4method{plot}{IData}(x, y, type=c("crosses","rectangles"), append=FALSE, \dots)
+\S4method{plot}{IData}(x, casen=NULL, layout=c("vertical","horizontal"), append=FALSE, \dots)
 
 }
 
@@ -23,17 +23,19 @@
 
   \item{y}{An object of type \linkS4class{IData} representing the values of a second Interval-value variable, to be displayed along y (vertical) coordinates.}
 
-  \item{\dots}{ Graphical arguments to be passed to methods. Currently the following arguments are allowed: }
-  \describe{
     \item{type}{What type of plot should de drawn. Alternatives are "crosses" (default) and "rectangles".}
-    \item{main}{An overall title for the plot. }
-    \item{sub}{A subtitle for the plot. }
-    \item{xlab}{A title for the x axis.}
-    \item{ylab}{A title for the y axis.}
-  }
+
+    \item{append}{A boolean flag indicating if the interval-valued variables should be displayed in a new plot, or added to an existing plot.}
+
+    \item{casen}{An optional character string with the case names.}
+
+    \item{layout}{The axes along which the interval-valued variables be displayed. Alternatives are "vertical" (default) and "horizontal".}
+    
+  \item{\dots}{ Graphical arguments to be passed to methods.}
 }
 
 \seealso{
   \linkS4class{IData} 
 }
+
 

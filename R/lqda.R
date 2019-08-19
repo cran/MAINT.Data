@@ -44,7 +44,7 @@ setMethod("lda",
     {
        if (silent)  {
           return(NULL)
-       }  else { stop("Trying to compute a linear discriminant function from an estimate of a heterocedastic mixture\n") }
+       }  else { stop("Trying to compute a linear discriminant function from an estimate of a heteroscedastic mixture\n") }
     }
     if (is.character(selmodel))  { selmodel <- sapply(selmodel,function(mod) which(mod==x@ModelNames)) }
     if (!is.finite(x@logLiks[selmodel]))
@@ -118,6 +118,10 @@ setMethod("lda",
     } else {  
       CovCaseArg <- FALSE
     }	
+    if (x@NIVar==1) {
+      CovCase <- q1CovCase(CovCase) 
+      Config <- q1Config(Config)
+    }  
 
     SelCrit <- match.arg(SelCrit)
 #    if (length(subset) < nrow(x))
@@ -223,7 +227,7 @@ setMethod("qda",
     {
        if (silent)  {
           return(NULL)
-       }  else { stop("Trying to compute a quadratic discriminant function from an estimate of a homocedastic mixture\n") }
+       }  else { stop("Trying to compute a quadratic discriminant function from an estimate of a homoscedastic mixture\n") }
     }
     if (is.character(selmodel))  { selmodel <- sapply(selmodel,function(mod) which(mod==x@ModelNames)) }
     if (!is.finite(x@logLiks[selmodel]))
@@ -282,6 +286,7 @@ setMethod("qda",
     CovCase=1:4, SelCrit=c("BIC","AIC"), silent=FALSE, ...)
   {
     SelCrit <- match.arg(SelCrit)
+    if (x@NIVar==2) CovCase <- q1CovCase(CovCase) 
 
     Config <- getConfig(...)
     if (is.null(Config))  
@@ -291,6 +296,10 @@ setMethod("qda",
     } else {  
       CovCaseArg <- FALSE
     }	
+    if (x@NIVar==1) {
+      CovCase <- q1CovCase(CovCase) 
+      Config <- q1Config(Config)
+    }  
 
 #    if (length(subset) < nrow(x))
     if (length(subset) < x@NObs)

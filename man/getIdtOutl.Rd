@@ -30,7 +30,7 @@
 
     \item{multiCmpCor}{Whether a multicomparison correction of the nominal size (eta) for the outliers tests should be performed. Alternatives are: \sQuote{never} -- ignoring the multicomparisons and testing all entities at the \sQuote{eta} nominal level. \sQuote{always} -- testing all n entitites at 1.- (1.-\sQuote{eta}^(1/n)); and \sQuote{iterstep} -- use the iterated rule proposed by  Cerioli (2010), \emph{i.e.}, make an initial set of tests using the nominal size 1.- (1-\sQuote{eta}^(1/n)), and if no outliers are detected stop. Otherwise, make a second step testing for outliers at the \sQuote{eta} nominal level.}   
 
-    \item{RefDist}{The assumed reference distributions used to find cutoffs defining the observations assumed as outliers. Alternatives are \dQuote{ChiSq},\dQuote{HardRockeAsF}, \dQuote{HardRockeAdjF} and \dQuote{CerioliBetaF}, respectivelly for the usual Qui-squared, the asymptotic and adjusted scaled F distributions proposed by Hardin and Rocke (2005), and the Beta and F distributions proposed by Cerioli (2010).}    
+    \item{RefDist}{The assumed reference distributions used to find cutoffs defining the observations assumed as outliers. Alternatives are \dQuote{ChiSq},\dQuote{HardRockeAsF}, \dQuote{HardRockeAdjF} and \dQuote{CerioliBetaF}, respectivelly for the usual Chi-squared, the asymptotic and adjusted scaled F distributions proposed by Hardin and Rocke (2005), and the Beta and F distributions proposed by Cerioli (2010).}    
 
     \item{outlin}{The type of outliers to be considered. \dQuote{MidPandLogR} if outliers may be present in both MidPpoints and LogRanges, \dQuote{MidP} if outliers are only present in MidPpoints, or \dQuote{LogR} if outliers are only present in LogRanges.}
 }

@@ -186,7 +186,8 @@ IdtSNmle <- function(Idt, grouping=NULL, Type=c("SingDst","HomMxt"), CVtol=1.0e-
       if (Type=="SingDst")  {
         newpar <- c(RestModel$mu,SigmaSrpar,RestModel$gamma1)
       }  else if (Type=="HomMxt")  {
-        newpar <- c(RestModel$mu[1,]-RestModel$mu0[1,],SigmaSrpar,RestModel$gamma1)
+#        newpar <- c(RestModel$mu[1,]-RestModel$mu0[1,],SigmaSrpar,RestModel$gamma1)
+        newpar <- c(RestModel$mu[1,],RestModel$beta2k,SigmaSrpar,RestModel$gamma1)
       }
       FullModel <- SNCMaxLik(Xscld,Config=FullConf,initpar=newpar,OptCntrl=OptCntrl)
     }
@@ -315,6 +316,7 @@ IdtSNmle <- function(Idt, grouping=NULL, Type=c("SingDst","HomMxt"), CVtol=1.0e-
   n <- Idt@NObs
   n1scvct <- rep(1,n)
   maxsk <- 0.99527
+  if (q==1) Config <- q1Config(Config)
 
   if (Type=="SingDst")  { 
     k <- 1
@@ -534,6 +536,7 @@ IdtFDMxtSNmle <- function(Idt, grouping, CVtol=1.0e-5, OptCntrl=list(), CovCaseA
   n <- Idt@NObs
   q <- Idt@NIVar
   p <- 2*q
+  if (q==1) Config <- q1Config(Config)
   nk <- as.numeric(table(grouping))
   k <- length(nk) 
   if (k==1)  {

@@ -99,8 +99,11 @@ setMethod("snda",
     } else {  
       CovCaseArg <- FALSE
     }	
+    if (x@NIVar==1) {
+      CovCase <- q1CovCase(CovCase) 
+      Config <- q1Config(Config)
+    }  
 
-#    if (length(subset) < nrow(x))
     if (length(subset) < x@NObs)
     {
       x <- x[subset,]

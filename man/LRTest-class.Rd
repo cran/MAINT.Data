@@ -10,9 +10,9 @@
 
 \section{Slots}{
   \describe{
-   \item{\code{QuiSq}:}{Value of the Qui-Square statistics corresponding to the performed test}
-    \item{\code{df}:}{Degrees of freedom of the Qui-Square statistics}
-    \item{\code{pvalue}:}{p-value of the Qui-Square statistics value, obtained from the Qui-Square distribution with df degrees of freedom}
+   \item{\code{ChiSq}:}{Value of the Chi-Square statistics corresponding to the performed test}
+    \item{\code{df}:}{Degrees of freedom of the Chi-Square statistics}
+    \item{\code{pvalue}:}{p-value of the Chi-Square statistics value, obtained from the Chi-Square distribution with df degrees of freedom}
     \item{\code{H0logLik}:}{Logarithm of the Likelihood function under the null hypothesis}
     \item{\code{H1logLik}:}{Logarithm of the Likelihood function under the alternative hypothesis}
   }

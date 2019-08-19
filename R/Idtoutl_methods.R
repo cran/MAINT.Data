@@ -8,10 +8,8 @@ setMethod("show",
 
 setMethod("plot",
   signature(x = "IdtOutl",y = "missing"),
-  function(x,scale=c("linear","log10","log"),RefDist=getRefDist(x),eta=geteta(x),multiCmpCor=getmultiCmpCor(x),...)
+  function(x,scale=c("linear","log"),RefDist=getRefDist(x),eta=geteta(x),multiCmpCor=getmultiCmpCor(x),...)
   {
-    require(ggplot2)   # To be completed (ex: add F and Bets cut-offs and tested ...
-
     scale <- match.arg(scale)
     MD2 <- getMahaD2(x)
     n <- x@NObs
@@ -25,7 +23,7 @@ setMethod("plot",
       oneminusalpha <- oneminuseta
     }
 
-    if (RefDist=="ChiSq")  { 
+    if (RefDist=="ChiSq")  {
       delta <- qchisq(oneminusalpha,p)
     } else if (RefDist=="HardRockeAdjF")  {
       delta <- qHardRoqF(oneminusalpha,n,p,h)
@@ -34,28 +32,33 @@ setMethod("plot",
     } else if (RefDist=="CerioliBetaF")  {
       delta1 <- ((h-1)^2/h) * qbeta(oneminusalpha,p/2,(h-p-1)/2)
       delta2 <- (((h+1)*(h-1)*p)/(h*(h-p))) * qf(oneminusalpha,p,h-p)
-    } 
+    }
 
-    if (RefDist!="CerioliBetaF")  {
-      plt <- ggplot(NULL,aes(x=names(MD2),y=MD2)) + geom_point() + geom_abline(intercept=delta,slope=0.)
-    } else {
+   if (RefDist!="CerioliBetaF")  {
+     if (scale=="linear") {
+       plot(MD2,main="Robust Mahalanobis Distances",xlab="",xaxt="n",...)
+     } else if (scale=="log") {
+       plot(MD2,main="Robust Mahalanobis Distances (log scale)",xlab="",xaxt="n",log="y",...)
+     }
+     axis(1,1:n,labels=names(MD2),las=2,...)
+     abline(h=delta)
+   } else {
       RewSet <- x@boolRewind
-      plt <- ggplot(NULL,aes(x=names(MD2),y=MD2,colour=RewSet)) + geom_point() + 
-        geom_abline(intercept=delta1,slope=0.,colour="blue") + geom_abline(intercept=delta2,slope=0.,colour="red")
-    }
-    if (scale=="linear") {
-      plt <- plt + ggtitle("Robust Mahalanobis Distances") + theme(plot.title=element_text(hjust=0.5)) + theme(axis.text.x=element_text(angle=90,hjust=1))       
-    } else if (scale=="log10") {
-      plt <- plt + ggtitle("Robust Mahalanobis Distances (log10 scale)") +  theme(plot.title=element_text(hjust=0.5)) + 
-        theme(axis.text.x=element_text(angle=90,hjust=1)) + coord_trans(y="log10")  
-    } else if (scale=="log") {
-      plt <- plt + ggtitle("Robust Mahalanobis Distances (logarithmic scale)") + theme(plot.title=element_text(hjust=0.5)) + 
-        theme(axis.text.x=element_text(angle=90,hjust=1)) + coord_trans(y="log") 
-    }
+      if (scale=="linear") {
+        plot(MD2,main="Robust Mahalanobis Distances",xlab="",xaxt="n",type="n",...)
+      } else if (scale=="log") {
+        plot(MD2,main="Robust Mahalanobis Distances (log scale)",xlab="",xaxt="n",type="n",log="y",...)
+        axis(1,1:n,labels=names(MD2),las=2,...)
+      }
+      axis(1,1:n,labels=names(MD2),las=2,...)
+      points(MD2[RewSet],pch=19,col="red")
+      points(MD2[!RewSet],pch=19,col="blue")
+      abline(h=delta1,col="blue")
+      abline(h=delta2,col="red")
+   }
+  }
+)
 
-    plt
-  }  
-) 
 
 setMethod("getMahaD2",signature(IdtOtl = "IdtOutl"),function(IdtOtl) IdtOtl@MD2) 
 setMethod("geteta", signature(IdtOtl = "IdtOutl"), function(IdtOtl) IdtOtl@eta)

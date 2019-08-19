@@ -8,12 +8,15 @@ RepLOptim <- function(start, parsd, fr, gr=NULL, inphess=NULL, ..., method="nlmi
 # Needs to be explicitly set to TRUE if non-linear constraints are to be
 # strictly enforced (instead of using BigM penalties) by local optimizers.   
 
-  maxrepet_default <- 2
-  maxnoimprov_default <- 50
-  maxreplic_default <- 250
-  maxiter_default <- 500
-  maxSANNiter_default <- 1500
-  maxeval_default <- 1000
+#cat("RepLOptim -- control =\n") ; print(control)  
+#cat("RepLOptim -- dots =\n") ; print(match.call(expand.dots=FALSE)$...)  
+
+  maxrepet_default <- 40
+  maxnoimprov_default <- 100
+  maxreplic_default <- 1000
+  maxiter_default <- 1500
+  maxSANNiter_default <- 3000
+  maxeval_default <- 2000
   srMachinetol <- sqrt(.Machine$double.eps)
   RLOtol_default <- srMachinetol
   reltol_default <- srMachinetol
@@ -69,7 +72,8 @@ RepLOptim <- function(start, parsd, fr, gr=NULL, inphess=NULL, ..., method="nlmi
     while (value >= objbnd && cnt < allrep && repcnt < maxrepet && noimpcnt < maxnoimprov)
     {
       if (is.function(method)) {
-        tmpres <- method(initpar,gr=gr,lbound=lower, ubound=upper, control=control, hessian=rethess, ...)
+#        tmpres <- method(initpar,gr=gr,lbound=lower, ubound=upper, control=control, hessian=rethess, ...)
+        tmpres <- method(initpar,gr=gr,lbound=lower, ubound=upper, hessian=rethess, ...)
       } else {
         if (method == "nlminb") {
           tmpres <- nlminb(start=initpar,fr,gradient=gr,hessian=inphess,lower=lower,upper=upper,

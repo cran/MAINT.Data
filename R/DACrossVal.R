@@ -8,9 +8,13 @@ DACrossVal <- function(data,grouping,TrainAlg,EvalAlg=EvalClrule,Strfolds=TRUE,k
     lb:ub  # return(lb:ub)
   }   
 
+  if (class(grouping)!="factor") {
+    grouping <- factor(grouping)
+  }
   codes <- levels(grouping)
   nk <- table(grouping)
   k <- nrow(nk)
+  if (k<2) stop("Factor grouping should have at least two different levels\n")
   nk <- as.numeric(nk)
   n <- sum(nk)
   if (loo) {
@@ -19,9 +23,7 @@ DACrossVal <- function(data,grouping,TrainAlg,EvalAlg=EvalClrule,Strfolds=TRUE,k
     permut <- vector("list",k)
   }
   trep <- kfold*CVrep
-  EvalRes <- array(dim=c(trep,k,2))
-  dimnames(EvalRes)[[2]] <- codes
-  dimnames(EvalRes)[[3]] <- c("Nk","Clerr")
+  EvalRes <- array(dim=c(trep,k,2),dimnames=list(NULL,codes,c("Nk","Clerr")))
   if (prior[1]=="proportions") { prior <- nk/n }
   for (i in 1:CVrep)
   {

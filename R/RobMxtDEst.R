@@ -25,6 +25,7 @@ setMethod("RobMxtDEst",
 
     n <- Idt@NObs  
     p <- 2*Idt@NIVar  
+    if (p==2) CovCase <- q1CovCase(CovCase) 
     if (n <=p) {
       stop("The number of observations is too small (not larger than the total number of variables) and would lead to singular covariance estimates.\n")
     }

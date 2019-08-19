@@ -50,12 +50,12 @@ SQMATTP RestCov(const int q,NumericVector::iterator xpos,const int Config,const 
 			SetZero<SQMATTP>(A,p,p,!FixedArrays);
  			for (int i=0;i<p;i++) A(i,i) = *xpos++;
   			for (int c=1;c<p;c++) for (int r=0;r<c;r++)  {
-    				if ( (r<q && c<q)  || (r>=q && c>=q) || c==r+q )  A(r,c) = *xpos++;
-    				else if (r>0)  {
-					double dbltmp = 0.;
-					for (int i=0;i<r;i++) dbltmp -= A(i,r)*A(i,c);   
-      					A(r,c) = dbltmp/A(r,r);
-				}
+    			  if ( (r<q && c<q)  || (r>=q && c>=q) || c==r+q )  A(r,c) = *xpos++;
+    			  else if (r>0)  {
+			    double dbltmp = 0.;
+			    for (int i=0;i<r;i++) dbltmp -= A(i,r)*A(i,c);   
+      			    A(r,c) = dbltmp/A(r,r);
+			  }
   			}  
 			return A.transpose() * A;
 		case 3: 
@@ -65,18 +65,18 @@ SQMATTP RestCov(const int q,NumericVector::iterator xpos,const int Config,const 
 //			Sigma = NullppMat;
 			SetZero<SQMATTP>(Sigma,p,p,!FixedArrays);
 			for (int i=0;i<q;i++)  {
-				A11 = *(xpos+i);
-				A12 = *(xpos+p+i);
-				A22 = *(xpos+(qplsi=q+i));
-				Sigma(i,i) = A11*A11;
-				Sigma(i,qplsi) = Sigma(qplsi,i) = A11*A12;  
-				Sigma(qplsi,qplsi) = A12*A12 + A22*A22;
+			  A11 = *(xpos+i);
+			  A12 = *(xpos+p+i);
+			  A22 = *(xpos+(qplsi=q+i));
+			  Sigma(i,i) = A11*A11;
+			  Sigma(i,qplsi) = Sigma(qplsi,i) = A11*A12;  
+			  Sigma(qplsi,qplsi) = A12*A12 + A22*A22;
 			}
 			return Sigma;  
 		case 4: 
 			if (A.size()!=q) {
-				A.resize(q,q);
-  				for (int c=0;c<q-1;c++) for (int r=c+1;r<q;r++)  A(r,c) = 0.;
+			  A.resize(q,q);
+  			  for (int c=0;c<q-1;c++) for (int r=c+1;r<q;r++)  A(r,c) = 0.;
 			}
 //			if (Sigma.size()!=p) Sigma.resize(p,p);
 //			Sigma = NullppMat;
@@ -94,8 +94,8 @@ SQMATTP RestCov(const int q,NumericVector::iterator xpos,const int Config,const 
 //			Sigma = NullppMat;
 			SetZero<SQMATTP>(Sigma,p,p,!FixedArrays);
 			for (int i=0;i<p;i++) {
-        x = *xpos++;
-        Sigma(i,i) = x*x;
+                          x = *xpos++;
+                          Sigma(i,i) = x*x;
 			}  
 			return Sigma;
 	}

@@ -139,7 +139,7 @@ GetCovPar <- function(S,Config=1)
 {
   if (!is.matrix(S) || !is.element(Config,1:5))  stop("Wrong argument types\n")
   p <- nrow(S)
-  if (ncol(S)!=p) stop("Matrix S is not square\n")
+  if (ncol(S)!=p) stop("Matrix S is not squared\n")
   Sr <- chol(S)
   if (Config==1) return(c(diag(Sr),Sr[col(Sr)>row(Sr)]))
   if (Config==5) return(diag(Sr))

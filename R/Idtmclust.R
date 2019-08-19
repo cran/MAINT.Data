@@ -2,23 +2,39 @@ setMethod("Idtmclust",
   signature(Idt = "IData"),
   function(Idt, G=1:9, CovCase=1:4, SelCrit=c("BIC","AIC"), Mxt=c("Hom","Het","HomandHet"), control=EMControl())   
   {
+    pertubzVct <- function(z,maxprt) {
+      maxzind <- which.max(z)
+      change <- runif(1,0.,min(z[maxzind],maxprt))
+      z[maxzind] <- z[maxzind] - change
+      z[-maxzind] <- z[-maxzind] + change/(length(z)-1)
+      z
+    } 
+    pertubzMat <- function(OrigzMat,maxprt=0.1) t(apply(OrigzMat,1,pertubzVct,maxprt=maxprt))
+
     call <- match.call()
     SelCrit <- match.arg(SelCrit)
+    Mxt <- match.arg(Mxt)
     nrep <- control@nrep
     maxiter <- control@maxiter 
     set.seed(control@seed)
     protol <- control@protol
     convtol <- control@convtol
 
+    if (class(G)!="integer") G <- as.integer(G)
+    if (class(CovCase)!="integer") CovCase <- as.integer(CovCase)
+
     X <- data.frame(c(Idt@MidP,Idt@LogR),row.names=rownames(Idt))
     n <- nrow(X)
     p <- ncol(X)
+    q <- p/2
+    if (q==1) CovCase <- q1CovCase(CovCase) 
     nCases <- length(CovCase)
     nG <- length(G)
     ntot <- nG*nCases
     GCnames <- paste(rep(paste("G",G,sep=""),each=nCases),paste("C",CovCase,sep=""),sep="")
     Vnames <- names(X)
     Onames <- rownames(X)
+
     if (Mxt=="HomandHet" || Mxt=="Hom") {
       RepresHom <- vector("list",ntot)
       HomlogLiks <- numeric(ntot)
@@ -37,7 +53,6 @@ setMethod("Idtmclust",
     } else {
       RepresHet <- HetlogLiks <- HetBICs <- HetAICs <- NULL
     }
-  
     ind0 <- 0
     for (k in G) {
 
@@ -62,8 +77,8 @@ setMethod("Idtmclust",
           }  
           if (Mxt=="HomandHet" || Mxt=="Hom") {
             RepresHom[[ind]] <- new("IdtMclustEl",NObs=Idt@NObs,NIVar=Idt@NIVar,SelCrit=SelCrit,Hmcdt=TRUE,Conf=Cf,nG=k,
-              logLik=Lik,alllnLik=Lik,bic=BIC,aic=AIC,z=NULL,classification=NULL,
-              parameters=list(pro=NULL,mean=matrix(muSig$mu,ncol=1,dimnames=list(Vnames,NULL)),
+              logLik=Lik,alllnLik=Lik,bic=BIC,aic=AIC,z=NULL,classification=rep("CP1",Idt@NObs),
+              parameters=list(pro=NULL,mean=matrix(muSig$mu,ncol=1,dimnames=list(Vnames,"CP1")),
                 covariance=array(muSig$Sigma,dim=c(p,p,1),dimnames=list(Vnames,Vnames,NULL)))
               )
             HomlogLiks[ind] <- Lik
@@ -72,9 +87,9 @@ setMethod("Idtmclust",
           }
           if (Mxt=="HomandHet" || Mxt=="Het") {
             RepresHet[[ind]] <- new("IdtMclustEl",NObs=Idt@NObs,NIVar=Idt@NIVar,SelCrit=SelCrit,Hmcdt=FALSE,Conf=Cf,nG=k,
-              logLik=Lik,bic=BIC,aic=AIC,z=NULL,classification=NULL,
-              parameters=list(pro=NULL,mean=matrix(muSig$mu,ncol=1,dimnames=list(Vnames,NULL)),
-                covariance=array(muSig$Sigma,dim=c(p,p,1),dimnames=list(Vnames,Vnames,NULL)))
+              logLik=Lik,alllnLik=Lik,bic=BIC,aic=AIC,z=NULL,classification=rep("CP1",Idt@NObs),
+              parameters=list(pro=NULL,mean=matrix(muSig$mu,ncol=1,dimnames=list(Vnames,"CP1")),
+                covariance=array(muSig$Sigma,dim=c(p,p,1),dimnames=list(Vnames,Vnames,"CP1")))
               )
             HetlogLiks[ind] <- Lik
             HetBICs[ind] <- BIC
@@ -83,9 +98,11 @@ setMethod("Idtmclust",
         }  
 
       } else { 
-        ptau <- rep(0.25,k-1)
-        sdmuk <- rep(5.,k*p)
-        sdSigmaSr <- rep(5.,k*p*(p+1)/2)
+        pertubfct <- 2.                               # pertubation factors
+        ptaufct <- 0.2   
+        pR <- 0.1
+        ptau <- pertubfct*rep(ptaufct/k,k-1)
+        
         z <- matrix(0.,n,k)
         if (Mxt=="HomandHet" || Mxt=="Hom") {
           clstiallk <- hcEEE(X,minclus=2)
@@ -101,16 +118,53 @@ setMethod("Idtmclust",
           HetISol <- list(LnLik=-Inf,z=z)
         }  
 
+        Vnames <- names(X)
+        Onames <- rownames(X)
+        Cnames <- paste("CP",1:k,sep="")
+
+#        pR <- 0.2       
+
         for (Cfi in 1:nCases) {
           Cf <- CovCase[Cfi]
           Config <- ifelse(Cf==1,1,Cf+1)
           Cf <- CovCase[Cfi]
           Config <- ifelse(Cf==1,1,Cf+1)
           ind <- ind0+Cfi
+
+          ISol <- NULL 
+          maxzpert <- 0.1
+          maxinittrials <- 100
+          inittrial <- 0
           if (Mxt=="HomandHet" || Mxt=="Hom") {
-            ISol <- EMGaus(X,k,HomISol,maxiter=maxiter,Config=Config,Homoc=TRUE,convtol=convtol,tautol=protol)
-            FSol <- RepEMGauss(X,n,p,k,ISol,pertub=list(z=NULL,tau=ptau,muk=sdmuk,SigmaSr=sdSigmaSr),
+            while ( is.null(ISol)  || any(!is.finite(ISol$tau)) || any(!is.finite(ISol$muk)) || any(!is.finite(ISol$Sigma)) )  
+            {
+              inittrial <- inittrial + 1
+              ISol <- .Call( "CEMGauss", as.matrix(X), k, Config, TRUE, maxiter, protol, convtol,
+#                HomISol$z, NULL, NULL, NULL, NULL, HomISol$LnLik, 
+                 HomISol$z, NULL, NULL, NULL, NULL, HomISol$LnLik, FALSE, 
+                 PACKAGE = "MAINT.Data" )
+              rownames(ISol$muk) <- rownames(ISol$Sigma) <- colnames(ISol$Sigma) <- Vnames
+              names(ISol$clusters) <- Onames
+              if ( any(!is.finite(ISol$tau)) || any(!is.finite(ISol$muk)) || any(!is.finite(ISol$Sigma)) ) {
+                if (inittrial < maxinittrials) HomISol$z <- pertubzMat(HomISol$z)
+                else stop(paste("Idtmclust failed to find a valid Homoscedastic ",k,"-group solution for configuration C",CovCase," after ",inittrial,"trials.\n",sep=""))
+              }
+            } 
+
+            rownames(ISol$z) <- Onames
+            names(ISol$tau) <- colnames(ISol$muk) <- colnames(ISol$z) <- Cnames
+            ISol$clusters <- Cnames[ISol$clusters] 
+            stdv <- sqrt(diag(ISol$Sigma))
+            sdmuk <- pertubfct*rep(stdv,k)
+            sdStdev <- pertubfct*stdv/4
+            if (Config==1 || Config==2) sdR <- pertubfct*rep(pR,p*(p-1)/2)
+            else if (Config==3) sdR <- pertubfct*rep(pR,p)
+            else if (Config==4) sdR <- pertubfct*rep(pR,q*(q-1))
+            else if (Config==5) sdR <- NULL
+            
+            FSol <- RepEMGauss(X,n,p,k,ISol,pertub=list(z=NULL,tau=ptau,muk=sdmuk,Stdev=sdStdev,cor=sdR),
               nrep=nrep,Config=Config,Homoc=TRUE,maxiter=maxiter,protol=protol,convtol=convtol)
+
             RepresHom[[ind]] <- new("IdtMclustEl",NObs=Idt@NObs,NIVar=Idt@NIVar,SelCrit=SelCrit,Hmcdt=TRUE,Conf=Cf,nG=k,
               logLik=FSol$BestSol$LnLik,alllnLik=FSol$alllnLik,bic=FSol$BestSol$BIC,aic=FSol$BestSol$AIC,
               parameters=list(
@@ -122,10 +176,43 @@ setMethod("Idtmclust",
             HomBICs[ind] <- FSol$BestSol$BIC
             HomAICs[ind] <- FSol$BestSol$AIC
           }
+
           if (Mxt=="HomandHet" || Mxt=="Het") {
-            ISol <- EMGaus(X,k,HetISol,maxiter=maxiter,Config=Config,Homoc=FALSE,convtol=convtol,tautol=protol)
-            FSol <- RepEMGauss(X,n,p,k,ISol,pertub=list(z=NULL,tau=ptau,muk=sdmuk,SigmaSr=sdSigmaSr),
+            while ( is.null(ISol)  || any(!is.finite(ISol$tau)) || any(!is.finite(ISol$muk)) || any(!is.finite(ISol$Sigmak)) )  
+            {
+              inittrial <- inittrial + 1
+                ISol <- .Call( "CEMGauss", as.matrix(X), k, Config, FALSE, maxiter, protol, convtol,
+#                  HetISol$z, NULL, NULL, NULL, NULL, HetISol$LnLik, 
+                  HetISol$z, NULL, NULL, NULL, NULL, HetISol$LnLik, FALSE, 
+                  PACKAGE = "MAINT.Data" )
+                rownames(ISol$muk) <- dimnames(ISol$Sigmak)[[1]]  <- dimnames(ISol$Sigmak)[[2]] <- Vnames
+                names(ISol$clusters) <- Onames
+              if ( any(!is.finite(ISol$tau)) || any(!is.finite(ISol$muk)) || any(!is.finite(ISol$Sigmak)) ) {
+                if (inittrial < maxinittrials) HetISol$z <- pertubzMat(HetISol$z)
+                else stop(paste("Idtmclust failed to find a valid Heteroscedastic ",k,"-group solution for configuration C",CovCase," after ",inittrial,"trials.\n",sep=""))
+              }
+            }
+
+            dimnames(ISol$Sigmak)[[3]] <- Cnames
+            rownames(ISol$z) <- Onames
+            names(ISol$tau) <- colnames(ISol$muk) <- colnames(ISol$z) <- Cnames
+            ISol$clusters <- Cnames[ISol$clusters] 
+            q0 <- p*(p-1)/2 
+            sdmuk <- numeric(p*k)
+            sdStdev <- numeric(p*k)
+            for (g in 1:k) {
+              stdv <- sqrt(diag(ISol$Sigmak[,,g]))
+              sdmuk[(g-1)*p+1:p] <- pertubfct*stdv
+              sdStdev[(g-1)*p+1:p] <- pertubfct*stdv/4
+            }
+            if (Config==1 || Config==2) sdR <- pertubfct*rep(pR,k*p*(p-1)/2)
+            else if (Config==3) sdR <- pertubfct*rep(pR,k*p)
+            else if (Config==4) sdR <- pertubfct*rep(pR,k*q*(q-1))
+            else if (Config==5) sdR <- NULL
+            
+            FSol <- RepEMGauss(X,n,p,k,ISol,pertub=list(z=NULL,tau=ptau,muk=sdmuk,Stdev=sdStdev,cor=sdR),
               nrep=nrep,Config=Config,Homoc=FALSE,maxiter=maxiter,protol=protol,convtol=convtol)
+            
             RepresHet[[ind]] <- new("IdtMclustEl",NObs=Idt@NObs,NIVar=Idt@NIVar,SelCrit=SelCrit,Hmcdt=FALSE,Conf=Cf,nG=k,
               logLik=FSol$BestSol$LnLik,alllnLik=FSol$alllnLik,bic=FSol$BestSol$BIC,aic=FSol$BestSol$AIC,
               parameters=list(pro=FSol$BestSol$tau,mean=FSol$BestSol$muk,covariance=FSol$BestSol$Sigmak),
@@ -182,10 +269,10 @@ setMethod("Idtmclust",
        return (
          new("IdtMclust",call=call,data=Idt,NObs=Idt@NObs,NIVar=Idt@NIVar,SelCrit=SelCrit,Hmcdt=FALSE,
            BestC=RepresHet[[bestHetMod]]@Conf,BestG=RepresHet[[bestHetMod]]@nG,
-           logLiks=c(HomlogLiks,HetlogLiks),BICs=c(HomBICs,HetBICs),AICs=c(HomAICs,HetAICs),
+           logLiks=c(HetlogLiks,HetlogLiks),BICs=c(HetBICs,HetBICs),AICs=c(HetAICs,HetAICs),
            logLik=RepresHet[[bestHetMod]]@logLik,bic=RepresHet[[bestHetMod]]@bic,aic=RepresHet[[bestHetMod]]@aic,
            parameters=RepresHet[[bestHetMod]]@parameters,z=RepresHet[[bestHetMod]]@z,classification=RepresHet[[bestHetMod]]@classification,
-           allres=list(RepresHom=RepresHom,RepresHet=RepresHet) )
+           allres=list(RepresHet=RepresHet,RepresHet=RepresHet) )
          )
      }
   }  
@@ -244,7 +331,7 @@ MDataGaussLogLik <- function(n,p,X,u,Sigma)
 #  Parameters:
 #  
 #  p          -  x dimension
-#  X          -  vector of observation data
+#  X          -  matrix of observation data
 #  u          -  vector of mean estimates 
 #  Sigma      -  The covariance matrix estimate 
 
@@ -278,7 +365,8 @@ EMGaus <- function(X,k,InitSol,Config,Homoc,maxiter,tautol,convtol)
    Onames <- rownames(X)
    Wk <- array(0.,dim=c(p,p,k))
    LnLik <- InitSol$LnLik
-   Likk <- array(dim=c(n,k))	
+   LikExp <- matrix(nrow=n,ncol=k)
+
    Repmuk <- array(dim=c(n,p,k),dimnames=list(Onames,Vnames,NULL))
    if (is.null(InitSol$z))  {
      z <- array(dim=c(n,k))
@@ -286,12 +374,15 @@ EMGaus <- function(X,k,InitSol,Config,Homoc,maxiter,tautol,convtol)
      muk <- InitSol$muk
      if (Homoc==TRUE) {
        Sigma <- InitSol$Sigma
-       for (i in 1:k)	Likk[,i] <- tau[i] * exp(MDataGaussLogLik(n,p,X,muk[,i],Sigma)) 
+        for (i in 1:k)	LikExp[,i] <- MDataGaussLogLik(n,p,X,muk[,i],Sigma) 
      } else {
        Sigmak <- InitSol$Sigmak
-       for (i in 1:k)	Likk[,i] <- tau[i] * exp(MDataGaussLogLik(n,p,X,muk[,i],Sigmak[,,i])) 
+       for (i in 1:k)	LikExp[,i] <- MDataGaussLogLik(n,p,X,muk[,i],Sigmak[,,i]) 
      }
-    Likall <- matrix(rep(apply(Likk,1,sum),k),n,k,byrow=FALSE)
+     nrmfct <- apply(LikExp,1,max)
+     Likk <- scale(exp(sweep(LikExp,1,nrmfct)),center=FALSE,scale=1/tau)
+     attr(Likk,"scaled:scale") <- NULL
+     Likall <- rowSums(Likk)
      z <-  matrix(sapply(Likk/Likall,minzenf,defp=1./k),n,k)
    } else {
      z <- InitSol$z
@@ -307,38 +398,45 @@ EMGaus <- function(X,k,InitSol,Config,Homoc,maxiter,tautol,convtol)
       for (i in 1:k)  {
         muk[,i] <- apply(matrix(rep(z[,i],p),n,p,byrow=FALSE)*X,2,sum)/nk[i]
         Repmuk[,,i] <- matrix(rep(muk[,i],n),n,p,byrow=TRUE)
-	wdev <- as.matrix(matrix(rep(sqrt(z[,i]),p),n,p,byrow=FALSE) * (X - Repmuk[,,i]))
-	allind <- 1:p
-        midpind <- allind[allind%/%2!=allind/2] 
+        wdev <- as.matrix(matrix(rep(sqrt(z[,i]),p),n,p,byrow=FALSE) * (X - Repmuk[,,i]))
+	      allind <- 1:p
+        q <- p/2
+        midpind <- allind[1:q] 
         lrind <- allind[-midpind]
         if (Config==1) Wk[,,i] <- t(wdev)%*%wdev
-	if (Config==4)  {
+	      if (Config==4)  {
           Wk[midpind,midpind,i] <- t(wdev[,midpind]) %*% wdev[,midpind] 
           Wk[lrind,lrind,i] <- t(wdev[,lrind]) %*% wdev[,lrind] 
-	}
+	      }
         if (Config==3 || Config==5 ) Wk[,,i] <- diag(apply(wdev^2,2,sum))
         if (Config==3) for (j in 1:(p/2)) {
-	  Wk[2*j,2*j-1,i] <- sum(wdev[,2*j-1]*wdev[,2*j])
-          Wk[2*j-1,2*j,i] <- Wk[2*j,2*j-1,i]
-	}
+	        Wk[q+j,j,i] <- Wk[j,q+j,i] <- sum(wdev[,j]*wdev[,q+j])
+	      }
         if (Homoc==FALSE) {
           Sigmak[,,i] <- Wk[,,i]/nk[i]
-          Likk[,i] <- tau[i] * exp(MDataGaussLogLik(n,p,X,muk[,i],Sigmak[,,i])) 
+          LikExp[,i] <- MDataGaussLogLik(n,p,X,muk[,i],Sigmak[,,i]) 
         }
       }	
+
       if (Homoc==TRUE) {
         Sigma <- apply(Wk,c(1,2),sum)/n
         dimnames(Sigma) <- list(Vnames,Vnames) 
-	for (i in 1:k)	Likk[,i] <- tau[i] * exp(MDataGaussLogLik(n,p,X,muk[,i],Sigma)) 
+        for (i in 1:k)	LikExp[,i] <- MDataGaussLogLik(n,p,X,muk[,i],Sigma) 
       }	
-      Likall <- matrix(rep(apply(Likk,1,sum),k),n,k,byrow=FALSE)
+      nrmfct <- apply(LikExp,1,max)
+      Likk <- scale(exp(sweep(LikExp,1,nrmfct)),center=FALSE,scale=1/tau)
+      attr(Likk,"scaled:scale") <- NULL
+      Likall <- rowSums(Likk)
       z <-  matrix(sapply(Likk/Likall,minzenf,defp=1./k),n,k)
-      LnLik1 <- sum(log(Likall[,1]))
-      if (!is.finite(LnLik1)) { LnLik1 <- -Inf ; converg <- TRUE  } 
+      LnLik1 <- sum(nrmfct+log(Likall))
+
+      if (!is.finite(LnLik1)) { LnLik <- -Inf ; converg <- TRUE  } 
       if (is.finite(LnLik) && is.finite(LnLik1)) if (abs(LnLik-LnLik1) < convtol) converg <- TRUE 
+
       if (is.finite(LnLik1)) LnLik <- LnLik1
       iter <- iter+1
     }
+
     grp <- apply(z,1,which.max)
     names(grp) <- rownames(X)
     if (Config==1) Sigmapar <- p*(p+1)/2	
@@ -401,93 +499,5 @@ MClusLikpar <- function(X,n,p,k,tau,muk,Sigma=NULL,Sigmak=NULL,Homoc,penalty=-1.
    else return(sum(lnLik))
 }
 
-RepEMGauss <- function(X,n,p,k,ISol,pertub,nrep,Config,Homoc,maxiter,convtol,protol)
-{
-  genunif <-function(u0,amp,ubnd,EPS=1E-6) return(max(EPS,min(ubnd,u0+runif(1,0.,amp)-amp/2)))
-  mychol <-function(Sigma,p,pert=1E-6) return(chol(Sigma+pert*diag(1.,p)))
-
-  Vnames <- names(X)
-  Onames <- rownames(X) 
-  Lik <- array(nrep)
-  if (Homoc==FALSE) Sigmak <- array(dim=c(p,p,k),dimnames=list(Vnames,Vnames,NULL))
-  if (!is.null(pertub$tau)) tau <- array(dim=k)
-  if (!is.null(pertub$z)) z <- array(dim=c(n,k))
-
-  BestLnLik <- ISol$LnLik
-  for (rep in 1:nrep)  {
-    if (!is.null(pertub$z)) {
-      tau <- muk <- Sigma <- Sigmak <- NULL
-      ampl <- rep(1.,n)
-      for (i in 1:(k-1)) {
-        z[,i] <- sapply(z[,i],genunif,amp=pertub$z*ampl,ubnd=ampl)
-        ampl <- ampl - z[,i]
-      }
-      z[,k] <- ampl
-      LnLik <- MClusLikz(z,X,n,p,k,Config,Homoc)
-    } else {
-      z <- NULL
-      if (!is.null(pertub$tau)) {
-        ampl <- 1.
-        for (i in 1:(k-1)) {
-          tau[i] <- max(0.,genunif(ISol$tau[i],amp=pertub$tau[i]*ampl,ubnd=ampl))
-          ampl <- max(0.,ampl-tau[i])
-        }
-        tau[k] <- ampl
-      } else {
-        tau <- ISol$tau
-      }  
-      if (!is.null(pertub$muk)) {
-        muk <- matrix(rnorm(k*p,ISol$muk,pertub$muk),nrow=p,ncol=k,dimnames=list(Vnames,NULL))
-      } else {
-        muk <- ISol$muk
-      }  
-      if (!is.null(pertub$SigmaSr)) {
-        q0 <- p*(p-1)/2
-       	if (Homoc==TRUE) {
-       	  Sk <- 1
-       	} else {
-       	  Sk <- k
-       	}  
-        for (i in 1:Sk)  {
-          if (Homoc==TRUE) {
-            SigmaSr <- mychol(ISol$Sigma,p)
-          } else {
-            SigmaSr <- mychol(ISol$Sigmak[,,i],p)
-          } 
-          SigmaSr[col(SigmaSr)>row(SigmaSr)] <- 
-            rnorm(q0,SigmaSr[col(SigmaSr)>row(SigmaSr)],pertub$SigmaSr[((i-1)*q0+1):(i*q0)])
-          SigmaSr[col(SigmaSr)==row(SigmaSr)] <- 
-            abs(rnorm(p,SigmaSr[col(SigmaSr)==row(SigmaSr)],pertub$SigmaSr[(Sk*q0+(i-1)*p+1):(Sk*q0+i*p)]))
-          if (Homoc==TRUE) {
-            Sigma <- t(SigmaSr) %*% SigmaSr
-            dimnames(Sigma) <- list(Vnames,Vnames) 
-          } else {
-            Sigmak[,,i] <- t(SigmaSr) %*% SigmaSr
-          } 
-         }
-       }  else { 
-         Sigma <- ISol$Sigma ; Sigmak <- ISol$Sigmak
-       } 
-       if (Homoc==TRUE) {
-         LnLik <- MClusLikpar(X,n,p,k,tau=tau,muk=muk,Sigma=Sigma,Homoc=TRUE)
-       } else {
-         LnLik <- MClusLikpar(X,n,p,k,tau=ISol$tau,muk=muk,Sigmak=Sigmak,Homoc=FALSE)
-       }  
-     }
-
-     if (Homoc==TRUE) {
-       res <- EMGaus(X,k,list(z=z,tau=tau,muk=muk,Sigma=Sigma,LnLik=LnLik),Config=Config,Homoc=TRUE,maxiter=maxiter,convtol=convtol,tautol=protol)
-     }  else {
-       res <- EMGaus(X,k,list(z=z,tau=tau,muk=muk,Sigmak=Sigmak,LnLik=LnLik),Config=Config,Homoc=FALSE,maxiter=maxiter,convtol=convtol,tautol=protol)
-     }  
-     Lik[rep] <- res$LnLik
-     if (res$LnLik > BestLnLik) {
-       ISol <- res
-       BestLnLik <- res$LnLik 
-     }
-   }
-
-   return(list(BestSol=ISol,alllnLik=Lik))
-} 
 
 

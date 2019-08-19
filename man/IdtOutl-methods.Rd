@@ -7,8 +7,8 @@
 \description{Plots robust Mahalanobis distances and outlier cut-offs for an object describing potential outliers in a interval-valued data set}
 
 \usage{
-  \S4method{plot}{IdtOutl}(x,scale=c("linear","log10","log"),RefDist=RefDist(x),
-eta=eta(x),multiCmpCor=multiCmpCor(x),...)
+  \S4method{plot}{IdtOutl}(x, scale=c("linear","log"), RefDist=getRefDist(x),
+eta=geteta(x), multiCmpCor=multiCmpCor(x), \dots)
 }
 
 \arguments{
@@ -16,7 +16,7 @@ eta=eta(x),multiCmpCor=multiCmpCor(x),...)
 
     \item{scale}{The scale of the axis for the robust Mahalanobis distances.}
 
-    \item{RefDist}{The assumed reference distributions used to find cutoffs defining the observations assumed as outliers. Alternatives are \dQuote{ChiSq} and \dQuote{CerioliBetaF} respectivelly for the usual Qui-squared, and the Beta and F distributions proposed by Cerioli (2010). By default uses the one selected in the creation of the object \sQuote{x}.}    
+    \item{RefDist}{The assumed reference distributions used to find cutoffs defining the observations assumed as outliers. Alternatives are \dQuote{ChiSq} and \dQuote{CerioliBetaF} respectivelly for the usual Chi-squared, and the Beta and F distributions proposed by Cerioli (2010). By default uses the one selected in the creation of the object \sQuote{x}.}    
 
     \item{eta}{Nominal size of the null hypothesis that a given observation is not an outlier. By default uses the one selected in the creation of the object \sQuote{x}.}
 

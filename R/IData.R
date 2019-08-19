@@ -86,41 +86,41 @@ setMethod("plot",
     if (x@NObs != y@NObs) stop("Arguments x and y have a different number of elements\n")
 
     type <- match.arg(type)
-    
+
     dotarguments <- match.call(expand.dots=FALSE)$...
 
     if (is.null(dotarguments$main)) {
       dotarguments$main <- paste(y@VarNames,"vs.",x@VarNames)
-    }  
+    }
     if (is.null(dotarguments$xlab)) {
       dotarguments$xlab <- x@VarNames
-    }  
+    }
     if (is.null(dotarguments$ylab)) {
       dotarguments$ylab <- y@VarNames
-    }  
-    
-      
+    }
+
+
     HlfRngx <- exp(x@LogR[,1])/2
-    Lbx <- x@MidP[,1] - HlfRngx 
-    Ubx <- x@MidP[,1] + HlfRngx 
+    Lbx <- x@MidP[,1] - HlfRngx
+    Ubx <- x@MidP[,1] + HlfRngx
     HlfRngy <- exp(y@LogR[,1])/2
-    Lby <- y@MidP[,1] - HlfRngy 
-    Uby <- y@MidP[,1] + HlfRngy 
-  
+    Lby <- y@MidP[,1] - HlfRngy
+    Uby <- y@MidP[,1] + HlfRngy
+
     if (is.null(dotarguments$xlim)) {
       minvx <- min(Lbx)
       maxvx <-max(Ubx)
       dotarguments$xlim <- c(0.95*minvx,1.05*maxvx)
-    }  
+    }
     if (is.null(dotarguments$ylim)) {
       minvy <- min(Lby)
       maxvy <-max(Uby)
       dotarguments$ylim <- c(0.95*minvy,1.05*maxvy)
-    }  
-    
+    }
+
     if (!append) {
       do.call("plot",c(list(x=0.,y=0.,type="n"),dotarguments))
-    }  
+    }
 
     if (type=="crosses") {
       do.call("segments",c(list(x0=Lbx,y0=y@MidP[,1],x1=Ubx,y1=y@MidP[,1]),dotarguments))
@@ -142,53 +142,53 @@ setMethod("plot",
       } else {
         stop("Currently method plot can only plot at most tow interval variables simultaneously\n")
       }
-    }  
-    
+    }
+
     layout <- match.arg(layout)
 
     dotarguments <- match.call(expand.dots=FALSE)$...
     if (is.null(dotarguments$main)) {
       dotarguments$main <- x@VarNames
-    }  
+    }
     if (is.null(dotarguments$ylab)) {
       dotarguments$ylab <- x@VarNames
-    }  
+    }
     if (is.null(dotarguments$xlab)) {
         dotarguments$xlab <- "Case numbers"
-    }  
+    }
 
     HlfRngy <- exp(x@LogR[,1])/2
-    Lby <- x@MidP[,1] - HlfRngy 
-    Uby <- x@MidP[,1] + HlfRngy 
+    Lby <- x@MidP[,1] - HlfRngy
+    Uby <- x@MidP[,1] + HlfRngy
     xcord <- 1:x@NObs
-  
+
     if (is.null(dotarguments$ylim) && layout=="vertical") {
       minvy <- min(Lby)
       maxvy <-max(Uby)
       dotarguments$ylim <- c(0.95*minvy,1.05*maxvy)
-    }  
+    }
     if (is.null(dotarguments$xlim) && layout=="horizontal") {
       minvy <- min(Lby)
       maxvy <-max(Uby)
       dotarguments$xlim <- c(0.95*minvy,1.05*maxvy)
-    }  
-    
+    }
+
     if (is.null(casen)) {
       casen <- c(0,x@NObs+1)
     } else {
       casen <- factor(eval(casen))
-    } 
+    }
     if (layout=="vertical") {
       if (!append) {
         do.call("plot",c(list(x=casen,y=rep(0.,length(casen)),type="n"),dotarguments))
-      }  
+      }
       do.call("segments",c(list(x0=xcord,y0=Lby,x1=xcord,y1=Uby),dotarguments))
     } else  {
       if (!append) {
         do.call("plot",c(list(x=rep(0.,length(casen)),y=casen,type="n"),dotarguments))
-      }  
+      }
       do.call("segments",c(list(y0=xcord,x0=Lby,y1=xcord,x1=Uby),dotarguments))
-    }  
+    }
   }
 )
 
