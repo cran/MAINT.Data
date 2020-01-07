@@ -8,9 +8,6 @@ RepLOptim <- function(start, parsd, fr, gr=NULL, inphess=NULL, ..., method="nlmi
 # Needs to be explicitly set to TRUE if non-linear constraints are to be
 # strictly enforced (instead of using BigM penalties) by local optimizers.   
 
-#cat("RepLOptim -- control =\n") ; print(control)  
-#cat("RepLOptim -- dots =\n") ; print(match.call(expand.dots=FALSE)$...)  
-
   maxrepet_default <- 40
   maxnoimprov_default <- 100
   maxreplic_default <- 1000
@@ -25,7 +22,8 @@ RepLOptim <- function(start, parsd, fr, gr=NULL, inphess=NULL, ..., method="nlmi
   if (!is.null(control$maxnoimprov)) maxnoimprov <- control$maxnoimprov else maxnoimprov <- maxnoimprov_default
   if (!is.null(control$maxreplic)) maxreplic <- control$maxreplic else maxreplic <- maxreplic_default
   if (!is.null(control$maxiter)) maxiter <- control$maxiter 
-  else if (class(method)!="character") maxiter <- maxiter_default
+#  else if (class(method)!="character") maxiter <- maxiter_default
+  else if (class(method)[1]!="character") maxiter <- maxiter_default
     else if (method!="SANN") maxiter <- maxiter_default
       else maxiter <-  maxSANNiter_default
   if (!is.null(control$maxeval)) maxeval <- control$maxeval else maxeval <- maxeval_default
@@ -55,7 +53,18 @@ RepLOptim <- function(start, parsd, fr, gr=NULL, inphess=NULL, ..., method="nlmi
   else allrep <- maxreplic
 
   if (length(lower)!=npar) { stop("Incorrect length of the lower limits vector\n") }
-  if (length(upper)!=npar) { stop("Incorrect length of the lower limits vector\n") }
+  if (length(upper)!=npar) { stop("Incorrect length of the upper limits vector\n") }
+
+  if (length(lower)!=npar) { 
+    cat("npar =",npar," -- start =",start,"\nlower =",lower,"\n")
+    stop("Incorrect length of the lower limits vector\n") 
+  }
+  if (length(upper)!=npar) { 
+    cat("npar =",npar," -- start =",start,"\nupper =",upper,"\n")
+    stop("Incorrect length of the upper limits vector\n") 
+  }
+
+
 
   bestres <- NULL	
   bestval <- Inf

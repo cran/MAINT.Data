@@ -3,7 +3,6 @@ setMethod("fulltle",
   function(Idt, CovCase=1:4, SelCrit=c("BIC","AIC"), alpha=0.75, use.correction=TRUE, getalpha="TwoStep", 
     rawMD2Dist=c("ChiSq","HardRockeAsF","HardRockeAdjF"), MD2Dist=c("ChiSq","CerioliBetaF"),
     eta=0.025, multiCmpCor=c("never","always","iterstep"), outlin=c("MidPandLogR","MidP","LogR"), reweighted=TRUE, 
-#    otpType=c("OnlyEst","SetMD2andEst"), force=FALSE, ...)
     force=FALSE, ...)
   {
     if (!requireNamespace("robustbase",quietly=TRUE)) 
@@ -14,7 +13,6 @@ setMethod("fulltle",
     MD2Dist <- match.arg(MD2Dist)
     multiCmpCor <- match.arg(multiCmpCor)
     outlin <- match.arg(outlin)
-#    otpType <- match.arg(otpType)
     q <- Idt@NIVar
     if (q==1) CovCase <- q1CovCase(CovCase) 
 
@@ -22,13 +20,10 @@ setMethod("fulltle",
     {
       X <- cbind(Idt@MidP,Idt@LogR)
       if (MD2Dist=="ChiSq") {
-#        fstsol <- fulltle1(Idt,CovCase,SelCrit,alpha,use.correction,rawMD2Dist,eta,multiCmpCor,outlin,reweighted,otpType="OnlyEst",force=force)
         fstsol <- fulltle1(Idt,CovCase,SelCrit,alpha,use.correction,rawMD2Dist,eta,multiCmpCor,outlin,reweighted,force=force)
         nOtls <- MDOtlDet(X,coef(fstsol)$mu,coef(fstsol)$Sigma,eta=eta,RefDist="ChiSq",multiCmpCor=multiCmpCor,otp="onlycnt")
       }  else if (MD2Dist=="CerioliBetaF")  {
-#        fstsol <- fulltle1(Idt,CovCase,SelCrit,alpha,use.correction,rawMD2Dist,eta,multiCmpCor,outlin,reweighted,otpType="SetMD2andEst",force=force)
         fstsol <- fulltle1(Idt,CovCase,SelCrit,alpha,use.correction,rawMD2Dist,eta,multiCmpCor,outlin,reweighted,force=force)
-#        nOtls <- MDOtlDet(X,coef(fstsol$sol)$mu,coef(fstsol$sol)$Sigma,eta=eta,RefDist="CerioliBetaF",Rewind=fstsol$RewghtdSet,multiCmpCor=multiCmpCor,otp="onlycnt")
         nOtls <- MDOtlDet(X,coef(fstsol)$mu,coef(fstsol)$Sigma,eta=eta,RefDist="CerioliBetaF",Rewind=fstsol@RewghtdSet,multiCmpCor=multiCmpCor,otp="onlycnt")
       }
       if (nOtls==0) {
@@ -41,23 +36,29 @@ setMethod("fulltle",
           CovCaseArg <- FALSE
         }	
         finalsol <- IdtNmle(Idt,CovCaseArg=CovCaseArg,Config=Config,SelCrit=SelCrit)
-        warning(paste("fasttle returned the classical maximum likelihood estimates because the data does not appear to include any outlier.\n",
+        warning(paste("fulltle returned the classical maximum likelihood estimates because the data does not appear to include any outlier.\n",
           "If you want to force a trimmed likelihood estimator run fasttle with the argument getalpha=FALSE.\n"))
-#        if (otpType=="OnlyEst") {
-#          return(finalsol)
-#        }  else {
           rawSet <- RewghtdSet <- 1: Idt@NObs
-          names(rawSet) <- names(RewghtdSet) <- Idt@ObsNames
-          if (outlin=="MidPandLogR") {
-            RobMD2 <- GetMD2(X,coef(finalsol)$mu,coef(finalsol)$Sigma)
-          } else if (outlin=="MidP") {
-            RobMD2 <- GetMD2(X[,1:q],coef(finalsol)$mu[1:q],coef(finalsol)$Sigma[1:q,1:q])
-          } else if (outlin=="LogR") {
-            RobMD2 <- GetMD2(X[,(q+1):(2*q)],coef(finalsol)$mu[(q+1):(2*q)],coef(finalsol)$Sigma[(q+1):(2*q),(q+1):(2*q)])
-          } 
-          return(list(sol=finalsol,rawSet=rawSet,RewghtdSet=RewghtdSet,RobMD2=RobMD2,
-              cnp2=c(1.,1.),raw.cov=coef(fstsol)$Sigma,raw.cnp2=c(1.,1.)))
-#        }
+        names(rawSet) <- names(RewghtdSet) <- Idt@ObsNames
+        if (outlin=="MidPandLogR") {
+          RobMD2 <- GetMD2(X,coef(finalsol)$mu,coef(finalsol)$Sigma)
+        } else if (outlin=="MidP") {
+          RobMD2 <- GetMD2(X[,1:q],coef(finalsol)$mu[1:q],coef(finalsol)$Sigma[1:q,1:q])
+        } else if (outlin=="LogR") {
+          RobMD2 <- GetMD2(X[,(q+1):(2*q)],coef(finalsol)$mu[(q+1):(2*q)],coef(finalsol)$Sigma[(q+1):(2*q),(q+1):(2*q)])
+        } 
+        for (case in 1:length(finalsol@CovConfCases)) {
+          if (!is.null(finalsol@CovConfCases[[case]])) {
+            names(finalsol@CovConfCases[[case]])[1] <- "RobSigE"
+            finalsol@CovConfCases[[case]][2] <- finalsol@CovConfCases[[case]][3] <- NULL
+          }
+        }
+        return(new("IdtSngNDRE",ModelNames=finalsol@ModelNames,ModelType=finalsol@ModelType,ModelConfig=finalsol@ModelConfig,
+                   NIVar=finalsol@NIVar,SelCrit=finalsol@SelCrit,logLiks=finalsol@logLiks,BICs=finalsol@BICs,AICs=finalsol@AICs,
+                   BestModel=finalsol@BestModel,RobNmuE=finalsol@mleNmuE,CovConfCases=finalsol@CovConfCases,SngD=TRUE,
+                   rawSet=rawSet,RewghtdSet=RewghtdSet,RobMD2=RobMD2,
+                   cnp2=c(1.,1.),raw.cov=coef(fstsol)$Sigma,raw.cnp2=c(1.,1.))
+        )
       }  
       newalpha <- 1. - nOtls/Idt@NObs
 #      return( fulltle1(Idt,CovCase,SelCrit,newalpha,use.correction,rawMD2Dist,eta,multiCmpCor,outlin,reweighted,otpType,force) )

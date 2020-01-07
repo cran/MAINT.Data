@@ -34,17 +34,38 @@ SNCMaxLik <- function(Data, Config, grouping=NULL, initpar=NULL, prevMod=NULL,
   if (is.null(initpar))
   {
     if (is.null(prevMod)) prevMod <- SNCnf1MaxLik(Data,grouping,OptCntrl=OptCntrl)
-    Sigma <- CovC1toRestCov(p,q,prevMod$Sigma,Config)
+    if (!is.null(prevMod$Sigma)) {
+      Sigma <- CovC1toRestCov(p,q,prevMod$Sigma,Config)
+    } else {
+      Sigma <- diag(apply(Data,2,sd)^2)
+    }  
     Spar <- GetCovPar(Sigma,Config=Config)
-    SigmaI <- pdwt.solve(Sigma)        
-    gamma1 <- ifelse(abs(prevMod$gamma1)<maxsk,prevMod$gamma1,sign(prevMod$gamma1)*maxsk)
+#    SigmaI <- pdwt.solve(Sigma)        
+    SigmaI <- pdwt.solve(Sigma,silent=TRUE)
+    if (is.null(SigmaI)) {
+      return(list(lnLik=-Inf,ksi=NULL,Omega=NULL,Omega.cor=NULL,alpha=NULL,delta=NULL,
+           mu=NULL,beta2k=NULL,Sigma=NULL,gamma1=NULL,admissible=NULL,c2=NULL,optres=NULL))
+    }
+    if (!is.null(prevMod$gamma1)) {
+      gamma1 <- ifelse(abs(prevMod$gamma1)<maxsk,prevMod$gamma1,sign(prevMod$gamma1)*maxsk)
+    } else {
+      gamma1 <- rep(0.,p)
+    }  
     mu0 <- sqrt(diag(Sigma)) * sign(gamma1)*(2*abs(gamma1)/(4.-pi))^(1/3) 
     Beta02 <- mu0 %*% drop(SigmaI %*% mu0)
     if (Beta02 > ulBeta02) gamma1 <- gamma1 * rep(sqrt(ulBeta02/Beta02)^3,length(gamma1)) 
     if ( is.null(grouping) ) {
-      prevModinitpar <- c(prevMod$mu,Spar,gamma1)
+      if (!is.null(prevMod$mu)) {
+        prevModinitpar <- c(prevMod$mu,Spar,gamma1)
+      } else {
+        prevModinitpar <- c(colMeans(Data),Spar,gamma1)
+      }  
     }  else  {
-      prevModinitpar <- c(prevMod$mu,prevMod$beta2k,Spar,gamma1)
+      if (!is.null(prevMod$mu)) {
+        prevModinitpar <- c(prevMod$mu,prevMod$beta2k,Spar,gamma1)
+      } else {
+        prevModinitpar <- c(colMeans(Data),Spar,gamma1)   # Check later if this is indeed righ... is prevMod$mu really a vector?? 
+      }  
     }
     prevModdev0 <- msnCP.dev(prevModinitpar,y=Data,grpind=grpind,Config=Config,k=k,nopenalty=TRUE)
     if (Config==2)  {

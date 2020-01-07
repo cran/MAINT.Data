@@ -13,6 +13,8 @@ mymsn.mle <-function( param, y, x=rep(1,nrow(y)), w=rep(1,nrow(y)), trace=FALSE,
 			control=list(), ...
                     )
 {
+#  if (is.null(param)) return(NULL)
+  
   y <- data.matrix(y)
   if (!is.numeric(x)) { stop("x must be numeric") }
   opt.method <- match.arg(algorithm)
@@ -110,12 +112,18 @@ mymsn.dev.grad <- function(param, x, y, w, trace=FALSE)
   -2*c(Dbeta,Deta)
 }
 
-msn.moment.fit <- function(y)
+#msn.moment.fit <- function(y)
+msn.moment.fit <- function(y,singtodiag=TRUE)
 {# 31-12-1997: simple fit of MSN distribution usign moments
   y     <- as.matrix(y)
   k     <- ncol(y)
+  if (k<= nrow(y)) {
+    if (singtodiag) var.y <- diag(apply(y,2,function(x) sd(x)^2))
+    else return(NULL) 
+  } else {
+    var.y <- var(y)
+  }
   m.y   <- apply(y, 2, mean)  
-  var.y <- var(y)
   y0    <- (t(y) - m.y)/sqrt(diag(var.y))
   gamma1<- apply(y0^3, 1, mean)
   out   <- (abs(gamma1) > 0.99527)
@@ -127,10 +135,26 @@ msn.moment.fit <- function(y)
   Omega <- var.y + outer(omega*m.z, omega*m.z) 
   xi    <- m.y-omega*m.z
   O.cor <- cov2cor(Omega)
-  O.inv <- pdwt.solve(O.cor)
+#cat("n = ",nrow(y),"p =",ncol(y),"var.y =\n"); print(var.y) 
+#cat("omega*m.z = ",omega*m.z,"\nouter(omega*m.z, omega*m.z) =\n"); print(outer(omega*m.z, omega*m.z)) 
+#Oomzegval <- eigen(outer(omega*m.z,omega*m.z),only.values=TRUE)$values
+#cat("Oomzegval =",Oomzegval,"\n")
+cat("O.cor =\n") ; print(O.cor) 
+Oegval <- eigen(O.cor,only.values=TRUE)$values
+cat("O.eval =",Oegval,"\n")
+#  O.inv <- pdwt.solve(O.cor)
+  O.inv <- pdwt.solve(O.cor,silent=TRUE)
+  if (is.null(O.inv)) {
+    if (singtodiag) O.inv <- diag(rep(1.,k))
+    else return(NULL) 
+  }
+cat("O.inv =\n") ; print(O.inv) 
   tmp   <- as.vector(1 - t(delta) %*% O.inv %*% delta)
-  if(tmp<=0) {tmp <- 0.0001; admissible <- FALSE} 
-        else admissible <- TRUE
+  if(tmp<=0) {
+    tmp <- 0.0001; admissible <- FALSE
+  } else  {
+    admissible <- TRUE
+  }
   alpha <- as.vector(O.inv %*% delta)/sqrt(tmp)
   list(xi=xi, Omega=Omega, alpha=alpha, Omega.cor=O.cor, omega=omega, 
        delta=delta, skewness=gamma1, admissible=admissible) 
@@ -303,6 +327,7 @@ mysn.infoMv <- function(dp, x=NULL, y, w, penalty=NULL, norm2.tol=1e-5)
   i3 <- max(i2) + 1:d
   # ind <- list(i1=i1, i2=i2, i3=i3)
   O.inv <- pdwt.solve(Omega, silent=TRUE)
+  if (is.null(O.inv)) return(list(status="SingOmega"))                                                      # My (PDS) version     
   if(type == "observed"){ 
     y0 <- y - x %*% beta
     S0 <- t(y0) %*% (w*y0) / nw

@@ -36,6 +36,9 @@ setMethod("stdEr",
       }  else if (modres$status=="PositiveScore") {
         warning("Standard errors were not computed for model ",x@ModelNames[selmodel]," because at the current estimate the score\n", 
          "function (i.e., the derivative of the log-likelihhod) is stricty positive\n")
+      }  else if (modres$status=="SingOmega") {
+        warning("Standard errors were not computed for model ",x@ModelNames[selmodel],"\n",
+        "because the mle estimates resulted in a singular Omega matrix.\n")
       }
       return(NULL)
     }
@@ -64,6 +67,9 @@ setMethod("vcov",
         warning("The asymptotic covariance matrix was not computed for model ",object@ModelNames[selmodel],
          " because at the current estimate the score\n", 
          "function (i.e., the derivative of the log-likelihhod) is stricty positive\n")
+      }  else if (modres$status=="SingOmega") {
+        warning("Standard errors were not computed for model ",object@ModelNames[selmodel],"\n",
+        "because the mle estimates resulted in a singular Omega matrix.\n")
       }
       return(NULL)
     }

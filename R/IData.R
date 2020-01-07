@@ -235,8 +235,10 @@ IData <- function(Data,
 
 "[.IData" <- function(x,rowi=1:x@NObs,coli=1:x@NIVar,...)
 {
-  if (class(rowi)=="character") rowi <- sapply(rowi,function(ri) which(ri==x@ObsNames))
-  if (class(coli)=="character") coli <- sapply(coli,function(ci) which(ci==x@VarNames))
+#  if (class(rowi)=="character") rowi <- sapply(rowi,function(ri) which(ri==x@ObsNames))
+#  if (class(coli)=="character") coli <- sapply(coli,function(ci) which(ci==x@VarNames))
+  if (class(rowi)[1]=="character") rowi <- sapply(rowi,function(ri) which(ri==x@ObsNames))
+  if (class(coli)[1]=="character") coli <- sapply(coli,function(ci) which(ci==x@VarNames))
   IData(cbind(x@MidP[rowi,coli,drop=FALSE],x@LogR[rowi,coli,drop=FALSE]),
     Seq="AllMidP_AllLogR",VarNames=x@VarNames[coli],ObsNames=x@ObsNames[rowi])
 }
@@ -244,8 +246,10 @@ IData <- function(Data,
 "[<-.IData" <- function(x,rowi=1:x@NObs,coli=1:x@NIVar,value)
 {
   if (!is(value,"IData")) stop("Argument value is not an IData object\n")
-  if (class(rowi)=="character") rowi <- sapply(rowi,function(ri) which(ri==x@ObsNames))
-  if (class(coli)=="character") coli <- sapply(coli,function(ci) which(ci==x@VarNames))
+#  if (class(rowi)=="character") rowi <- sapply(rowi,function(ri) which(ri==x@ObsNames))
+#  if (class(coli)=="character") coli <- sapply(coli,function(ci) which(ci==x@VarNames))
+  if (class(rowi)[1]=="character") rowi <- sapply(rowi,function(ri) which(ri==x@ObsNames))
+  if (class(coli)[1]=="character") coli <- sapply(coli,function(ci) which(ci==x@VarNames))
   x@MidP[rowi,coli] <- value@MidP
   x@LogR[rowi,coli] <- value@LogR
   x
@@ -280,8 +284,10 @@ IData <- function(Data,
 
 rbind.IData <- function(x, y, ...)
 {
-  if (class(x)!="IData") stop("Argument x is not an object of class IData\n")
-  if (class(y)!="IData") stop("Argument y is not an object of class IData\n")
+#  if (class(x)!="IData") stop("Argument x is not an object of class IData\n")
+#  if (class(y)!="IData") stop("Argument y is not an object of class IData\n")
+  if (class(x)[1]!="IData") stop("Argument x is not an object of class IData\n")
+  if (class(y)[1]!="IData") stop("Argument y is not an object of class IData\n")
   if (x@NIVar != y@NIVar) stop("Arguments x and y have a different number of interval-valued variables\n")
   dataDF <- rbind(cbind(x@MidP,x@LogR),cbind(y@MidP,y@LogR))
   if (x@NIVar==1) {
@@ -294,7 +300,8 @@ rbind.IData <- function(x, y, ...)
   if (lpar>4) for (i in 3:(lpar-2))  {
     newIDtObj <- eval(par[[i]])
     if (i==3) auxtxt <- "rd " else auxtxt <- "-th "
-    if (class(newIDtObj)!="IData") stop("The ",i,auxtxt,"argument is not an object of class IData\n")
+#    if (class(newIDtObj)!="IData") stop("The ",i,auxtxt,"argument is not an object of class IData\n")
+    if (class(newIDtObj)[1]!="IData") stop("The ",i,auxtxt,"argument is not an object of class IData\n")
     if (x@NIVar != newIDtObj@NIVar) stop("First and ",i,auxtxt,"argument have a different number of interval-valued variables\n")
     dataDF <- rbind(dataDF,cbind(newIDtObj@MidP,newIDtObj@LogR))
     if (x@NIVar==1) {
@@ -308,8 +315,10 @@ rbind.IData <- function(x, y, ...)
 
 cbind.IData <- function(x, y, ...)
 {
-  if (class(x)!="IData") stop("Argument x is not an object of class IData\n")
-  if (class(y)!="IData") stop("Argument y is not an object of class IData\n")
+#  if (class(x)!="IData") stop("Argument x is not an object of class IData\n")
+#  if (class(y)!="IData") stop("Argument y is not an object of class IData\n")
+  if (class(x)[1]!="IData") stop("Argument x is not an object of class IData\n")
+  if (class(y)[1]!="IData") stop("Argument y is not an object of class IData\n")
   if (x@NObs != y@NObs) stop("Arguments x and y have a different number of rows\n")
   dataDF <- cbind(x@MidP,y@MidP,x@LogR,y@LogR)
   if (x@NIVar==1 && y@NIVar==1) rownames(dataDF) <- x@ObsNames
@@ -320,7 +329,8 @@ cbind.IData <- function(x, y, ...)
   if (lpar>4) for (i in 3:(lpar-2))  {
     newIDtObj <- eval(par[[i]])
     if (i==3) auxtxt <- "rd " else auxtxt <- "-th "
-    if (class(newIDtObj)!="IData") stop("The ",i,auxtxt,"argument is not an object of class IData\n")
+#    if (class(newIDtObj)!="IData") stop("The ",i,auxtxt,"argument is not an object of class IData\n")
+    if (class(newIDtObj)[1]!="IData") stop("The ",i,auxtxt,"argument is not an object of class IData\n")
     if (x@NObs != newIDtObj@NObs) stop("First and ",i,auxtxt,"argument have a different number of rows\n")
     dataDF <- cbind(dataDF[,1:curnIvar],newIDtObj@MidP,dataDF[,(curnIvar+1):(2*curnIvar)],newIDtObj@LogR)
     VNames <- c(VNames,newIDtObj@VarNames)

@@ -181,7 +181,8 @@ MANOVAPermTest <- function(MANOVAres, Idt, grouping, nrep=200,
 {
    if (inherits(MANOVAres,"IdtMANOVA")==FALSE) stop("Argument MANOVAres is not of class IdtMANOVA\n")
    ChiSq <- MANOVAres@ChiSq
-   if (class(Idt)!="IData") stop("Argument Idt is not of class IData\n")
+#   if (class(Idt)!="IData") stop("Argument Idt is not of class IData\n")
+   if (class(Idt)[1]!="IData") stop("Argument Idt is not of class IData\n")
    if (!is.factor(grouping)) stop("Argument rouping is not a factor\n")
    n <- Idt@NObs
    if (length(grouping) != n) stop("The numbers of data and partition observations are different\n")
@@ -207,7 +208,7 @@ MANOVAPermTest <- function(MANOVAres, Idt, grouping, nrep=200,
      empdist[rep] <- MANOVA(Idt,curgrouping,Model,CovCase,SelCrit,Mxt,CVtol,OptCntrl,onerror,...)@ChiSq
    }
    pvalue <- length(which(ChiSq<empdist))/nrep
-   cat("Permutation p-value of MANOVA statistic",ChiSq,":\n")
+   cat("Permutation p-value of MANOVA statistic",ChiSq,":",pvalue,"\n")
    pvalue 
 } 
 
@@ -462,9 +463,11 @@ setMethod("coef",
   signature(object = "IdtNDE"),
   function(object,selmodel=BestModel(object),...)
   {
-    if (class(object)=="IdtSngNDE" || class(object)=="IdtMxNDE")  {
+#    if (class(object)=="IdtSngNDE" || class(object)=="IdtMxNDE")  {
+    if (class(object)[1]=="IdtSngNDE" || class(object)[1]=="IdtMxNDE")  {
       return(list(mu=object@mleNmuE,Sigma=object@CovConfCases[[selmodel]]$mleSigE))
-    } else if (class(object)=="IdtSngNDRE" || class(object)=="IdtMxNDRE")  {
+#    } else if (class(object)=="IdtSngNDRE" || class(object)=="IdtMxNDRE")  {
+    } else if (class(object)[1]=="IdtSngNDRE" || class(object)[1]=="IdtMxNDRE")  {
       return(list(mu=object@RobNmuE,Sigma=object@CovConfCases[[selmodel]]$RobSigE))
     }
   }
@@ -580,7 +583,9 @@ setMethod("summary",
     cat("degrees of freedom:",object@df,"\n")
     cat("p-value:",object@pvalue,"\n\n")
     if ( length(object@grouping)<=30 ) { 
-      cat("Note: Given the small sample size, the use of the Chi-square distribution may not be appropriate.\nAlternatively, consider using the permutation test implemented in function MANOVAPermTest.\nNote that this may take a long time.\n")
+      cat("Note: Given the small sample size, the use of the Chi-square distribution may not be appropriate.\n",
+          "Alternatively, consider using the permutation test implemented in function MANOVAPermTest.\n",
+          "Note that this may take a long time.\n")
     } 
   }
 )

@@ -8,7 +8,8 @@ DACrossVal <- function(data,grouping,TrainAlg,EvalAlg=EvalClrule,Strfolds=TRUE,k
     lb:ub  # return(lb:ub)
   }   
 
-  if (class(grouping)!="factor") {
+#  if (class(grouping)!="factor") {
+  if (class(grouping)[1]!="factor") {
     grouping <- factor(grouping)
   }
   codes <- levels(grouping)
@@ -48,7 +49,8 @@ DACrossVal <- function(data,grouping,TrainAlg,EvalAlg=EvalClrule,Strfolds=TRUE,k
       }
       if (length(out)==0) next
       tres <- try(TrainAlg(data[-out,,drop=FALSE],grouping[-out],prior=prior,...))
-      if (is.null(tres) || class(tres) == "try-error")
+#      if (is.null(tres) || class(tres) == "try-error")
+      if (is.null(tres) || class(tres)[1] == "try-error")
       {
         EvalResij <- list(err=NA,Nk=as.numeric(table(grouping[-out])))
         warning("Non valid classification rule in fold ",j," of replication ",i,"\n")

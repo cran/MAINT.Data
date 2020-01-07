@@ -7,13 +7,13 @@
 
 \description{Performs maximum trimmed likelihood estimation by an exact algorithm (full enumeratiom of all k-trimmed subsets)}
 
-\usage{fulltle(Idt, CovCase=1:4, SelCrit=c("BIC","AIC"), alpha=0.75, 
-  use.correction=TRUE, getalpha="TwoStep", 
-  rawMD2Dist=c("ChiSq","HardRockeAsF","HardRockeAdjF"),
-  MD2Dist=c("ChiSq","CerioliBetaF"),
-  eta=0.025,multiCmpCor=c("never","always","iterstep"),    
-  outlin=c("MidPandLogR","MidP","LogR"), reweighted=TRUE, 
-  force=FALSE, \dots)
+\usage{fulltle(Idt, CovCase = 1:4, SelCrit = c("BIC", "AIC"), alpha =
+                 0.75, use.correction = TRUE, getalpha = "TwoStep",
+                 rawMD2Dist = c("ChiSq", "HardRockeAsF",
+                 "HardRockeAdjF"), MD2Dist = c("ChiSq",
+                 "CerioliBetaF"), eta = 0.025, multiCmpCor = c("never",
+                 "always", "iterstep"), outlin = c("MidPandLogR",
+                 "MidP", "LogR"), reweighted = TRUE, force = FALSE, \dots)
 }
 
 \arguments{

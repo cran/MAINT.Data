@@ -76,8 +76,11 @@ setMethod("Idtmclust",
             Sigmapar <- p
           }  
           if (Mxt=="HomandHet" || Mxt=="Hom") {
+            clusters <- rep("CP1",Idt@NObs)
+            names(clusters) <- Idt@ObsNames
             RepresHom[[ind]] <- new("IdtMclustEl",NObs=Idt@NObs,NIVar=Idt@NIVar,SelCrit=SelCrit,Hmcdt=TRUE,Conf=Cf,nG=k,
-              logLik=Lik,alllnLik=Lik,bic=BIC,aic=AIC,z=NULL,classification=rep("CP1",Idt@NObs),
+#              logLik=Lik,alllnLik=Lik,bic=BIC,aic=AIC,z=NULL,classification=rep("CP1",Idt@NObs),
+              logLik=Lik,alllnLik=Lik,bic=BIC,aic=AIC,z=NULL,classification=clusters,
               parameters=list(pro=NULL,mean=matrix(muSig$mu,ncol=1,dimnames=list(Vnames,"CP1")),
                 covariance=array(muSig$Sigma,dim=c(p,p,1),dimnames=list(Vnames,Vnames,NULL)))
               )
@@ -86,8 +89,11 @@ setMethod("Idtmclust",
             HomAICs[ind] <- AIC
           }
           if (Mxt=="HomandHet" || Mxt=="Het") {
+            clusters <- rep("CP1",Idt@NObs)
+            names(clusters) <- Idt@ObsNames
             RepresHet[[ind]] <- new("IdtMclustEl",NObs=Idt@NObs,NIVar=Idt@NIVar,SelCrit=SelCrit,Hmcdt=FALSE,Conf=Cf,nG=k,
-              logLik=Lik,alllnLik=Lik,bic=BIC,aic=AIC,z=NULL,classification=rep("CP1",Idt@NObs),
+#              logLik=Lik,alllnLik=Lik,bic=BIC,aic=AIC,z=NULL,classification=rep("CP1",Idt@NObs),
+              logLik=Lik,alllnLik=Lik,bic=BIC,aic=AIC,z=NULL,classification=clusters,
               parameters=list(pro=NULL,mean=matrix(muSig$mu,ncol=1,dimnames=list(Vnames,"CP1")),
                 covariance=array(muSig$Sigma,dim=c(p,p,1),dimnames=list(Vnames,Vnames,"CP1")))
               )
@@ -122,8 +128,6 @@ setMethod("Idtmclust",
         Onames <- rownames(X)
         Cnames <- paste("CP",1:k,sep="")
 
-#        pR <- 0.2       
-
         for (Cfi in 1:nCases) {
           Cf <- CovCase[Cfi]
           Config <- ifelse(Cf==1,1,Cf+1)
@@ -154,6 +158,7 @@ setMethod("Idtmclust",
             rownames(ISol$z) <- Onames
             names(ISol$tau) <- colnames(ISol$muk) <- colnames(ISol$z) <- Cnames
             ISol$clusters <- Cnames[ISol$clusters] 
+            names(ISol$clusters) <- Onames
             stdv <- sqrt(diag(ISol$Sigma))
             sdmuk <- pertubfct*rep(stdv,k)
             sdStdev <- pertubfct*stdv/4
@@ -197,6 +202,7 @@ setMethod("Idtmclust",
             rownames(ISol$z) <- Onames
             names(ISol$tau) <- colnames(ISol$muk) <- colnames(ISol$z) <- Cnames
             ISol$clusters <- Cnames[ISol$clusters] 
+            names(ISol$clusters) <- Onames
             q0 <- p*(p-1)/2 
             sdmuk <- numeric(p*k)
             sdStdev <- numeric(p*k)

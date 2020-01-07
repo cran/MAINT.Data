@@ -10,7 +10,12 @@ Ilocsnda <- function(Conf,x,prior,W,B,mu,gamma1,alpha,ksi,egvtol)
 
   if (prior[1]=="proportions") { prior <- nk/N }
   names(prior) <- levels(x@grouping)
-  Wi <- pdwt.solve(W)					
+#  Wi <- pdwt.solve(W)					
+  Wi <- pdwt.solve(W,silent=TRUE)
+  if (is.null(Wi)) {
+    warning("Ilocsnda function received a singular matrix in the  W argument\n")
+    return(NULL)
+  }
   WiBdecp <- eigen(Wi%*%B)
   if (Conf==1) {
     r <- min(p,k-1)

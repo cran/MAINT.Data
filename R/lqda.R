@@ -8,7 +8,12 @@ Ilda <- function(Conf,p,nk,prior,means,W,B,egvtol)
 
   if (prior[1]=="proportions") { prior <- nk/N }
   names(prior) <- rownames(means)
-  Wi <- pdwt.solve(W)					
+#  Wi <- pdwt.solve(W)					
+  Wi <- pdwt.solve(W,silent=TRUE)
+  if (is.null(Wi)) {
+    warning("Ilda function received a singular matrix in the  W argument\n")
+    return(NULL)
+  }
   WiBdecp <- eigen(Wi%*%B)
   if (Conf!=5) 
   {

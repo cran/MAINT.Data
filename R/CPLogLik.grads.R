@@ -50,7 +50,12 @@ OmgInv.grad <- function(x,p)
   Omega <- matrix(nrow=p,ncol=p)
   Omega[lower.tri(Omega,diag=TRUE)] <- x
   Omega[upper.tri(Omega)] <- t(Omega)[upper.tri(Omega)] 
-  OmegaI <- pdwt.solve(Omega)
+#  OmegaI <- pdwt.solve(Omega)
+  OmegaI <- pdwt.solve(Omega, silent=TRUE)
+  if(is.null(OmegaI)) {
+    warning("Singular Omega matix found in the course of the mle estimation\n")
+    return(matrix(0.,nrow=nvcovpar,ncol=nvcovpar)) 
+  }  
   
   nvcovpar <- p*(p+1)/2
   Jacob <- matrix(nrow=nvcovpar,ncol=nvcovpar)
@@ -102,7 +107,13 @@ msnDP.ll.grad <-function(param,y,n=ifelse(is.matrix(y),nrow(y),1),
   omega <- sqrt(diag(Omega))
   alpha <- param[p+nvcovpar+1:p]
   eta <- alpha/omega
-  Thetagrad <- Theta.ll.grad(ksi,Omega,eta,y,n,p,pdwt.solve(Omega,log.det=TRUE))
+#  Thetagrad <- Theta.ll.grad(ksi,Omega,eta,y,n,p,pdwt.solve(Omega,log.det=TRUE))
+  OmegaI <- pdwt.solve(Omega, silent=TRUE, log.det=TRUE)
+  if(is.null(OmegaI)) {
+    warning("Singular Omega matix found in the course of the mle estimation\n")
+    return(rep(0.,2*p+nvcovpar)) 
+  }  
+  Thetagrad <- Theta.ll.grad(ksi,Omega,eta,y,n,p,OmegaI)
   etagrad <- Thetagrad[(p+nvcovpar+1):(2*p+nvcovpar)]
   alphagrad <- etagrad/omega
   Omegagrad <- Thetagrad[(p+1):(p+nvcovpar)]

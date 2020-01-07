@@ -2,6 +2,7 @@ setClassUnion("extmatrix",c("matrix","NULL"))
 setClassUnion("extlogical",c("logical","NULL"))
 setClassUnion("extnumeric",c("numeric","NULL"))
 setClassUnion("extcharacter",c("character","NULL"))
+setClassUnion("extinteger",c("integer","NULL"))
 setClass("IData",slots=c(MidP="data.frame",LogR="data.frame",ObsNames="character",VarNames="character",
   NObs="numeric",NIVar="numeric"))
 setClass("IdtE",slots=c(ModelNames="character",ModelType="character",ModelConfig="numeric",NIVar="numeric",SelCrit="character",
@@ -80,7 +81,7 @@ setClass("EMControl",
   slots=c(nrep="numeric", maxiter="numeric", convtol="numeric", protol="numeric", seed="extnumeric"),
   prototype = list(nrep = 100, maxiter=1000, convtol=0.01, protol=1e-6, seed=NULL)
 )
-setClass("IdtOutl",slots=c(outliers="integer", MD2="numeric",eta="numeric",RefDist="character",
+setClass("IdtOutl",slots=c(outliers="extinteger", MD2="numeric",eta="numeric",RefDist="character",
   multiCmpCor="character",NObs="numeric",p="numeric",h="numeric",boolRewind="extlogical"))
 
 setGeneric("nrow")

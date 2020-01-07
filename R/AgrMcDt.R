@@ -1,11 +1,13 @@
 AgrMcDt <- function(MicDtDF,agrby,agrcrt="minmax")
 {
   if (!(is.data.frame(MicDtDF))) stop("First argument of AgMicroData must be a data frame\n")
-  if (class(agrby)!="factor") stop("Argument agrby is not a factor\n")
+#  if (class(agrby)!="factor") stop("Argument agrby is not a factor\n")
+  if (class(agrby)[1]!="factor") stop("Argument agrby is not a factor\n")
   globaln <- nrow(MicDtDF)
   if (length(agrby)!=globaln) stop("Size of the agrby argument does not agree with the number of rows in the MicDtDF data frame\n") 
 #To  do: test if all columns of MicDtDF are numeric
-  if ( agrcrt[1]!="minmax" && (class(agrcrt)!="numeric" || length(agrcrt)!=2 || agrcrt[1]>=agrcrt[2] || agrcrt[1]<0. || agrcrt[2]>1.) )
+#  if ( agrcrt[1]!="minmax" && (class(agrcrt)!="numeric" || length(agrcrt)!=2 || agrcrt[1]>=agrcrt[2] || agrcrt[1]<0. || agrcrt[2]>1.) )
+  if ( agrcrt[1]!="minmax" && (class(agrcrt)[1]!="numeric" || length(agrcrt)!=2 || agrcrt[1]>=agrcrt[2] || agrcrt[1]<0. || agrcrt[2]>1.) )
     stop("Wrong value for the agrcrt argument\n( it should be either the string minmax or a two-dim vector\nof a prob. value for the lower percentile, followed by the prob. value for the upper percentile - \nex:c(0.05,0.95) )\n") 
    
   if (length(unique(agrby))!=length(levels(agrby)))  agrby <- factor(agrby)
