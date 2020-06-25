@@ -2,19 +2,19 @@ Cnf2MaxLik <- function(Data,initpar=NULL,EPS=1E-6,OptCntrl=list())
 {
    #  Note  -  The Data argument should be a matrix containing the mid-points in the first columns and the log-ranges in the following columns 
 
-	sd0_default <- 0.1
+	sd0_default <- 0.01
 
 	n <- nrow(Data)			    # number of observations
 	p <- ncol(Data)			    # total number of variables (mid-points + log-ranges)
 	q <- p/2			    # number of interval variables
 	intcomb <- q*(q+1)/2	   	    # Number of possible combinations between pairs of interval variables
 	npar <- 2*intcomb + q	   	    # Total number of parameters to optimize
-	if (is.null(initpar)) 
-		initpar <- initparconf2(var(Data)*(n-1)/n,n,q)	
+	if (is.null(initpar))  initpar <- initparconf2(var(Data)*(n-1)/n,n,q)	
 	if (!is.null(OptCntrl$sd0)) sd0 <- OptCntrl$sd0 
 	else sd0 <- sd0_default 
 	OptCntrl$sd0 <- NULL 
-	parsd <- rep(sd0,npar)      	    # standard deviation hyper-parameters - used to generate random starting points
+#	parsd <- rep(sd0,npar)      	    # standard deviation hyper-parameters - used to generate random starting points
+        parsd <- sd0*c(rep(1./sqrt(n),p),rep(0.1,npar-p))   # standard deviation hyper-parameters
 	parlb <- rep(-Inf,npar)    	    # vector of lower bounds
 	for (i in 1:q)  { 
 		parlb[i*(i-1)/2+i] <- EPS 	    # diagonal elements of Choleski decomposition must be positive
@@ -259,7 +259,8 @@ SigmagradCnt <- function(VCnt,InvMat,j1,j2,n)
 }
 
 
-VCovGC2LogLikC.grad <- function(t0,X,ue=NULL)   
+#VCovGC2LogLikC.grad <- function(t0,X,ue=NULL)   
+VCovGC2LogLikC.grad <- function(t0,X,limlnk2,ue=NULL)   
 # Variance-Covariance Gradient of observation contributions for Log-likelihood of Gaussian model with Configuration 2
 {
 	PenF <- 1E12					# large penalty for unfeasible parameters                             
@@ -283,7 +284,8 @@ VCovGC2LogLikC.grad <- function(t0,X,ue=NULL)
 	else  X <- as.matrix(X-ue)
         Vcnt <- apply(X,1,function(v) outer(v,v)/n)
 	dim(Vcnt) <- c(p,p,n)
-	SigmaInv <- pdwt.solve(Sigma)
+#	SigmaInv <- pdwt.solve(Sigma)
+	SigmaInv <- Safepdsolve(Sigma,maxlnk2=limlnk2,scale=TRUE)
  	gradc = matrix(nrow=2*intcomb+q,ncol=n)
 	for (i in 1:q)  { 
 		for (j in 1:i) {		
@@ -334,7 +336,8 @@ PartoMatC2 <- function(par,q,initval)
 }
 
 
-C2GetCovStderr <- function(mleSigmaC2,Data,q,ue=NULL)
+#C2GetCovStderr <- function(mleSigmaC2,Data,q,ue=NULL)
+C2GetCovStderr <- function(mleSigmaC2,Data,q,limlnk2,ue=NULL)
 
 #  Arguments
 
@@ -347,7 +350,8 @@ C2GetCovStderr <- function(mleSigmaC2,Data,q,ue=NULL)
 {
 	if (!is.null(ue)) Data <- scale(Data,center=ue,scale=FALSE)
 	par <- CovtoParC2(mleSigmaC2,q,Sqrt=FALSE)
-	gradc <- VCovGC2LogLikC.grad(par,Data)
+#	gradc <- VCovGC2LogLikC.grad(par,Data)
+	gradc <- VCovGC2LogLikC.grad(par,Data,limlnk2=limlnk2)
 	VCov <- mleVCov(gradc)
 	stderr <- sqrt(diag(VCov))
 	PartoMatC2(stderr,q,NA)

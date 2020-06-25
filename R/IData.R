@@ -51,6 +51,14 @@ setMethod("MidPoints",signature(Idt = "IData"),function(Idt) Idt@MidP)
 setMethod("LogRanges",signature(Idt = "IData"),function(Idt) Idt@LogR)
 setMethod("Ranges",signature(Idt = "IData"),function(Idt) exp(Idt@LogR))
 
+setMethod("NbMicroUnits",
+  signature(x = "IData"),
+  function(x) {
+    if (length(x@NbMicroUnits)==0) return(NULL)
+    x@NbMicroUnits
+  }
+)
+
 
 setMethod("head",
   signature(x = "IData"),
@@ -119,7 +127,8 @@ setMethod("plot",
     }
 
     if (!append) {
-      do.call("plot",c(list(x=0.,y=0.,type="n"),dotarguments))
+#      do.call("plot",c(list(x=0.,y=0.,type="n"),dotarguments))
+      do.call("plot.default",c(list(x=0.,y=0.,type="n"),dotarguments))
     }
 
     if (type=="crosses") {
@@ -137,7 +146,8 @@ setMethod("plot",
   {
     if (x@NIVar > 1) {
       if (x@NIVar==2) {
-        plot(x[,1],x[,2],...)
+#        plot(x[,1],x[,2],...)
+        plot.default(x[,1],x[,2],...)
         return()
       } else {
         stop("Currently method plot can only plot at most tow interval variables simultaneously\n")
@@ -180,12 +190,14 @@ setMethod("plot",
     }
     if (layout=="vertical") {
       if (!append) {
-        do.call("plot",c(list(x=casen,y=rep(0.,length(casen)),type="n"),dotarguments))
+#        do.call("plot",c(list(x=casen,y=rep(0.,length(casen)),type="n"),dotarguments))
+        do.call("plot,default",c(list(x=casen,y=rep(0.,length(casen)),type="n"),dotarguments))
       }
       do.call("segments",c(list(x0=xcord,y0=Lby,x1=xcord,y1=Uby),dotarguments))
     } else  {
       if (!append) {
-        do.call("plot",c(list(x=rep(0.,length(casen)),y=casen,type="n"),dotarguments))
+#        do.call("plot",c(list(x=rep(0.,length(casen)),y=casen,type="n"),dotarguments))
+        do.call("plot.default",c(list(x=rep(0.,length(casen)),y=casen,type="n"),dotarguments))
       }
       do.call("segments",c(list(y0=xcord,x0=Lby,y1=xcord,x1=Uby),dotarguments))
     }
@@ -226,7 +238,7 @@ IData <- function(Data,
   names(LogR) <- paste(VarNames,".LogR",sep="")
   rownames(MidP) <- rownames(LogR) <- ObsNames
 
-  new("IData",MidP=MidP,LogR=LogR,ObsNames=ObsNames,VarNames=VarNames,NObs=nrow(MidP),NIVar=q)
+  new("IData",MidP=MidP,LogR=LogR,ObsNames=ObsNames,VarNames=VarNames,NObs=nrow(MidP),NIVar=q,NbMicroUnits=integer(0))
 }
 
 # Standard operators for IData objects
@@ -235,8 +247,6 @@ IData <- function(Data,
 
 "[.IData" <- function(x,rowi=1:x@NObs,coli=1:x@NIVar,...)
 {
-#  if (class(rowi)=="character") rowi <- sapply(rowi,function(ri) which(ri==x@ObsNames))
-#  if (class(coli)=="character") coli <- sapply(coli,function(ci) which(ci==x@VarNames))
   if (class(rowi)[1]=="character") rowi <- sapply(rowi,function(ri) which(ri==x@ObsNames))
   if (class(coli)[1]=="character") coli <- sapply(coli,function(ci) which(ci==x@VarNames))
   IData(cbind(x@MidP[rowi,coli,drop=FALSE],x@LogR[rowi,coli,drop=FALSE]),
@@ -246,8 +256,6 @@ IData <- function(Data,
 "[<-.IData" <- function(x,rowi=1:x@NObs,coli=1:x@NIVar,value)
 {
   if (!is(value,"IData")) stop("Argument value is not an IData object\n")
-#  if (class(rowi)=="character") rowi <- sapply(rowi,function(ri) which(ri==x@ObsNames))
-#  if (class(coli)=="character") coli <- sapply(coli,function(ci) which(ci==x@VarNames))
   if (class(rowi)[1]=="character") rowi <- sapply(rowi,function(ri) which(ri==x@ObsNames))
   if (class(coli)[1]=="character") coli <- sapply(coli,function(ci) which(ci==x@VarNames))
   x@MidP[rowi,coli] <- value@MidP
@@ -284,8 +292,6 @@ IData <- function(Data,
 
 rbind.IData <- function(x, y, ...)
 {
-#  if (class(x)!="IData") stop("Argument x is not an object of class IData\n")
-#  if (class(y)!="IData") stop("Argument y is not an object of class IData\n")
   if (class(x)[1]!="IData") stop("Argument x is not an object of class IData\n")
   if (class(y)[1]!="IData") stop("Argument y is not an object of class IData\n")
   if (x@NIVar != y@NIVar) stop("Arguments x and y have a different number of interval-valued variables\n")
@@ -300,7 +306,6 @@ rbind.IData <- function(x, y, ...)
   if (lpar>4) for (i in 3:(lpar-2))  {
     newIDtObj <- eval(par[[i]])
     if (i==3) auxtxt <- "rd " else auxtxt <- "-th "
-#    if (class(newIDtObj)!="IData") stop("The ",i,auxtxt,"argument is not an object of class IData\n")
     if (class(newIDtObj)[1]!="IData") stop("The ",i,auxtxt,"argument is not an object of class IData\n")
     if (x@NIVar != newIDtObj@NIVar) stop("First and ",i,auxtxt,"argument have a different number of interval-valued variables\n")
     dataDF <- rbind(dataDF,cbind(newIDtObj@MidP,newIDtObj@LogR))
@@ -315,8 +320,6 @@ rbind.IData <- function(x, y, ...)
 
 cbind.IData <- function(x, y, ...)
 {
-#  if (class(x)!="IData") stop("Argument x is not an object of class IData\n")
-#  if (class(y)!="IData") stop("Argument y is not an object of class IData\n")
   if (class(x)[1]!="IData") stop("Argument x is not an object of class IData\n")
   if (class(y)[1]!="IData") stop("Argument y is not an object of class IData\n")
   if (x@NObs != y@NObs) stop("Arguments x and y have a different number of rows\n")
@@ -329,7 +332,6 @@ cbind.IData <- function(x, y, ...)
   if (lpar>4) for (i in 3:(lpar-2))  {
     newIDtObj <- eval(par[[i]])
     if (i==3) auxtxt <- "rd " else auxtxt <- "-th "
-#    if (class(newIDtObj)!="IData") stop("The ",i,auxtxt,"argument is not an object of class IData\n")
     if (class(newIDtObj)[1]!="IData") stop("The ",i,auxtxt,"argument is not an object of class IData\n")
     if (x@NObs != newIDtObj@NObs) stop("First and ",i,auxtxt,"argument have a different number of rows\n")
     dataDF <- cbind(dataDF[,1:curnIvar],newIDtObj@MidP,dataDF[,(curnIvar+1):(2*curnIvar)],newIDtObj@LogR)

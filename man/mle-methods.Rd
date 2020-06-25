@@ -10,7 +10,7 @@
 \usage{
 
 \S4method{mle}{IData}(Idt, Model=c("Normal","SKNormal","NrmandSKN"), CovCase=1:4,
-  SelCrit=c("BIC","AIC"), OptCntrl=list(), \dots)
+  SelCrit=c("BIC","AIC"), k2max=1e6, OptCntrl=list(), \dots)
 
 }
 
@@ -23,6 +23,8 @@ distributions, \dQuote{SNNormal} for Skew-Normal and \dQuote{NrmandSKN} for both
   \item{CovCase}{Configuration of the variance-covariance matrix: a set of integers between 1 and 4.}
 
    \item{SelCrit}{The model selection criterion.}
+
+   \item{k2max}{Maximal allowed l2-norm condition number for correlation matrices. Correlation matrices with condition number above k2max are considered to be numerically singular, leading to degenerate results.}
 
    \item{OptCntrl}{List of optional control parameters to passed to the optimization routine. See the documentation of RepLOptim for a description of the available options.}
 

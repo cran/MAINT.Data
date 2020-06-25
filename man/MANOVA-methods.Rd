@@ -15,7 +15,8 @@
 \usage{
 
 MANOVA(Idt, grouping, Model=c("Normal","SKNormal","NrmandSKN"), CovCase=1:4, 
-		SelCrit=c("BIC","AIC"), Mxt=c("Hom","Het","Loc","Gen"), CVtol=1.0e-5, 
+		SelCrit=c("BIC","AIC"), Mxt=c("Hom","Het","Loc","Gen"), 
+                CVtol=1.0e-5, k2max=1e6,
 		OptCntrl=list(), onerror=c("stop","warning","silentNull"), \dots)
 
 \S4method{H0res}{IdtMANOVA}(object)
@@ -42,7 +43,9 @@ distributions, \dQuote{SKNormal} for Skew-Normal and \dQuote{NrmandSKN} for both
 
   \item{CVtol}{Tolerance level for absolute value of the coefficient of variation of non-constant variables. When a MidPoint or LogRange has an absolute value within-groups coefficient of variation below CVtol, it is considered to be a constant.}
 
-   \item{OptCntrl}{List of optional control parameters to passed to the optimization routine. See the documentation of RepLOptim for a description of the available options.}
+  \item{k2max}{Maximal allowed l2-norm condition number for correlation matrices. Correlation matrices with condition number above k2max are considered to be numerically singular, leading to degenerate results.}
+
+  \item{OptCntrl}{List of optional control parameters to passed to the optimization routine. See the documentation of RepLOptim for a description of the available options.}
 
    \item{onerror}{Indicates whether an error in the optimization algorithm should stop the current call, generate a warning, or return silently a NULL object.}
 

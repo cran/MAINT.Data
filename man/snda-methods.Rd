@@ -15,19 +15,19 @@
 \usage{
 
 \S4method{snda}{IData}(x, grouping, prior="proportions", CVtol=1.0e-5, subset=1:nrow(x),
-  CovCase=1:4, SelCrit=c("BIC","AIC"), Mxt=c("Loc","Gen"), \dots )
+  CovCase=1:4, SelCrit=c("BIC","AIC"), Mxt=c("Loc","Gen"), k2max=1e6, \dots )
 
 \S4method{snda}{IdtLocSNMANOVA}( x, prior="proportions", selmodel=BestModel(H1res(x)),
-  egvtol=1.0e-10, silent=FALSE, \dots )
+  egvtol=1.0e-10, silent=FALSE, k2max=1e6, \dots )
 
 \S4method{snda}{IdtLocNSNMANOVA}( x, prior="proportions",
-  selmodel=BestModel(H1res(x)@SNMod), egvtol=1.0e-10, silent=FALSE, \dots )
+  selmodel=BestModel(H1res(x)@SNMod), egvtol=1.0e-10, silent=FALSE, k2max=1e6, \dots )
 
 \S4method{snda}{IdtGenSNMANOVA}( x, prior="proportions", selmodel=BestModel(H1res(x)),
-  silent=FALSE, \dots )
+  silent=FALSE, k2max=1e6, \dots )
 
 \S4method{snda}{IdtGenNSNMANOVA}( x, prior="proportions",
-  selmodel=BestModel(H1res(x)@SNMod), silent=FALSE, \dots )
+  selmodel=BestModel(H1res(x)@SNMod), silent=FALSE, k2max=1e6, \dots )
 
 }
 
@@ -55,6 +55,8 @@ present, the probabilities should be specified in the order of the factor levels
   \item{selmodel}{Selected model from a list of candidate models saved in object x.}
 
   \item{egvtol}{Tolerance level for the eigenvalues of the product of the inverse within by the between covariance matrices. When a  eigenvalue has an absolute value below egvtol, it is considered to be zero.}
+
+  \item{k2max}{Maximal allowed l2-norm condition number for correlation matrices. Correlation matrices with condition number above k2max are considered to be numerically singular, leading to degenerate results.}
 
   \item{\dots}{Other named arguments.}
 }

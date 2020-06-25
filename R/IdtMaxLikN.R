@@ -10,7 +10,7 @@ error <- function(onerror,msg)     # Things to do: replace this by an exception-
   }
 } 
 
-IdtNmle <- function(Idt, grouping=NULL, Type=c("SingDst","HomMxt"), CVtol=1.0e-5,
+IdtNmle <- function(Idt, grouping=NULL, Type=c("SingDst","HomMxt"), CVtol=1.0e-5, limlnk2=log(1e8),
   OptCntrl=list(), onerror=c("stop","warning","silentNull"), CovCaseArg, Config, SelCrit)
 {                                   
   onerror <- match.arg(onerror)
@@ -189,7 +189,8 @@ IdtNmle <- function(Idt, grouping=NULL, Type=c("SingDst","HomMxt"), CVtol=1.0e-5
       C2res <- Cnf2MaxLik(Xscld,initpar=initparconf2(CovConfCases[[CovCaseMap[3]]]$mleSigE,n,q))
     }    
     CovConfCases[[2]]$mleSigE <- C2GetCov(C2res$SigmaSr,outer(Xsd,Xsd),q)
-    CovConfCases[[2]]$mleSigEse <- C2GetCovStderr(CovConfCases[[2]]$mleSigE,X,q,ue=colMeans(X))
+#    CovConfCases[[2]]$mleSigEse <- C2GetCovStderr(CovConfCases[[2]]$mleSigE,X,q,ue=colMeans(X))
+    CovConfCases[[2]]$mleSigEse <- C2GetCovStderr(CovConfCases[[2]]$mleSigE,X,q,limlnk2=limlnk2,ue=colMeans(X))
     dimnames(CovConfCases[[2]]$mleSigEse) <- dimnames(CovConfCases[[2]]$mleSigE)
     logLiks[2] <- CovConfCases[[2]]$logLik <- C2res$lnLik + lglikdif 
     AICs[2] <- CovConfCases[[2]]$AIC <- -2*CovConfCases[[2]]$logLik + 2*npar(2,p,q,Ngrps=k)

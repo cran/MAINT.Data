@@ -9,6 +9,7 @@
 \alias{MidPoints,IData-method}
 \alias{LogRanges,IData-method}
 \alias{Ranges,IData-method}
+\alias{NbMicroUnits,IData-method}
 
 \title{Class IData}
 \description{
@@ -23,6 +24,7 @@
     \item{\code{VarNames}:}{An optional vector of names to be assigned to the Interval-Valued Variables.}
     \item{\code{NObs}:}{Number of entities under analysis (cases)}
     \item{\code{NIVar}:}{Number of interval variables}
+    \item{\code{NbMicroUnits}:}{An integer vector with the number of micro data units by interval-valued observation (or an empty vector, if not applicable)}
   }
 }
 
@@ -36,7 +38,8 @@
     \item{names}{\code{signature(x = "IData")}: returns column (variable) names for an object of class IData.}
     \item{MidPoints}{\code{signature(Idt = "IData")}: returns a data frame with MidPoints for an object of class IData.}
     \item{LogRanges}{\code{signature(Idt = "IData")}: returns a data frame with LogRanges for an object of class IData.}
-    \item{Ranges}{\code{signature(Idt = "IData")}: returns a data frame with Ranges for an object of class IData.}
+    \item{Ranges}{\code{signature(Idt = "IData")}: returns an data frame with Ranges for an object of class IData.}
+    \item{NbMicroUnits}{\code{signature(Idt = "IData")}: returns an integer vector with the number of micro data units by interval-valued observation for an object of class IData.}
     \item{head}{\code{signature(x = "IData")}: head S4 method for the IData-class.}
     \item{tail}{\code{signature(x = "IData")}: tail S4 method for the IData-class.}
     \item{plot}{\code{signature(x = "IData")}: plot S4 methods for the IData-class.}

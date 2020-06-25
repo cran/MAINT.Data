@@ -2,17 +2,13 @@
 #define GAUSSLOGLIKH
 
 #include<vector>
-#include <RcppEigen.h>
-
-using namespace Eigen;
+#include <RcppArmadillo.h>
 
 const double LN2PI = log(2*PI);
 
-// void MDataGaussLogLik(const int n, const int p, const MatrixXd& X, const VectorXd& u, 
-//                      const MatrixXd& Sigma, std::vector<double>& res);
-
-void MDataGaussLogLik(const int n, const int p, const int Config, const MatrixXd& X, 
-                      const VectorXd& u, const MatrixXd& Sigma, std::vector<double>& res);
-
+void MDataGaussLogLik(const int n, const int p, const int Cf, const arma::mat& X, const arma::vec& u, 
+                      arma::mat* Sigmap, arma::mat* SigmaInvp, double* lndetSigp, std::vector<double>& res, bool& validsol, 
+//                      const bool print, const double maxlnk2, const double MaxSctlnEgvlRt, const bool chksing=true);
+                      const bool print, const double maxlnk2, const bool chksing=true);
 
 #endif

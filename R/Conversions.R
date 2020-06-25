@@ -29,8 +29,9 @@ cnvDPtoCP <- function(p,ksi,Omega,alpha)
 }
 
 
-cnvCPtoDP <- function(p,mu,Sigma,gamma1,silent=FALSE,
-                      tol=sqrt(.Machine$double.eps))
+#cnvCPtoDP <- function(p,mu,Sigma,gamma1,silent=FALSE,
+#                      tol=sqrt(.Machine$double.eps))                      
+cnvCPtoDP <- function(p, mu, Sigma, gamma1, limlnk2, silent=FALSE, tol=sqrt(.Machine$double.eps))
 {
   c <- sign(gamma1)*(2*abs(gamma1)/(4.-pi))^(1./3)
   muz <- c/sqrt(1.+c^2)
@@ -59,14 +60,16 @@ cnvCPtoDP <- function(p,mu,Sigma,gamma1,silent=FALSE,
     ksi <- mu - mu0
     Omega <- Sigma + outer(mu0,mu0)
     Omegabar <- cov2cor(Omega)
-    OmgbInv <- pdwt.solve(Omegabar,silent=TRUE)
-    if (is.null(OmgbInv))
+#    OmgbInv <- pdwt.solve(Omegabar,silent=TRUE)
+    OmgbInv <- Safepdsolve(Omegabar,maxlnk2=limlnk2,scale=FALSE)
+#    if (is.null(OmgbInv))
+    if (is.null(OmgbInv)) {
       if (silent) return( 
         list(ksi=ksi,Omega=Omega,alpha=NULL,Omega.cor=Omegabar,delta=delta,c2=NULL,
              admissible=FALSE,viol=-determinant(Omegabar)$modulus) )
-        else stop("Inadmissible centred parameters\n")          
+        else stop("Inadmissible centred parameters\n")       
+    }   
     tmp <- drop(OmgbInv%*%delta)
-#    c2 <- drop(1. - delta%*%tmp)
     c2 <- 1. - drop(delta%*%tmp)
     if (c2<0. || isTRUE(all.equal(c2,0.,tol=tol)))
     {

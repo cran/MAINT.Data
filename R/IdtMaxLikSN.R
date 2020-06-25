@@ -1,4 +1,4 @@
-SNCnf1MaxLik <- function(Data,grouping=NULL,initpar=NULL,EPS=1E-6,OptCntrl=list())
+SNCnf1MaxLik <- function(Data,grouping=NULL,initpar=NULL,EPS=1E-6,limlnk2,OptCntrl=list())
 {
 #  Note  -  The Data argument should be a matrix containing the mid-points in the first columns and the log-ranges in the next columns 
 
@@ -6,7 +6,7 @@ SNCnf1MaxLik <- function(Data,grouping=NULL,initpar=NULL,EPS=1E-6,OptCntrl=list(
   p <- ncol(Data)		# total number of variables (mid-points + log-ranges)
   q <- p/2			# number of interval variables
 
-  sd0_default <- 0.1
+  sd0_default <- 0.01
   if (!is.null(OptCntrl$sd0))  {
     sd0 <- OptCntrl$sd0
   }  else  {
@@ -23,15 +23,16 @@ SNCnf1MaxLik <- function(Data,grouping=NULL,initpar=NULL,EPS=1E-6,OptCntrl=list(
 
   if (is.null(grouping))  {
     k <- 1  
-    parsd <- rep(sd0,2*p)      	# standard deviation hyper-parameters - used to generate random starting points
+#    parsd <- rep(sd0,2*p)      	# standard deviation hyper-parameters - used to generate random starting points
+    parsd <- sd0*c(rep(1./sqrt(n),p),rep(0.1,p))   # standard deviation hyper-parameters
     if (is.null(initpar))  { 
-      initpar <- mymsn.mle(NULL,y=Data,control=mymsncontrol)$par 
+      initpar <- mymsn.mle(NULL,y=Data,limlnk2=limlnk2,control=mymsncontrol)$par 
       if (is.null(initpar))  { 
         return(list(lnLik=-Inf,ksi=NULL,beta2k=NULL,Omega=NULL,Omega.cor=NULL,alpha=NULL,
              delta=NULL,mu=NULL,Sigma=NULL,gamma1=NULL,admissible=NULL,c2=NULL,optres=NULL))
       }
     }
-    res <- RepLOptim(initpar,parsd,fr=NULL,method=mymsn.mle,y=Data,control=OptCntrl)
+    res <- RepLOptim(initpar,parsd,fr=NULL,method=mymsn.mle,y=Data,limlnk2=limlnk2,control=OptCntrl)
     ksi <- res$par[1:p]
     beta2k <- NULL
     dev <- scale(Data,center=ksi,scale=FALSE)
@@ -39,15 +40,16 @@ SNCnf1MaxLik <- function(Data,grouping=NULL,initpar=NULL,EPS=1E-6,OptCntrl=list(
     lev <- levels(grouping)
     k <- length(lev)
     parsd <- rep(sd0,(k+1)*p)      	# standard deviation hyper-parameters - used to generate random starting points
+    parsd <- sd0*c(rep(1./sqrt(n),k*p),rep(0.1,p))   # standard deviation hyper-parameters
     X <- model.matrix(Data ~ grouping)
     if (is.null(initpar))  { 
-      initpar <- mymsn.mle(NULL,y=Data,x=X,control=mymsncontrol)$par
+      initpar <- mymsn.mle(NULL,y=Data,x=X,limlnk2=limlnk2,control=mymsncontrol)$par
       if (is.null(initpar)) {
         return(list(lnLik=-Inf,ksi=NULL,beta2k=NULL,Omega=NULL,Omega.cor=NULL,alpha=NULL,
              delta=NULL,mu=NULL,Sigma=NULL,gamma1=NULL,admissible=NULL,c2=NULL,optres=NULL))
       }
     }
-    res <- RepLOptim(initpar,parsd,fr=NULL,method=mymsn.mle,y=Data,x=X,control=OptCntrl)
+    res <- RepLOptim(initpar,parsd,fr=NULL,method=mymsn.mle,y=Data,x=X,limlnk2=limlnk2,control=OptCntrl)
     beta <- matrix(res$par[1:(k*p)],nrow=k,ncol=p)
     beta2k <- beta[-1,]
     ksi <- matrix(nrow=k,ncol=p)
@@ -174,8 +176,8 @@ SNVCovscaling <- function(Conf,p,stdv,k=1)  # Creates a scaling matrix in order 
   outer(sclvct,sclvct)  
 }
 
-IdtSNmle <- function(Idt, grouping=NULL, Type=c("SingDst","HomMxt"), CVtol=1.0e-5, bordertol=1e-2,
-  OptCntrl=list(), onerror=c("stop","warning","silentNull"), CovCaseArg, Config, SelCrit)
+IdtSNmle <- function(Idt, grouping=NULL, Type=c("SingDst","HomMxt"), CVtol=1.0e-5, bordertol=1e-2, 
+  OptCntrl=list(), onerror=c("stop","warning","silentNull"), limlnk2, CovCaseArg, Config, SelCrit)
 {
 
 ##########################################################################
@@ -187,20 +189,21 @@ IdtSNmle <- function(Idt, grouping=NULL, Type=c("SingDst","HomMxt"), CVtol=1.0e-
     if (FullConf==1)
     {
       if (Type=="SingDst")  {
-        DP <- cnvCPtoDP(p,RestModel$mu,RestModel$Sigma,RestModel$gamma1) 
+        DP <- cnvCPtoDP(p,RestModel$mu,RestModel$Sigma,RestModel$gamma1,limlnk2=limlnk2) 
       }  else if (Type=="HomMxt")  {  
-        DP <- cnvCPtoDP(p,RestModel$mu[1,]-RestModel$mu0[1,],RestModel$Sigma,RestModel$gamma1)
+        DP <- cnvCPtoDP(p,RestModel$mu[1,]-RestModel$mu0[1,],RestModel$Sigma,RestModel$gamma1,limlnk2=limlnk2)
       }
       newpar <- c(DP$ksi,DP$alpha/DP$omega)
-      FullModel <- SNCnf1MaxLik(Xscld,initpar=newpar,grouping=grouping,OptCntrl=OptCntrl)
+      FullModel <- SNCnf1MaxLik(Xscld,initpar=newpar,grouping=grouping,limlnk2=limlnk2,OptCntrl=OptCntrl)
     }  else  {
-      SigmaSrpar <- GetCovPar(RestModel$Sigma,FullConf) 
+#      SigmaSrpar <- GetCovPar(RestModel$Sigma,FullConf) 
+      SigmaSrpar <- GetCovPar(RestModel$Sigma,FullConf,test=FALSE) 
       if (Type=="SingDst")  {
         newpar <- c(RestModel$mu,SigmaSrpar,RestModel$gamma1)
       }  else if (Type=="HomMxt")  {
         newpar <- c(RestModel$mu[1,],RestModel$beta2k,SigmaSrpar,RestModel$gamma1)
       }
-      FullModel <- SNCMaxLik(Xscld,Config=FullConf,initpar=newpar,grouping=grouping,OptCntrl=OptCntrl)
+      FullModel <- SNCMaxLik(Xscld,Config=FullConf,initpar=newpar,grouping=grouping,limlnk2=limlnk2,OptCntrl=OptCntrl)
     }
 
     FullModel
@@ -211,12 +214,11 @@ IdtSNmle <- function(Idt, grouping=NULL, Type=c("SingDst","HomMxt"), CVtol=1.0e-
     if (Type=="SingDst")
     {
       SngDparnam <- paste("mu_",Xnames,sep="")
-      for (i in 1:p)
-        SngDparnam <- c(SngDparnam,paste("Sigma_",Xnames[i],"_",Xnames[i:p],sep=""))
+      for (i in 1:p) SngDparnam <- c(SngDparnam,paste("Sigma_",Xnames[i],"_",Xnames[i:p],sep=""))
       SngDparnam <- c(SngDparnam,paste("gamma1_",Xnames,sep=""))
       npar <- SKnpar(Conf,p,p/2)
       InFData <- mysn.infoMv( dp=list(xi=Res$ksi,Omega=Res$Omega,alpha=Res$alpha),
-        y=Xscld, w=n1scvct )
+        y=Xscld, w=n1scvct, limlnk2=limlnk2)
       if (InFData$status!="Regular") {
         return( list(mleCPvcov=NULL,muEse=NULL,SigmaEse=NULL,gamma1Ese=NULL,status=InFData$status) )
       }
@@ -226,8 +228,7 @@ IdtSNmle <- function(Idt, grouping=NULL, Type=c("SingDst","HomMxt"), CVtol=1.0e-
       }  else  {
         nparC1 <- 2*p + p*(p+1)/2  
         parind <- c(1:p,p+SigCind(Conf,p/2),(nparC1-p+1):nparC1)
-#        mleCPvcov <- pdwt.solve(InFData$info.cp[parind,parind])
-        mleCPvcov <- pdwt.solve(InFData$info.cp[parind,parind],silent=TRUE)
+        mleCPvcov <- Safepdsolve(InFData$info.cp[parind,parind],maxlnk2=limlnk2,scale=TRUE)
         if ( !is.null(mleCPvcov) ) { rownames(mleCPvcov) <- colnames(mleCPvcov) <- SngDparnam[parind] }
       }
     }  else if (Type=="HomMxt") {
@@ -237,7 +238,7 @@ IdtSNmle <- function(Idt, grouping=NULL, Type=c("SingDst","HomMxt"), CVtol=1.0e-
       HoMxtparnam <- c(HoMxtparnam,paste("gamma1_",Xnames,sep=""))
       npar <- SKnpar(Conf,p,p/2,Ngrps=k)
       InFData <- mysn.infoMv( dp=list(beta=rbind(Res$ksi[1,],Res$beta2k),Omega=Res$Omega,alpha=Res$alpha),
-        y=Xscld, x=grpModMat, w=n1scvct )
+        y=Xscld, x=grpModMat, w=n1scvct, limlnk2=limlnk2)
       if (InFData$status!="Regular") {
         return( list(mleCPvcov=NULL,muEse=NULL,SigmaEse=NULL,gamma1Ese=NULL,status=InFData$status) )
       }
@@ -248,8 +249,7 @@ IdtSNmle <- function(Idt, grouping=NULL, Type=c("SingDst","HomMxt"), CVtol=1.0e-
         nparC1 <- (k+1)*p + p*(p+1)/2  
         parind <- c(1:(k*p),(k*p)+SigCind(Conf,p/2),(nparC1-p+1):nparC1)
         nSpar <- length(parind) - (k+1)*p
-#        betavcov <- pdwt.solve(InFData$info.cp[parind,parind])
-        betavcov <- pdwt.solve(InFData$info.cp[parind,parind],silent=TRUE)
+        betavcov <- Safepdsolve(InFData$info.cp[parind,parind],maxlnk2=limlnk2,scale=TRUE)
       }
       if ( !is.null(betavcov) )
       {
@@ -417,26 +417,31 @@ IdtSNmle <- function(Idt, grouping=NULL, Type=c("SingDst","HomMxt"), CVtol=1.0e-
     if (Type=="SingDst")
     {
       if (Conf == 1)  {
-        StdDtRes[[1]] <- SNCnf1MaxLik(Xscld,OptCntrl=OptCntrl)
+        StdDtRes[[1]] <- SNCnf1MaxLik(Xscld,limlnk2=limlnk2,OptCntrl=OptCntrl)
       }  else if (Conf == 2) {
-        StdDtRes4 <- SNCMaxLik(Xscld,Config=4,OptCntrl=OptCntrl,prevMod=prevMod)
+        StdDtRes4 <- SNCMaxLik(Xscld,Config=4,limlnk2=limlnk2,OptCntrl=OptCntrl,prevMod=prevMod)
         StdDtRes[[2]] <- ImprvSNmdl(RestModel=StdDtRes4,RestConf=4,FullConf=2)
       }  else if (Conf == 4 && !is.null(StdDtRes4)) {
         StdDtRes[[CovCaseMap[4]]] <- StdDtRes4
       }  else {
-        StdDtRes[[CovCaseMap[Conf]]] <- SNCMaxLik(Xscld,Config=Conf,OptCntrl=OptCntrl,prevMod=prevMod)
+        StdDtRes[[CovCaseMap[Conf]]] <- SNCMaxLik(Xscld,Config=Conf,limlnk2=limlnk2,OptCntrl=OptCntrl,prevMod=prevMod)
+        if (is.null(StdDtRes[[CovCaseMap[Conf]]]$admissible))
+          cat("Data seems to be colinear (Covariance matrix estimate for CovCase",CovCaseMap[Conf],"is found not to be positive-definite\n")
+
       } 
     }  else if (Type=="HomMxt")
     {
       if (Conf == 1)  {
-        StdDtRes[[1]] <- SNCnf1MaxLik(Xscld,grouping,OptCntrl=OptCntrl)
+        StdDtRes[[1]] <- SNCnf1MaxLik(Xscld,grouping,limlnk2=limlnk2,OptCntrl=OptCntrl)
       }  else if (Conf == 2) {
-        StdDtRes4 <- SNCMaxLik(Xscld,Config=4,grouping=grouping,OptCntrl=OptCntrl,prevMod=prevMod)
+        StdDtRes4 <- SNCMaxLik(Xscld,Config=4,grouping=grouping,limlnk2=limlnk2,OptCntrl=OptCntrl,prevMod=prevMod)
         StdDtRes[[2]] <- ImprvSNmdl(RestModel=StdDtRes4,RestConf=4,FullConf=2)
       }  else if (Conf == 4 && !is.null(StdDtRes4))  {
         StdDtRes[[CovCaseMap[4]]] <- StdDtRes4 
       }  else  {
-        StdDtRes[[CovCaseMap[Conf]]] <- SNCMaxLik(Xscld,Config=Conf,grouping=grouping,OptCntrl=OptCntrl,prevMod=prevMod) 
+        StdDtRes[[CovCaseMap[Conf]]] <- SNCMaxLik(Xscld,Config=Conf,grouping=grouping,limlnk2=limlnk2,OptCntrl=OptCntrl,prevMod=prevMod) 
+        if (is.null(StdDtRes[[CovCaseMap[Conf]]]$admissible))
+          cat("Data seems to be colinear (Covariance matrix estimate for CovCase",CovCaseMap[Conf],"is found not to be positive-definite\n")
       }
     }
   }	
@@ -503,9 +508,13 @@ IdtSNmle <- function(Idt, grouping=NULL, Type=c("SingDst","HomMxt"), CVtol=1.0e-
         rownames(CovConfCases[[CvCase]]$muE) <-  rownames(CovConfCases[[CvCase]]$ksiE) <- levels(grouping)
         rownames(CovConfCases[[CvCase]]$muE) <-  rownames(CovConfCases[[CvCase]]$ksiE) <- grplvls
       }
-      names(CovConfCases[[CvCase]]$gamma1E) <- names(CovConfCases[[CvCase]]$alphaE) <-
-        dimnames(CovConfCases[[CvCase]]$SigmaE)[[1]] <- dimnames(CovConfCases[[CvCase]]$SigmaE)[[2]] <- 
-        dimnames(CovConfCases[[CvCase]]$OmegaE)[[1]] <- dimnames(CovConfCases[[CvCase]]$OmegaE)[[2]] <- Xnames
+      if ( !is.null(CovConfCases[[CvCase]]$gamma1E) && !is.null(CovConfCases[[CvCase]]$alphaE) &&
+           !is.null(CovConfCases[[CvCase]]$SigmaE) && !is.null(CovConfCases[[CvCase]]$OmegaE) )
+      {
+        names(CovConfCases[[CvCase]]$gamma1E) <- names(CovConfCases[[CvCase]]$alphaE) <-
+          dimnames(CovConfCases[[CvCase]]$SigmaE)[[1]] <- dimnames(CovConfCases[[CvCase]]$SigmaE)[[2]] <- 
+          dimnames(CovConfCases[[CvCase]]$OmegaE)[[1]] <- dimnames(CovConfCases[[CvCase]]$OmegaE)[[2]] <- Xnames
+      }  
       AICs[CvCase] <- CovConfCases[[CvCase]]$AIC <- -2*CovConfCases[[CvCase]]$logLik + 2*SKnpar(Conf,p,q,Ngrps=k)
       BICs[CvCase] <- CovConfCases[[CvCase]]$BIC <- -2*CovConfCases[[CvCase]]$logLik + log(n)*SKnpar(Conf,p,q,Ngrps=k)
 #    } # Note: In previous versions this conditonal loop was closed here
@@ -538,7 +547,7 @@ IdtSNmle <- function(Idt, grouping=NULL, Type=c("SingDst","HomMxt"), CVtol=1.0e-
   }
 }
 
-IdtFDMxtSNmle <- function(Idt, grouping, CVtol=1.0e-5, OptCntrl=list(), CovCaseArg, Config, SelCrit)
+IdtFDMxtSNmle <- function(Idt, grouping, CVtol=1.0e-5, OptCntrl=list(), limlnk2, CovCaseArg, Config, SelCrit)
 {
   n <- Idt@NObs
   q <- Idt@NIVar
@@ -567,7 +576,6 @@ IdtFDMxtSNmle <- function(Idt, grouping, CVtol=1.0e-5, OptCntrl=list(), CovCaseA
   names(logLiks) <- names(AICs) <- names(BICs) <- names(CovConfCases) <- slotnames
   for (model in Config)
   {
-cat("Got here -- Configuration case =",model,"\n")
     nparbyg <- SKnpar(model,p,q)
     CvCase <- CovCaseMap[model]	
     CovConfCases[[CvCase]] <- list(
@@ -593,7 +601,7 @@ cat("Got here -- Configuration case =",model,"\n")
     }  else if (length(CnstV)>1)  {
       stop("Variables ",paste(names(CnstV),collapse=" ")," appear to be constant in group ",lev[g],"\n")
     }
-    pres <- IdtSNmle(Idtg,Type="SingDst",CVtol=CVtol,OptCntrl=OptCntrl,
+    pres <- IdtSNmle(Idtg,Type="SingDst",CVtol=CVtol,OptCntrl=OptCntrl, limlnk2=limlnk2,
       CovCaseArg=CovCaseArg,Config=Config,SelCrit=SelCrit)
     for (model in Config)
     { 

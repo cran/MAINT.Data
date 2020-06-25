@@ -26,6 +26,7 @@
     trialmethod=control@trialmethod,
     m=control@m,
     reweighted = control@reweighted,
+    k2max = control@k2max, 
     otpType=control@otpType,
     control=RobEstControl(), \dots)
 }
@@ -68,6 +69,8 @@
     \item{m}{Number of non-overlaping subsets used by the trial method when the argument of \sQuote{trialmethod} is set to 'Poolm'.}
 
     \item{reweighted}{Should a (Re)weighted estimate of the covariance matrix be used in the computation of the trimmed likelihood or just a \dQuote{raw} covariance estimate; default is (Re)weighting.}
+
+    \item{k2max}{Maximal allowed l2-norm condition number for correlation matrices. Correlation matrices with condition number above k2max are considered to be numerically singular, leading to degenerate results.}
 
     \item{otpType}{The amount of output returned by fasttle. Current options are \dQuote{SetMD2andEst} (default) which returns an \sQuote{IdtSngNDRE} object with the fasttle estimates, \cr
 a vector with the final trimmed subset elements used to compute these estimates and the corresponding robust squared Mahalanobis distances, and \cr

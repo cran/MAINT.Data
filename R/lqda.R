@@ -1,4 +1,5 @@
-Ilda <- function(Conf,p,nk,prior,means,W,B,egvtol)
+#Ilda <- function(Conf,p,nk,prior,means,W,B,egvtol)
+Ilda <- function(Conf,p,nk,prior,means,W,B,egvtol,limlnk2)
 {
   N <- sum(nk)
   k <- length(nk) 
@@ -9,7 +10,8 @@ Ilda <- function(Conf,p,nk,prior,means,W,B,egvtol)
   if (prior[1]=="proportions") { prior <- nk/N }
   names(prior) <- rownames(means)
 #  Wi <- pdwt.solve(W)					
-  Wi <- pdwt.solve(W,silent=TRUE)
+#  Wi <- pdwt.solve(W,silent=TRUE)
+  Wi <- Safepdsolve(W,maxlnk2=limlnk2,scale=TRUE)
   if (is.null(Wi)) {
     warning("Ilda function received a singular matrix in the  W argument\n")
     return(NULL)
@@ -43,8 +45,10 @@ Ilda <- function(Conf,p,nk,prior,means,W,B,egvtol)
 
 setMethod("lda",
   signature(x = "IdtMxtNDE"),
-  function(x,prior="proportions",selmodel=BestModel(x),egvtol=1.0e-10,silent=FALSE,...)
+#  function(x,prior="proportions",selmodel=BestModel(x),egvtol=1.0e-10,silent=FALSE,...)
+  function(x,prior="proportions",selmodel=BestModel(x),egvtol=1.0e-10,silent=FALSE,k2max=1e6,...)
   {
+    limlnk2 <- log(k2max)
     if (!x@Hmcdt) 
     {
        if (silent)  {
@@ -70,14 +74,17 @@ setMethod("lda",
     B <- matrix(0.,nrow=p,ncol=p,dimnames=list(vnames,vnames))
     for (g in 1:k) B <- B + (nk[g]/n)*outer(mugdev[g,],mugdev[g,]) 
 
-    Ilda(Conf=selmodel,p=p,nk=nk,prior=prior,means=grpmeans,W=coef(x,selmodel)$Sigma,B=B,egvtol=egvtol,...)
+#    Ilda(Conf=selmodel,p=p,nk=nk,prior=prior,means=grpmeans,W=coef(x,selmodel)$Sigma,B=B,egvtol=egvtol,...)
+    Ilda(Conf=selmodel,p=p,nk=nk,prior=prior,means=grpmeans,W=coef(x,selmodel)$Sigma,B=B,egvtol=egvtol,limlnk2=limlnk2,...)
   }
 )
 
 setMethod("lda",
   signature(x = "IdtClMANOVA"),
-  function(x,prior="proportions",selmodel=BestModel(H1res(x)),egvtol=1.0e-10,silent=FALSE,...)
+#  function(x,prior="proportions",selmodel=BestModel(H1res(x)),egvtol=1.0e-10,silent=FALSE,...)
+  function(x,prior="proportions",selmodel=BestModel(H1res(x)),egvtol=1.0e-10,silent=FALSE,k2max=1e6,...)
   {
+    limlnk2 <- log(k2max)
     if (is.character(selmodel))  { selmodel <- sapply(selmodel,function(mod) which(mod==x@H0res@ModelNames)) }
     if (!is.finite(x@H0res@logLiks[selmodel]) || !is.finite(x@H1res@logLiks[selmodel]))
     {
@@ -87,14 +94,17 @@ setMethod("lda",
     }
     W <- coef(H1res(x),selmodel)$Sigma
     Ilda(Conf=selmodel,p=2*x@NIVar,nk=as.numeric(table(x@grouping)),prior=prior,
-      means=coef(H1res(x))$mu,W=W,B=coef(H0res(x),selmodel)$Sigma-W,egvtol=egvtol)
+#      means=coef(H1res(x))$mu,W=W,B=coef(H0res(x),selmodel)$Sigma-W,egvtol=egvtol)
+      means=coef(H1res(x))$mu,W=W,B=coef(H0res(x),selmodel)$Sigma-W,egvtol=egvtol,limlnk2=limlnk2)
   }
 )
 
 setMethod("lda",
   signature(x = "IdtLocNSNMANOVA"),
-  function(x,prior="proportions",selmodel=BestModel(H1res(x)@NMod),egvtol=1.0e-10,silent=FALSE,...)
+#  function(x,prior="proportions",selmodel=BestModel(H1res(x)@NMod),egvtol=1.0e-10,silent=FALSE,...)
+  function(x,prior="proportions",selmodel=BestModel(H1res(x)@NMod),egvtol=1.0e-10,silent=FALSE,k2max=1e6,...)
   {
+    limlnk2 <- log(k2max)
     H0res <- H0res(x)@NMod
     H1res <- H1res(x)@NMod
     if (is.character(selmodel)) { selmodel <- sapply(selmodel,function(mod) which(mod==H0res@ModelNames)) }
@@ -106,15 +116,18 @@ setMethod("lda",
      }
      W <- coef(H1res(x),selmodel)$Sigma
      Ilda(Conf=selmodel,p=2*x@NIVar,nk=as.numeric(table(x@grouping)),prior=prior,
-       means=coef(H1res)$mu,W=W,B=coef(H0res(x),selmodel)$Sigma-W,egvtol=egvtol)
+#       means=coef(H1res)$mu,W=W,B=coef(H0res(x),selmodel)$Sigma-W,egvtol=egvtol)
+       means=coef(H1res)$mu,W=W,B=coef(H0res(x),selmodel)$Sigma-W,egvtol=egvtol,limlnk2=limlnk2)
   }
 )
 
 setMethod("lda",
   signature(x = "IData"),
   function(x, grouping, prior="proportions", CVtol=1.0e-5, egvtol=1.0e-10, subset=1:nrow(x), CovCase=1:4,
-    SelCrit=c("BIC","AIC"), silent=FALSE, ...)
+#    SelCrit=c("BIC","AIC"), silent=FALSE, ...)
+    SelCrit=c("BIC","AIC"), silent=FALSE, k2max=1e6, ...)
   {
+    limlnk2 <- log(k2max)
     Config <- getConfig(...)
     if (is.null(Config))  
     {
@@ -161,7 +174,7 @@ setMethod("lda",
     for (g in 1:k) B <- B + (nk[g]/n) * outer(mugdev[g,],mugdev[g,]) 
     selmodel <- BestModel(MxtDEst)
 
-    Ilda(Conf=selmodel,p=p,nk=nk,prior=prior,means=grpmeans,W=coef(MxtDEst,selmodel)$Sigma,B=B,egvtol=egvtol,...)
+    Ilda(Conf=selmodel,p=p,nk=nk,prior=prior,means=grpmeans,W=coef(MxtDEst,selmodel)$Sigma,B=B,egvtol=egvtol,limlnk2=limlnk2,...)
   }
 )
 
@@ -180,7 +193,9 @@ setMethod("predict",
     sphdata <- newdata %*% object@scaling 
     sphmeans <- object@means %*% object@scaling 
     Mahdistovertwo <- apply(sphdata, 1, function(x) apply(sphmeans, 1, function(mu) (sum((mu-x)^2)/2)))
-    wghtdensities <- sweep(exp(-Mahdistovertwo),1,STATS=prior,FUN="*")
+#    wghtdensities <- sweep(exp(-Mahdistovertwo),1,STATS=prior,FUN="*")
+    minhlfMD2 <- apply(Mahdistovertwo,2,min)
+    wghtdensities <- sweep(exp(sweep(-Mahdistovertwo,2,minhlfMD2,"+")),1,prior,"*")
     ncnst <- apply(wghtdensities,2,sum)  			# normalizing constants
     posterior <- sweep(wghtdensities,2,STATS=ncnst,FUN="/")
     clres <- apply(posterior, 2, function(pst) return(dimnames(sphmeans)[[1]][which.max(pst)]))
@@ -198,7 +213,7 @@ setMethod("show",
   }
 )
 
-Iqda <- function(Conf,p,nk,lev,prior,means,Wg)
+Iqda <- function(Conf,p,nk,lev,prior,means,Wg,limlnk2)
 {
   N <- sum(nk)
   k <- length(nk) 
@@ -213,7 +228,13 @@ Iqda <- function(Conf,p,nk,lev,prior,means,Wg)
   {
     if (Conf != 5)
     {
-      scaling[,,g] <- backsolve(chol(Wg[,,g]),Ip)
+#      scaling[,,g] <- backsolve(chol(Wg[,,g]),Ip)
+      scalingg <- Safepdsolve(Wg[,,g],maxlnk2=limlnk2,scale=TRUE)
+      if (is.null(scalingg)) {
+        warning("Found a non positive definite within group matrix\n")
+        return(NULL) 
+      }    
+      scaling[,,g] <- scalingg
       ldet[g] <- as.numeric(determinant(Wg[,,g],logarithm=TRUE)$modulus)/2
     }  else {
       Wd <- diag(Wg[,,g])
@@ -226,8 +247,9 @@ Iqda <- function(Conf,p,nk,lev,prior,means,Wg)
 
 setMethod("qda",
   signature(x = "IdtMxtNDE"),
-  function(x,prior="proportions",selmodel=BestModel(x),silent=FALSE,...)
+  function(x,prior="proportions",selmodel=BestModel(x),silent=FALSE,k2max=1e6,...)
   {
+    limlnk2 <- log(k2max)
     if (x@Hmcdt) 
     {
        if (silent)  {
@@ -243,14 +265,15 @@ setMethod("qda",
     }
 
     Iqda(Conf=selmodel,p=2*x@NIVar,nk=as.numeric(table(x@grouping)),lev=levels(x@grouping),
-      prior=prior,means=coef(x)$mu,Wg=coef(x,selmodel)$Sigma)
+      prior=prior,means=coef(x)$mu,Wg=coef(x,selmodel)$Sigma,limlnk2=limlnk2)
   }
 )
 
 setMethod("qda",
   signature(x = "IdtHetNMANOVA"),
-  function(x, prior="proportions", selmodel=BestModel(H1res(x)),silent=FALSE, ...)
+  function(x, prior="proportions", selmodel=BestModel(H1res(x)),silent=FALSE,k2max=1e6, ...)
   {
+    limlnk2 <- log(k2max)
     if (is.character(selmodel)) { selmodel <- sapply(selmodel,function(mod) which(mod==x@H1res@ModelNames)) }
     if ( !is.finite(x@H0res@logLiks[selmodel]) || !is.finite(x@H1res@logLiks[selmodel]) )
     {
@@ -261,14 +284,15 @@ setMethod("qda",
       }
     }
     Iqda(Conf=selmodel,p=2*x@NIVar,nk=as.numeric(table(x@grouping)),lev=levels(x@grouping),
-      prior=prior,means=coef(H1res(x))$mu,Wg=coef(H1res(x),selmodel)$Sigma)
+      prior=prior,means=coef(H1res(x))$mu,Wg=coef(H1res(x),selmodel)$Sigma,limlnk2=limlnk2)
   }
 )
 
 setMethod("qda",
   signature(x = "IdtGenNSNMANOVA"),
-  function(x, prior="proportions", selmodel=BestModel(H1res(x)@NMod),silent=FALSE, ...)
+  function(x, prior="proportions", selmodel=BestModel(H1res(x)@NMod),silent=FALSE,k2max=1e6, ...)
   {
+    limlnk2 <- log(k2max)
     H0res <- H0res(x)@NMod
     H1res <- H1res(x)@NMod
     if (is.character(selmodel)) { selmodel <- sapply(selmodel,function(mod) which(mod==H1res@ModelNames)) }
@@ -281,15 +305,16 @@ setMethod("qda",
       }
     }
     Iqda(Conf=selmodel,p=2*x@NIVar,nk=as.numeric(table(x@grouping)),lev=levels(x@grouping),
-      prior=prior,means=coef(H1res)$mu,Wg=coef(H1res,selmodel)$Sigma)
+      prior=prior,means=coef(H1res)$mu,Wg=coef(H1res,selmodel)$Sigma,limlnk2=limlnk2)
   }
 )
 
 setMethod("qda",
   signature(x = "IData"),
   function(x, grouping, prior="proportions", CVtol=1.0e-5, subset=1:nrow(x),
-    CovCase=1:4, SelCrit=c("BIC","AIC"), silent=FALSE, ...)
+    CovCase=1:4, SelCrit=c("BIC","AIC"), silent=FALSE, k2max=1e6, ...)
   {
+    limlnk2 <- log(k2max)
     SelCrit <- match.arg(SelCrit)
     if (x@NIVar==2) CovCase <- q1CovCase(CovCase) 
 
@@ -306,7 +331,6 @@ setMethod("qda",
       Config <- q1Config(Config)
     }  
 
-#    if (length(subset) < nrow(x))
     if (length(subset) < x@NObs)
     {
       x <- x[subset,]
@@ -328,7 +352,7 @@ setMethod("qda",
     selmodel <- BestModel(MxtDEst)
 
     Iqda(Conf=selmodel,p=2*x@NIVar,nk=as.numeric(table(grouping)),lev=grplvls,
-      prior=prior,means=coef(MxtDEst)$mu,Wg=coef(MxtDEst,selmodel)$Sigma)
+      prior=prior,means=coef(MxtDEst)$mu,Wg=coef(MxtDEst,selmodel)$Sigma,limlnk2=limlnk2)
   }
 )
 
@@ -349,7 +373,10 @@ setMethod("predict",
       sphmeang <- object@means[g,] %*% object@scaling[,,g]
       Mahdistovertwo[g,] <- apply(sphdata, 1, function(x) sum((x-sphmeang)^2)/2)
     } 
-    wghtdensities <- sweep(exp(sweep(-Mahdistovertwo,1,STATS=object@ldet,FUN="-")),1,STATS=prior,FUN="*")
+#    wghtdensities <- sweep(exp(sweep(-Mahdistovertwo,1,STATS=object@ldet,FUN="-")),1,STATS=prior,FUN="*")
+    minhlfMD2 <- apply(Mahdistovertwo,2,min)
+    nrmhlfMD2 <- sweep(Mahdistovertwo,2,minhlfMD2)
+    wghtdensities <- sweep(exp(sweep(-nrmhlfMD2,1,object@ldet-minhlfMD2)),1,prior,"*")
     ncnst <- apply(wghtdensities,2,sum)  			# normalizing constants
     posterior <- sweep(wghtdensities,2,STATS=ncnst,FUN="/")
     NAind <- which(apply(posterior,2,function(x) any(!is.finite(x))))

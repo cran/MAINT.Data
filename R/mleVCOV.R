@@ -1,4 +1,5 @@
-mleVCov <- function(mlegrad)  # Gets the Var-Cov of maximum likelihood estimators by the outer-gradient approximation
+#mleVCov <- function(mlegrad)  # Gets the Var-Cov of maximum likelihood estimators by the outer-gradient approximation
+mleVCov <- function(mlegrad,limlnk2)  # Gets the Var-Cov of maximum likelihood estimators by the outer-gradient approximation
 
 #  Arguments:
 
@@ -12,7 +13,8 @@ mleVCov <- function(mlegrad)  # Gets the Var-Cov of maximum likelihood estimator
   OtProd <- apply(mlegrad,1,function(v) outer(v,v))
   dim(OtProd) <- c(npar,npar,nrow(mlegrad))
   NegHessAp <- matrix(apply(OtProd,c(1,2),sum),nrow=npar,ncol=npar,byrow=FALSE)
-  pdwt.solve(NegHessAp,silent=TRUE)
+#  pdwt.solve(NegHessAp,silent=TRUE)
+  Safepdsolve(NegHessAp,maxlnk2=limlnk2,scale=TRUE)
 }
 
 NmleVCov <- function(nk,p,SigmaE,k=1,grpnames=NULL)  # Gets the Var-Cov of maximum likelihood estimators for Gaussian models

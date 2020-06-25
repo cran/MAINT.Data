@@ -3,18 +3,24 @@ getConfig <- function(Config=NULL,...) Config
 setMethod("mle",
   signature(Idt = "IData"),
   function(Idt,Model=c("Normal","SKNormal","NrmandSKN"),CovCase=1:4,
-  SelCrit=c("BIC","AIC"), OptCntrl=list(),...)
+  SelCrit=c("BIC","AIC"), k2max=1e6, OptCntrl=list(),...)
   {
     Model <- match.arg(Model)
     SelCrit <- match.arg(SelCrit)
+    q <- Idt@NIVar
+    p <- 2*q
+    n <- Idt@NObs
+    limlnk2 <- log(k2max)
 
     Config <- getConfig(...)
     if (is.null(Config))  
     {
       Config <- ifelse(CovCase==1,1,CovCase+1)
       CovCaseArg <- TRUE
+      CovCaseMap <- c(1,NA,2,3,4)
     } else {
       CovCaseArg <- FALSE
+      CovCaseMap <- 1:5
     }	
     if (Idt@NIVar==1) {
       CovCase <- q1CovCase(CovCase) 
@@ -24,12 +30,32 @@ setMethod("mle",
       Nres <- IdtNmle(Idt,OptCntrl=OptCntrl,CovCaseArg=CovCaseArg,Config=Config,SelCrit=SelCrit)
     }
     if (Model!="Normal") { 
-      SNres <- IdtSNmle(Idt,OptCntrl=OptCntrl,CovCaseArg=CovCaseArg,Config=Config,SelCrit=SelCrit)
+      SNres <- IdtSNmle(Idt,OptCntrl=OptCntrl,limlnk2=limlnk2,CovCaseArg=CovCaseArg,Config=Config,SelCrit=SelCrit)
     }
     if (Model=="Normal") { return(Nres) }
     if (Model=="SKNormal") { return(SNres) }
     if (Model=="NrmandSKN")
     {
+
+      Xscld <- NULL 
+      for (Conf in Config) {
+        CvCase <- CovCaseMap[Conf]
+        if (SNres@logLiks[CvCase] < Nres@logLiks[CvCase]) {
+          if (is.null(Xscld)) {
+            Xscld <- scale(cbind(Idt@MidP,Idt@LogR))
+            Xmean <- attr(Xscld,"scaled:center")  
+            Xsd <- attr(Xscld,"scaled:scale")  
+            XsdOutPrd <- outer(Xsd,Xsd)
+            lglikdif <- -n*sum(log(Xsd))		# difference between the log-likelihoods for the original and standardized data  
+          } 
+          SNres@CovConfCases[[CvCase]] <- CorrSNSol(Nres,SNres,CvCase,Conf,Xscld,Xmean,Xsd,XsdOutPrd,lglikdif,limlnk2,OptCntrl)
+          SNres@logLiks[CvCase] <- LogLik <- SNres@CovConfCases[[CvCase]]$logLik
+          nfreepar <- SKnpar(Conf,p,q)
+          SNres@AICs[CvCase] <- -2*LogLik + 2*nfreepar
+          SNres@BICs[CvCase] <- -2*LogLik + log(n)*nfreepar
+        }
+      }
+
       AICs <- c(Nres@AICs,SNres@AICs)
       BICs <- c(Nres@BICs,SNres@BICs)    			
       if (SelCrit=="AIC") {
@@ -49,10 +75,11 @@ setMethod("mle",
 setMethod("MANOVA",
   signature(Idt = "IData"),
   function(Idt, grouping, Model=c("Normal","SKNormal","NrmandSKN"), CovCase=1:4,
-    SelCrit=c("BIC","AIC"), Mxt=c("Hom","Het","Loc","Gen"), CVtol=1.0e-5, 
+    SelCrit=c("BIC","AIC"), Mxt=c("Hom","Het","Loc","Gen"), CVtol=1.0e-5, k2max=1e6, 
     OptCntrl=list(), onerror=c("stop","warning","silentNull"), ...)
   {
     onerror <- match.arg(onerror)
+    limlnk2 <- log(k2max)
     if (!is.factor(grouping)) { return(error(onerror,"'grouping' is not a factor\n")) }
     if ( Idt@NObs != length(grouping)) { 
       return(error(onerror,"The numbers of data and partition observations are different\n"))
@@ -68,8 +95,10 @@ setMethod("MANOVA",
     {
       Config <- ifelse(CovCase==1,1,CovCase+1)
       CovCaseArg <- TRUE	
+      CovCaseMap <- c(1,NA,2,3,4)
     } else {  
       CovCaseArg <- FALSE
+      CovCaseMap <- 1:5
     }	
     if (Idt@NIVar==1) {
       CovCase <- q1CovCase(CovCase) 
@@ -79,7 +108,8 @@ setMethod("MANOVA",
     grouping <- factor(grouping,exclude=NULL)
     nk <- as.numeric(table(grouping))
     q <- Idt@NIVar 
-    p <- 2*q 
+    p <- 2*q
+    n <- Idt@NObs 
     k <- length(nk) 
     if (k==1) {
       return( error(onerror,
@@ -89,30 +119,50 @@ setMethod("MANOVA",
     if (length(H0res@BestModel)==0) {
       return( error(onerror,"Procedure MANOVA failed to find a valid null model mle estimate\n") )
     }
+
     if (Model=="Normal" && (Mxt=="Hom" || Mxt=="Loc") ) {  
       H1res <- IdtNmle(Idt,grouping,Type="HomMxt",CVtol=CVtol,
         OptCntrl=OptCntrl,CovCaseArg=CovCaseArg,Config=Config,SelCrit=SelCrit)
     }  else if (Model=="SKNormal" && (Mxt=="Hom" || Mxt=="Loc") )  {  
-      H1res <- IdtSNmle(Idt,grouping,Type="HomMxt",CVtol=CVtol,
+      H1res <- IdtSNmle(Idt,grouping,Type="HomMxt",CVtol=CVtol,limlnk2=limlnk2,
         OptCntrl=OptCntrl,CovCaseArg=CovCaseArg,Config=Config,SelCrit=SelCrit)
     }  else if (Model=="Normal" && (Mxt=="Het" || Mxt=="Gen") ) { 
       H1res <- IdtHetMxtNmle(Idt,grouping,CVtol=CVtol,
         OptCntrl=OptCntrl,CovCaseArg=CovCaseArg,Config=Config,SelCrit=SelCrit)
     }  else if (Model=="SKNormal" && (Mxt=="Het" || Mxt=="Gen") ) { 
-      H1res <- IdtFDMxtSNmle(Idt,grouping,CVtol=CVtol,
+      H1res <- IdtFDMxtSNmle(Idt,grouping,CVtol=CVtol,limlnk2=limlnk2,
         OptCntrl=OptCntrl,CovCaseArg=CovCaseArg,Config=Config,SelCrit=SelCrit)
+
     }  else if (Model=="NrmandSKN")  {
       if (Mxt=="Hom" || Mxt=="Loc")  {
         NH1res <- IdtNmle(Idt,grouping,Type="HomMxt",CVtol=CVtol,
           OptCntrl=OptCntrl,CovCaseArg=CovCaseArg,Config=Config,SelCrit=SelCrit)
-        SNH1res <- IdtSNmle(Idt,grouping,Type="HomMxt",CVtol=CVtol,
+        SNH1res <- IdtSNmle(Idt,grouping,Type="HomMxt",CVtol=CVtol,limlnk2=limlnk2,
           OptCntrl=OptCntrl,CovCaseArg=CovCaseArg,Config=Config,SelCrit=SelCrit)
       } else if (Mxt=="Het" || Mxt=="Gen")  {
         NH1res <- IdtHetMxtNmle(Idt,grouping,CVtol=CVtol,
           OptCntrl=OptCntrl,CovCaseArg=CovCaseArg,Config=Config,SelCrit=SelCrit)
-        SNH1res <- IdtFDMxtSNmle(Idt,grouping,CVtol=CVtol,
+        SNH1res <- IdtFDMxtSNmle(Idt,grouping,CVtol=CVtol,limlnk2=limlnk2,
           OptCntrl=OptCntrl,CovCaseArg=CovCaseArg,Config=Config,SelCrit=SelCrit)
       } 
+      Xscld <- NULL 
+      for (Conf in Config) {
+        CvCase <- CovCaseMap[Conf]
+        if (SNH1res@logLiks[CvCase] < NH1res@logLiks[CvCase]) {
+          if (is.null(Xscld)) {
+            Xscld <- scale(cbind(Idt@MidP,Idt@LogR))
+            Xmean <- attr(Xscld,"scaled:center")  
+            Xsd <- attr(Xscld,"scaled:scale")  
+            XsdOutPrd <- outer(Xsd,Xsd)
+            lglikdif <- -n*sum(log(Xsd))		# difference between the log-likelihoods for the original and standardized data  
+          } 
+          SNH1res@CovConfCases[[CvCase]] <- CorrHetSNSol(NH1res,SNH1res,CvCase,Conf,Xscld,Xmean,Xsd,XsdOutPrd,grouping,Mxt,lglikdif,limlnk2,OptCntrl)
+          SNH1res@logLiks[CvCase] <- LogLik <- SNH1res@CovConfCases[[CvCase]]$logLik
+          nfreepar <- SKnpar(Conf,p,q)
+          SNH1res@AICs[CvCase] <- -2*LogLik + 2*nfreepar
+          SNH1res@BICs[CvCase] <- -2*LogLik + log(n)*nfreepar
+        }
+      }
       AICs <- c(NH1res@AICs,SNH1res@AICs)
       BICs <- c(NH1res@BICs,SNH1res@BICs)    			
       if (SelCrit=="AIC") { 
@@ -125,6 +175,7 @@ setMethod("MANOVA",
         ModelConfig=c(NH1res@ModelConfig,SNH1res@ModelConfig),SelCrit=SelCrit,NIVar=Idt@NIVar,
 	logLiks=c(NH1res@logLiks,SNH1res@logLiks),AICs=AICs,BICs=BICs,BestModel=bestmod,SngD=FALSE,Ngrps=k)  
     }
+
     if (length(H1res@BestModel)==0)  { 
       return(error(onerror,"Procedure MANOVA failed to find a valid alternative model mle estimate\n"))
     }
@@ -227,6 +278,7 @@ setMethod("summary",
     }
     cat("Selected model:\n")
     print(names(object@BestModel))
+    invisible()
   }
 )
 
@@ -237,6 +289,7 @@ setMethod("show",
     summary(object)
     cat("\nSelected model parameter estimates:\n")
     print(coef(object))
+    invisible()
   }
 )
 
@@ -441,6 +494,7 @@ setMethod("show",
         print(object@TestRes[[i]])
       }
     }
+    invisible()
   }
 )
 
@@ -463,10 +517,8 @@ setMethod("coef",
   signature(object = "IdtNDE"),
   function(object,selmodel=BestModel(object),...)
   {
-#    if (class(object)=="IdtSngNDE" || class(object)=="IdtMxNDE")  {
     if (class(object)[1]=="IdtSngNDE" || class(object)[1]=="IdtMxNDE")  {
       return(list(mu=object@mleNmuE,Sigma=object@CovConfCases[[selmodel]]$mleSigE))
-#    } else if (class(object)=="IdtSngNDRE" || class(object)=="IdtMxNDRE")  {
     } else if (class(object)[1]=="IdtSngNDRE" || class(object)[1]=="IdtMxNDRE")  {
       return(list(mu=object@RobNmuE,Sigma=object@CovConfCases[[selmodel]]$RobSigE))
     }
@@ -554,6 +606,7 @@ setMethod("show",
     cat("Chi-squared statistic:",object@ChiSq,"\n")
     cat("degrees of freedom:",object@df,"\n")
     cat("p-value:",object@pvalue,"\n\n")
+    invisible()
   }
 )
 
@@ -587,6 +640,7 @@ setMethod("summary",
           "Alternatively, consider using the permutation test implemented in function MANOVAPermTest.\n",
           "Note that this may take a long time.\n")
     } 
+    invisible()
   }
 )
 

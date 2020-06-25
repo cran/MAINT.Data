@@ -45,13 +45,15 @@ rghtD <- function(vecM,p,ncols=p*(p+1)/2)
   matrix(tmpM[row(tmpM)>=col(tmpM)],1,ncols)
 }         
 
-OmgInv.grad <- function(x,p)
+#OmgInv.grad <- function(x,p)
+OmgInv.grad <- function(x,p,limlnk2)
 {
   Omega <- matrix(nrow=p,ncol=p)
   Omega[lower.tri(Omega,diag=TRUE)] <- x
   Omega[upper.tri(Omega)] <- t(Omega)[upper.tri(Omega)] 
 #  OmegaI <- pdwt.solve(Omega)
-  OmegaI <- pdwt.solve(Omega, silent=TRUE)
+#  OmegaI <- pdwt.solve(Omega, silent=TRUE)
+  OmegaI <- Safepdsolve(Omega,maxlnk2=limlnk2,scale=TRUE)
   if(is.null(OmegaI)) {
     warning("Singular Omega matix found in the course of the mle estimation\n")
     return(matrix(0.,nrow=nvcovpar,ncol=nvcovpar)) 
@@ -69,7 +71,8 @@ OmgInv.grad <- function(x,p)
   Jacob  
 }
 
-Theta.ll.grad <-function(ksi,Omega,eta,y,n,p,OmegaInv)
+#Theta.ll.grad <-function(ksi,Omega,eta,y,n,p,OmegaInv)
+Theta.ll.grad <-function(ksi,Omega,eta,y,n,p,OmegaInv,limlnk2)
 {
   logDet <- attr(OmegaInv,"log.det")
   if (is.matrix(y)) {
@@ -83,7 +86,7 @@ Theta.ll.grad <-function(ksi,Omega,eta,y,n,p,OmegaInv)
   diag(nOmgminusS0) <- diag(nOmgminusS0)/2 
   OmegaInvgrad <- nOmgminusS0[lower.tri(nOmgminusS0,diag=TRUE)] 
   Omegapar <- Omega[lower.tri(Omega,diag=TRUE)]
-  Omegagrad <-  drop( OmegaInvgrad %*% OmgInv.grad(Omegapar,p) )
+  Omegagrad <-  drop( OmegaInvgrad %*% OmgInv.grad(Omegapar,p,limlnk2) )
   if (is.matrix(y0)) {
     ksigrad <- drop( OmegaInv%*%matrix(apply(y0,2,sum),p,1) - 
                        sum(sapply(y0%*%eta,zeta1))*eta )
@@ -97,7 +100,7 @@ Theta.ll.grad <-function(ksi,Omega,eta,y,n,p,OmegaInv)
 }
 
 msnDP.ll.grad <-function(param,y,n=ifelse(is.matrix(y),nrow(y),1),
-                    p=ifelse(is.matrix(y),ncol(y),length(y)))
+                    p=ifelse(is.matrix(y),ncol(y),length(y)),limlnk2)
 {
   nvcovpar <- p*(p+1)/2
   ksi <- param[1:p]
@@ -108,12 +111,14 @@ msnDP.ll.grad <-function(param,y,n=ifelse(is.matrix(y),nrow(y),1),
   alpha <- param[p+nvcovpar+1:p]
   eta <- alpha/omega
 #  Thetagrad <- Theta.ll.grad(ksi,Omega,eta,y,n,p,pdwt.solve(Omega,log.det=TRUE))
-  OmegaI <- pdwt.solve(Omega, silent=TRUE, log.det=TRUE)
+  OmegaI <- Safepdsolve(Omega,maxlnk2=limlnk2,scale=TRUE)
   if(is.null(OmegaI)) {
     warning("Singular Omega matix found in the course of the mle estimation\n")
     return(rep(0.,2*p+nvcovpar)) 
-  }  
-  Thetagrad <- Theta.ll.grad(ksi,Omega,eta,y,n,p,OmegaI)
+  } else {  
+    attr(OmegaI,"log.det") <- determinant(Omega,logarithm=TRUE)$modulus
+  }
+  Thetagrad <- Theta.ll.grad(ksi,Omega,eta,y,n,p,OmegaI,limlnk2=limlnk2)
   etagrad <- Thetagrad[(p+nvcovpar+1):(2*p+nvcovpar)]
   alphagrad <- etagrad/omega
   Omegagrad <- Thetagrad[(p+1):(p+nvcovpar)]
@@ -129,7 +134,8 @@ zeta1 <- function(x) zeta(1,x)
 
 msnCP.ll.grad <-function(param,y,n=ifelse(is.matrix(y),nrow(y),1),
   p=ifelse(is.matrix(y),ncol(y),length(y)),inoptm=TRUE,
-  PenF=1E12,ldRtol=log(1E-5)+1-p,c2tol=1E-6)
+#  PenF=1E12,ldRtol=log(1E-5)+1-p,c2tol=1E-6)
+  PenF=1E12,ldRtol=log(1E-5)+1-p,c2tol=1E-6,limlnk2)
 {
   if ( (is.matrix(y) && p!=ncol(y)) || (!is.matrix(y) && p!=length(y)) ) 
   {
@@ -147,16 +153,17 @@ msnCP.ll.grad <-function(param,y,n=ifelse(is.matrix(y),nrow(y),1),
   DPll.grad(intres$ksi,intres$Omega,intres$eta,intres$OmegaInv,
     intres$nvcovpar,intres$penaltygrad,
     intres$D23,intres$D32,intres$D33,intres$Dtld32,intres$Dtld33,
-    y,n,p,PenF,ldRtol,c2tol)
+    y,n,p,PenF,ldRtol,c2tol,limlnk2=limlnk2)
 }
 
 CPtoDP.ll.grad <-function(mu,Sigma,gamma1,p,inoptm=FALSE,PenF=0.,
- ldRtol=log(1e-5)+1-p,c2tol=1e-6,beta0tol=1e-6)
+# ldRtol=log(1e-5)+1-p,c2tol=1e-6,beta0tol=1e-6,limlnk2)
+ ldRtol=-500,c2tol=1e-6,beta0tol=1e-6,limlnk2)
 {
   nvcovpar <- p*(p+1)/2
   sigma <- sqrt(diag(Sigma))
   mu0 <- sign(gamma1)*sigma*(b0*abs(gamma1))^(1/3)
-  SigmaI <- pdwt.solve(Sigma,silent=TRUE,log.det=TRUE)
+  SigmaI <- Safepdsolve(Sigma,maxlnk2=limlnk2,scale=TRUE)
   if (is.null(SigmaI))  {
     if (inoptm)  
     {
@@ -165,6 +172,8 @@ CPtoDP.ll.grad <-function(mu,Sigma,gamma1,p,inoptm=FALSE,PenF=0.,
     }  else {
       return(NULL)
     }  
+  } else {  
+    attr(SigmaI,"log.det") <- determinant(Sigma,logarithm=TRUE)$modulus
   }
   lRdet <- attr(SigmaI,"log.det") - sum(log(diag(Sigma))) 
   if (lRdet < ldRtol)
@@ -204,8 +213,8 @@ CPtoDP.ll.grad <-function(mu,Sigma,gamma1,p,inoptm=FALSE,PenF=0.,
 
   ksi <- mu - mu0 
   Omega <- Sigma + outer(mu0,mu0) 
-  OmegaInv <- pdwt.solve(Omega,silent=TRUE,log.det=TRUE)
-  b2 <- b^2
+#  OmegaInv <- pdwt.solve(Omega,silent=TRUE,log.det=TRUE)
+  OmegaInv <- Safepdsolve(Omega,maxlnk2=limlnk2,scale=TRUE)
   if (is.null(OmegaInv)) {
     if (inoptm)  
     {
@@ -214,7 +223,10 @@ CPtoDP.ll.grad <-function(mu,Sigma,gamma1,p,inoptm=FALSE,PenF=0.,
     }  else {
       return(NULL)
     }  
+  } else {  
+    attr(OmegaInv,"log.det") <- determinant(Omega,logarithm=TRUE)$modulus
   }
+  b2 <- b^2
   omega <- sqrt(diag(Omega))
   delta <- mu0/(b*omega)
   sclMat <- 1./outer(omega,omega)
@@ -264,9 +276,11 @@ DPll.grad <- function(ksi,Omega,eta,OmegaInv,nvcovpar,penaltygrad,
   D23,D32,D33,Dtld32,Dtld33,
   y,n=ifelse(is.matrix(y),nrow(y),1),
   p=ifelse(is.matrix(y),ncol(y),length(y)),inoptm=FALSE,
-  PenF=0.,ldRtol=log(1E-5)+1-p,c2tol=1E-6)
+#  PenF=0.,ldRtol=log(1E-5)+1-p,c2tol=1E-6)
+  PenF=0.,ldRtol=log(1E-5)+1-p,c2tol=1E-6,limlnk2)
 {
-  Thetagrad <- Theta.ll.grad(ksi,Omega,eta,y,n,p,OmegaInv)
+#  Thetagrad <- Theta.ll.grad(ksi,Omega,eta,y,n,p,OmegaInv)
+  Thetagrad <- Theta.ll.grad(ksi,Omega,eta,y,n,p,OmegaInv,limlnk2=limlnk2)
   mugrad <- Thetagrad[1:p] 
   Omegagrad <- Thetagrad[(p+1):(p+nvcovpar)]
   etagrad <- Thetagrad[(p+nvcovpar+1):(2*p+nvcovpar)]

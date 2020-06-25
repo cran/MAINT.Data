@@ -12,7 +12,6 @@ pdwt.solve <- function(x, silent=FALSE, log.det=FALSE, onlylogdet=FALSE, symtol=
   if(maxsymdif > symtol) if(silent) return (NULL) else stop("x appears to be not symmetric") 
   if (maxsymdif > 0.) x <- (x + t(x))/2
   u <- try(chol(x, pivot = FALSE), silent = silent)
-#  if(class(u) == "try-error") if(silent) return(NULL) else stop("x appears to be not positive definite")
   if(class(u)[1] == "try-error") if(silent) return(NULL) else stop("x appears to be not positive definite")
   if(log.det || onlylogdet) logdet <- 2*sum(log(diag(u)))
   if(onlylogdet) return(logdet)

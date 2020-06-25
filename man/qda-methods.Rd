@@ -13,16 +13,16 @@
 
 \usage{
 \S4method{qda}{IData}( x, grouping, prior="proportions", CVtol=1.0e-5, subset=1:nrow(x),
-  CovCase=1:4, SelCrit=c("BIC","AIC"), silent=FALSE, \dots )
+  CovCase=1:4, SelCrit=c("BIC","AIC"), silent=FALSE, k2max=1e6, \dots )
 
 \S4method{qda}{IdtMxtNDE}(x, prior="proportions", selmodel=BestModel(x), silent=FALSE, 
-  \dots )
+  k2max=1e6, \dots )
 
 \S4method{qda}{IdtHetNMANOVA}( x, prior="proportions", selmodel=BestModel(H1res(x)), 
-  silent=FALSE, \dots )
+  silent=FALSE, k2max=1e6, \dots )
 
 \S4method{qda}{IdtGenNSNMANOVA}( x, prior="proportions", 
-  selmodel=BestModel(H1res(x)@NMod), silent=FALSE, \dots )
+  selmodel=BestModel(H1res(x)@NMod), silent=FALSE, k2max=1e6, \dots )
 }
 
 \arguments{
@@ -44,7 +44,9 @@ present, the probabilities should be specified in the order of the factor levels
 
   \item{silent}{A boolean flag indicating wether a warning message should be printed if the method fails.}
  
-   \item{selmodel}{Selected model from a list of candidate models saved in object x.}
+  \item{selmodel}{Selected model from a list of candidate models saved in object x.}
+
+  \item{k2max}{Maximal allowed l2-norm condition number for correlation matrices. Correlation matrices with condition number above k2max are considered to be numerically singular, leading to degenerate results.}
 
   \item{\dots}{Other named arguments.}
 }

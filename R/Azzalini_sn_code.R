@@ -10,7 +10,8 @@ mymsn.mle <-function( param, y, x=rep(1,nrow(y)), w=rep(1,nrow(y)), trace=FALSE,
 			p=ifelse(is.matrix(y),ncol(y),1), 
 			lbound=c(rep(-Inf,length(param))),
 			ubound=c(rep(Inf,length(param))), 
-			control=list(), ...
+#			control=list(), ...
+			limlnk2, control=list(), ...
                     )
 {
 #  if (is.null(param)) return(NULL)
@@ -26,7 +27,8 @@ mymsn.mle <-function( param, y, x=rep(1,nrow(y)), w=rep(1,nrow(y)), trace=FALSE,
     fit0  <- lm.wfit(x, y, w, method="qr")
     beta  <- as.matrix(coef(fit0))
     res   <- resid(fit0)
-    a     <- msn.moment.fit(res)
+#    a     <- msn.moment.fit(res)
+    a     <- msn.moment.fit(res,limlnk2=limlnk2)
     Omega <- a$Omega
     omega <- a$omega
     alpha <- a$alpha
@@ -43,14 +45,16 @@ mymsn.mle <-function( param, y, x=rep(1,nrow(y)), w=rep(1,nrow(y)), trace=FALSE,
   dev <- mymsn.dev(param, x, y, w)    
   if(opt.method == "nlminb")
   {
-    opt <- nlminb(param, mymsn.dev, mymsn.dev.grad, control=control, 
+#    opt <- nlminb(param, mymsn.dev, mymsn.dev.grad, control=control, 
+    opt <- nlminb(param, mymsn.dev, mymsn.dev.grad, control=control, limlnk2=limlnk2, 
       x=x, y=y, w=w, trace=trace, lower=lbound, upper=ubound)
 
     opt$value <- opt$objective 
     opt$objective <- NULL
 
   }  else  {
-    opt <- optim(param, fn=mymsn.dev, gr=mymsn.dev.grad, method=opt.method, control=control,
+#    opt <- optim(param, fn=mymsn.dev, gr=mymsn.dev.grad, method=opt.method, control=control,
+    opt <- optim(param, fn=mymsn.dev, gr=mymsn.dev.grad, method=opt.method, control=control, limlnk2=limlnk2,
       x=x, y=y, w=w, trace=trace, lower=lbound, upper=ubound)
  } 
   if(trace)
@@ -63,7 +67,8 @@ mymsn.mle <-function( param, y, x=rep(1,nrow(y)), w=rep(1,nrow(y)), trace=FALSE,
   opt
 }
 
-mymsn.dev <- function(param, x, y, w=rep(1,nrow(y)), trace=FALSE)
+#mymsn.dev <- function(param, x, y, w=rep(1,nrow(y)), trace=FALSE)
+mymsn.dev <- function(param, x, y, w=rep(1,nrow(y)), limlnk2, trace=FALSE)
 {
   d <- ncol(y)
   n <- sum(w)
@@ -89,7 +94,8 @@ mymsn.dev <- function(param, x, y, w=rep(1,nrow(y)), trace=FALSE)
   dev
 }
 
-mymsn.dev.grad <- function(param, x, y, w, trace=FALSE)
+#mymsn.dev.grad <- function(param, x, y, w, trace=FALSE)
+mymsn.dev.grad <- function(param, x, y, w, limlnk2, trace=FALSE)
 {
   d <- ncol(y)
   if(missing(w)) w <- rep(1,nrow(y))
@@ -102,7 +108,8 @@ mymsn.dev.grad <- function(param, x, y, w, trace=FALSE)
   if (!all(is.finite(Omega)))        # my (PDS) addition  - original Azzalini code does not handle
     { return(rep(0., p*d+d)) }       # the possibility that an infinite Omega is found along the optimization search
   p1 <- zeta(1,as.vector(y0 %*% eta)) * w
-  Omega.inv <- pdwt.solve(Omega, silent=TRUE)
+#  Omega.inv <- pdwt.solve(Omega, silent=TRUE)
+  Omega.inv <- Safepdsolve(Omega,maxlnk2=limlnk2,scale=TRUE)
   if(is.null(Omega.inv)) return(rep(0., p*d+d))  # my (PDS) addition  - original Azzalini returned NA instead of 0. 
   Dbeta <- (t(x) %*% (y0*w) %*% Omega.inv - outer(as.vector(t(x) %*% p1), eta))
   Deta <- as.vector(t(y0) %*% p1)
@@ -113,7 +120,8 @@ mymsn.dev.grad <- function(param, x, y, w, trace=FALSE)
 }
 
 #msn.moment.fit <- function(y)
-msn.moment.fit <- function(y,singtodiag=TRUE)
+#msn.moment.fit <- function(y,singtodiag=TRUE)
+msn.moment.fit <- function(y, limlnk2, singtodiag=TRUE)
 {# 31-12-1997: simple fit of MSN distribution usign moments
   y     <- as.matrix(y)
   k     <- ncol(y)
@@ -135,20 +143,14 @@ msn.moment.fit <- function(y,singtodiag=TRUE)
   Omega <- var.y + outer(omega*m.z, omega*m.z) 
   xi    <- m.y-omega*m.z
   O.cor <- cov2cor(Omega)
-#cat("n = ",nrow(y),"p =",ncol(y),"var.y =\n"); print(var.y) 
-#cat("omega*m.z = ",omega*m.z,"\nouter(omega*m.z, omega*m.z) =\n"); print(outer(omega*m.z, omega*m.z)) 
-#Oomzegval <- eigen(outer(omega*m.z,omega*m.z),only.values=TRUE)$values
-#cat("Oomzegval =",Oomzegval,"\n")
-cat("O.cor =\n") ; print(O.cor) 
-Oegval <- eigen(O.cor,only.values=TRUE)$values
-cat("O.eval =",Oegval,"\n")
+#Oegval <- eigen(O.cor,only.values=TRUE)$values
 #  O.inv <- pdwt.solve(O.cor)
-  O.inv <- pdwt.solve(O.cor,silent=TRUE)
+#  O.inv <- pdwt.solve(O.cor,silent=TRUE)
+  O.inv <- Safepdsolve(O.cor,maxlnk2=limlnk2,scale=FALSE)
   if (is.null(O.inv)) {
     if (singtodiag) O.inv <- diag(rep(1.,k))
     else return(NULL) 
   }
-cat("O.inv =\n") ; print(O.inv) 
   tmp   <- as.vector(1 - t(delta) %*% O.inv %*% delta)
   if(tmp<=0) {
     tmp <- 0.0001; admissible <- FALSE
@@ -160,8 +162,8 @@ cat("O.inv =\n") ; print(O.inv)
        delta=delta, skewness=gamma1, admissible=admissible) 
 }
 
-mydp2cpMv <- 
-function(dp, family, cp.type="proper", fixed.nu=NULL, aux=FALSE, upto=NULL) 
+#mydp2cpMv <- function(dp, family, cp.type="proper", fixed.nu=NULL, aux=FALSE, upto=NULL) 
+mydp2cpMv <- function(dp, family, limlnk2, cp.type="proper", fixed.nu=NULL, aux=FALSE, upto=NULL) 
 {# internal. NB: name of cp[1] must change according to dp[1]
   cp.type <- match.arg(cp.type, c("proper", "pseudo", "auto"))
   family <- toupper(family)
@@ -171,7 +173,8 @@ function(dp, family, cp.type="proper", fixed.nu=NULL, aux=FALSE, upto=NULL)
   {  
     if(cp.type == "pseudo") 
       warning("'cp.type=pseudo' makes no sense for SN and ESN families")
-    cp <- msn.dp2cp(dp, aux=aux)
+#    cp <- msn.dp2cp(dp, aux=aux)
+    cp <- msn.dp2cp(dp, limlnk2=limlnk2, aux=aux)
     if(!is.null(upto)) cp <- cp[1:upto]
   }
 #  if (family %in% c("SC","ST"))  # Code block turned off by me (PDS) since MAIN.Data does not use the Skew-t or the Skew-Cauchi
@@ -189,7 +192,8 @@ function(dp, family, cp.type="proper", fixed.nu=NULL, aux=FALSE, upto=NULL)
   return(cp)
 }
   
-msn.dp2cp <- function(dp, aux=FALSE)
+#msn.dp2cp <- function(dp, aux=FALSE)
+msn.dp2cp <- function(dp, limlnk2, aux=FALSE)
 {# dp2cp for multivariate SN and ESN 
   alpha <- dp$alpha
   d <- length(alpha)
@@ -220,7 +224,8 @@ msn.dp2cp <- function(dp, aux=FALSE)
     Ocor <- lot$Omega.cor
     Psi <- D %*% (Ocor-outer(delta,delta)) %*% D
     Psi <- (Psi + t(Psi))/2
-    O.inv <- pdwt.solve(Omega)
+#    O.inv <- pdwt.solve(Omega)
+    O.inv <- Safepdsolve(Omega,maxlnk2=limlnk2,scale=TRUE)
     O.pcor <- -cov2cor(O.inv) 
     O.pcor[cbind(1:d, 1:d)] <- 1
     R <- force.symmetry(Ocor + zeta(2,tau)*outer(delta,delta))
@@ -278,13 +283,15 @@ force.symmetry <- function(x, tol=10*sqrt(.Machine$double.eps))
   return((x + t(x))/2)
 }
 
-mysn.infoMv <- function(dp, x=NULL, y, w, penalty=NULL, norm2.tol=1e-5) 
+#mysn.infoMv <- function(dp, x=NULL, y, w, penalty=NULL, norm2.tol=1e-5) 
+mysn.infoMv <- function(dp, x=NULL, y, w, limlnk2, penalty=NULL, norm2.tol=1e-5) 
 {# computes observed/expected Fisher information matrix for multiv.SN variates
  # using results in Arellano-Valle & Azzalini (JMVA, 2008+erratum)
   type <- if(missing(y)) "expected" else "observed"
   if (type == "observed") { if(!is.matrix(y)) stop("y is not a matrix") }
 #  cp <- dp2cpMv(dp, "SN")        #  Original Azzalin code     
-  cp <- mydp2cpMv(dp, "SN")       #  My (PDS) version 
+#  cp <- mydp2cpMv(dp, "SN")       #  My (PDS) version 
+  cp <- mydp2cpMv(dp, limlnk2=limlnk2, "SN")       #  My (PDS) version 
   d <- length(dp$alpha)
   d2 <- d*(d+1)/2
 #  if(missing(w)) w <- rep(1, max(NROW(cbind(x,y)),1))       #  Original Azzalin code
@@ -326,7 +333,8 @@ mysn.infoMv <- function(dp, x=NULL, y, w, penalty=NULL, norm2.tol=1e-5)
   i2 <- max(i1) + 1:(d*(d+1)/2)
   i3 <- max(i2) + 1:d
   # ind <- list(i1=i1, i2=i2, i3=i3)
-  O.inv <- pdwt.solve(Omega, silent=TRUE)
+#  O.inv <- pdwt.solve(Omega, silent=TRUE)
+  O.inv <- Safepdsolve(Omega,maxlnk2=limlnk2,scale=TRUE)
   if (is.null(O.inv)) return(list(status="SingOmega"))                                                      # My (PDS) version     
   if(type == "observed"){ 
     y0 <- y - x %*% beta
@@ -404,7 +412,8 @@ mysn.infoMv <- function(dp, x=NULL, y, w, penalty=NULL, norm2.tol=1e-5)
 #    I.theta[i23, i23] <- I.theta[i23, i23] + jQ
 #  }                 
   I.theta <- force.symmetry(I.theta, tol=1e3)
-  inv_I.theta <- pdwt.solve(I.theta, silent=TRUE)
+#  inv_I.theta <- pdwt.solve(I.theta, silent=TRUE)
+  inv_I.theta <- Safepdsolve(I.theta,maxlnk2=limlnk2,scale=TRUE)
   if(is.null(inv_I.theta)) {
 #    warning("numerically unstable information matrix")         # Azzalini original code
 #     return(NULL)                                              # Azzalini original code 
@@ -432,13 +441,15 @@ mysn.infoMv <- function(dp, x=NULL, y, w, penalty=NULL, norm2.tol=1e-5)
   # psi<- c(mu, vSigma, mu0)
   Sigma <- cp$var.cov
   sigma <- sqrt(diag(Sigma))
-  Sigma.inv <- pdwt.solve(Sigma)
+#  Sigma.inv <- pdwt.solve(Sigma)
+  Sigma.inv <- Safepdsolve(Sigma,maxlnk2=limlnk2,scale=TRUE)
   mu0 <- c1* omega * Obar.alpha
   beta0.sq <- as.vector(t(mu0) %*% Sigma.inv %*% mu0)
   beta0 <- sqrt(beta0.sq)
   q1 <- 1/(c1*(1+beta0.sq))
   q2 <- 0.5*q1*(2*c1-q1)
-  Dplus <- pdwt.solve(t(D) %*% D) %*% t(D)
+#  Dplus <- pdwt.solve(t(D) %*% D) %*% t(D)
+  Dplus <- Safepdsolve(t(D) %*% D,maxlnk2=limlnk2,scale=TRUE) %*% t(D)
   D23 <- Dplus %*% (diag(d) %x% mu0 + mu0 %x% diag(d))
   a <- as.vector(Sigma.inv %*% mu0)
   D32 <- t(-a) %x% (q1 * Sigma.inv - q1*q2*outer(a,a)) %*% D
@@ -462,7 +473,8 @@ mysn.infoMv <- function(dp, x=NULL, y, w, penalty=NULL, norm2.tol=1e-5)
   jacob <- Dtheta.psi %*% Dpsi.cp
   I.cp <- t(jacob) %*% I.theta %*% jacob                          # cfr (17)
   I.cp <- if(any(is.na(I.cp))) NULL else force.symmetry(I.cp)  
-  asyvar.dp <- pdwt.solve(I.dp, silent=TRUE)
+#  asyvar.dp <- pdwt.solve(I.dp, silent=TRUE)
+  asyvar.dp <- Safepdsolve(I.dp,maxlnk2=limlnk2,scale=TRUE)
   if(is.null(asyvar.dp))  se.dp <- list(NULL) else {
     diags.dp <- sqrt(diag(asyvar.dp))
     se.beta <- matrix(diags.dp[1:(p*d)], p, d)
@@ -471,7 +483,8 @@ mysn.infoMv <- function(dp, x=NULL, y, w, penalty=NULL, norm2.tol=1e-5)
     se.alpha <- diags.dp[p*d +d2 +(1:d)]
     se.dp <- list(beta=se.beta, diagOmega=se.diagOmega, alpha=se.alpha)
     }
-  asyvar.cp <- pdwt.solve(I.cp, silent=TRUE)
+#  asyvar.cp <- pdwt.solve(I.cp, silent=TRUE)
+  asyvar.cp <- Safepdsolve(I.cp,maxlnk2=limlnk2,scale=TRUE)
   if(is.null(asyvar.cp))  se.cp <- list(NULL) else {
     diags.cp <- sqrt(diag(asyvar.cp))
     se.beta <- matrix(diags.cp[1:(p*d)], p, d)

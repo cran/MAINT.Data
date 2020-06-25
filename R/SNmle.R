@@ -95,7 +95,6 @@ setMethod("vcov",
   }
 )
 
-#setMethod("mean", signature(x = "IdtSNDE"), function(x,...) { coef(x)$mu } )
 setMethod("mean", signature(x = "IdtSNDE"), function(x) { coef(x)$mu } )
 setMethod("var", signature(x ="IdtSNDE"), function(x) { coef(x)$Sigma } )
 
@@ -149,7 +148,6 @@ setMethod("vcov",
   }
 )
 
-#setMethod("mean", signature(x = "IdtNandSNDE"), function(x,...) { coef(x)$mu } )
 setMethod("mean", signature(x = "IdtNandSNDE"), function(x) { coef(x)$mu } )
 setMethod("var", signature(x ="IdtNandSNDE"), function(x) { coef(x)$Sigma } )
 

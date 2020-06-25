@@ -1,7 +1,6 @@
 #include "tle.h"
 #include "msnCP_dev.h"
 #include "CEMGauss.h"
-// #include "tmp.h"
 
 #include <R.h>
 #include <Rinternals.h>
@@ -9,12 +8,15 @@
 #include <R_ext/Rdynload.h>
 
 static const R_CallMethodDef CallEntries[] = {
-  {"Cfasttle",       (DL_FUNC) &Cfasttle,       12},
-  {"Cfulltle",       (DL_FUNC) &Cfulltle,        6},
-  {"msnCP_dev",      (DL_FUNC) &msnCP_dev,      14},
-  {"msnCP_dev_grad", (DL_FUNC) &msnCP_dev_grad, 13},
-  {"CEMGauss",       (DL_FUNC) &CEMGauss, 13},
-//  {"tmp",            (DL_FUNC) &tmp, 6},
+//  {"Cfasttle",       (DL_FUNC) &Cfasttle,       12},
+//  {"Cfulltle",       (DL_FUNC) &Cfulltle,        6},
+//  {"msnCP_dev",      (DL_FUNC) &msnCP_dev,      14},
+//  {"msnCP_dev_grad", (DL_FUNC) &msnCP_dev_grad, 13},
+  {"Cfasttle",       (DL_FUNC) &Cfasttle,       13},
+  {"Cfulltle",       (DL_FUNC) &Cfulltle,        7},
+  {"msnCP_dev",      (DL_FUNC) &msnCP_dev,      15},
+  {"msnCP_dev_grad", (DL_FUNC) &msnCP_dev_grad, 15},
+  {"CEMGauss",       (DL_FUNC) &CEMGauss,       18},
   {NULL, NULL, 0}
 };
 

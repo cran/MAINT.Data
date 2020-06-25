@@ -30,5 +30,3 @@ ObsLik.Omegagrad <- function(Xdevi,j1,j2,alpha,Omega)
    }
    grad 
 }
-
-

@@ -19,36 +19,44 @@ setMethod("fasttle",
     trialmethod=control@trialmethod,
     m=control@m,
     reweighted = control@reweighted,
+    k2max = control@k2max,
     otpType=control@otpType,
     control=RobEstControl(), ...)
   {
-    if (alpha*Idt@NObs <= 2*Idt@NIVar) {
-      stop("The number of observations is too small and would lead to singular covariance estimates.\n")
-    }
+    limlnk2 <- log(k2max)
+
+    q <- Idt@NIVar
+    if (q==1) CovCase <- q1CovCase(CovCase) 
+    p <- 2*q 
+    n <- Idt@NObs
+
+#    if (alpha*n <= 2*q) {
+#      stop("The number of observations is too small and would lead to singular covariance estimates.\n")
+#    }
     SelCrit <- match.arg(SelCrit)
     if (!requireNamespace("robustbase",quietly=TRUE)) {
       stop("fasttle needs the robustbase package to work. Please install it.\n")
     }
     if  (getkdblstar=="Twopplusone") { 
-      kdblstar <- 2*Idt@NIVar+1
+      kdblstar <- 2*q+1
     }  else {
       if (!is.finite(getkdblstar)) {
         stop("Wrong value for argument getkdblstar\n")
       }
       kdblstar <- getkdblstar 
     }
-    q <- Idt@NIVar
-    if (q==1) CovCase <- q1CovCase(CovCase) 
     if (getalpha=="TwoStep")
     {
       X <- cbind(Idt@MidP,Idt@LogR)
       if (MD2Dist=="ChiSq") {
         fstsol <- fasttle1(Idt,CovCase,SelCrit,alpha,nsamp,ncsteps,trace,use.correction,
-          rawMD2Dist,eta,multiCmpCor,kdblstar,outlin,trialmethod,m,reweighted,otpType="OnlyEst")
+          rawMD2Dist,eta,multiCmpCor,kdblstar,outlin,trialmethod,m,reweighted,limlnk2,otpType="OnlyEst")
+        if (is.null(fstsol)) return(NULL)
         nOtls <- MDOtlDet(X,coef(fstsol)$mu,coef(fstsol)$Sigma,eta=eta,RefDist="ChiSq",multiCmpCor=multiCmpCor,otp="onlycnt")
       }  else if (MD2Dist=="CerioliBetaF") {
         fstsol <- fasttle1(Idt,CovCase,SelCrit,alpha,nsamp,ncsteps,trace,use.correction,
-          rawMD2Dist,eta,multiCmpCor,kdblstar,outlin,trialmethod,m,reweighted,otpType="SetMD2andEst")
+          rawMD2Dist,eta,multiCmpCor,kdblstar,outlin,trialmethod,m,reweighted,limlnk2,otpType="SetMD2andEst")
+        if (is.null(fstsol)) return(NULL)
         nOtls <- MDOtlDet(X,coef(fstsol)$mu,coef(fstsol)$Sigma,eta=eta,RefDist="CerioliBetaF",
           Rewind=fstsol@RewghtdSet,multiCmpCor=multiCmpCor,otp="onlycnt")
       }
@@ -67,14 +75,14 @@ setMethod("fasttle",
         if (otpType=="OnlyEst") {
            stop("otpType argument 'OnlyEst' has beed decrepated\n")
         }  else {
-          rawSet <- RewghtdSet <- 1:Idt@NObs
+          rawSet <- RewghtdSet <- 1:n
           names(rawSet) <- names(RewghtdSet) <- Idt@ObsNames
           if (outlin=="MidPandLogR") {
             RobMD2 <- GetMD2(X,coef(finalsol)$mu,coef(finalsol)$Sigma)
           } else if (outlin=="MidP") {
             RobMD2 <- GetMD2(X[,1:q],coef(finalsol)$mu[1:q],coef(finalsol)$Sigma[1:q,1:q])
           } else if (outlin=="LogR") {
-            RobMD2 <- GetMD2(X[,(q+1):(2*q)],coef(finalsol)$mu[(q+1):(2*q)],coef(finalsol)$Sigma[(q+1):(2*q),(q+1):(2*q)])
+            RobMD2 <- GetMD2(X[,(q+1):p],coef(finalsol)$mu[(q+1):p],coef(finalsol)$Sigma[(q+1):p,(q+1):p])
           } 
           for (case in 1:length(finalsol@CovConfCases)) {
             if (!is.null(finalsol@CovConfCases[[case]])) {
@@ -100,55 +108,18 @@ setMethod("fasttle",
           }  
         }
       }  
-      newalpha <- 1. - nOtls/Idt@NObs
+      newalpha <- 1. - nOtls/n
       return( fasttle1(Idt,CovCase,SelCrit,newalpha,nsamp,ncsteps,trace,use.correction,
-        rawMD2Dist,eta,multiCmpCor,kdblstar,outlin,trialmethod,m,reweighted,otpType) )
+        rawMD2Dist,eta,multiCmpCor,kdblstar,outlin,trialmethod,m,reweighted,limlnk2,otpType) )
     }  else {
       return( fasttle1(Idt,CovCase,SelCrit,alpha,nsamp,ncsteps,trace,use.correction,
-        rawMD2Dist,eta,multiCmpCor,kdblstar,outlin,trialmethod,m,reweighted,otpType) )
+        rawMD2Dist,eta,multiCmpCor,kdblstar,outlin,trialmethod,m,reweighted,limlnk2,otpType) )
     } 
   }
 )
 
-RobEstControl <- function (alpha=0.75,
-                           nsamp=500,
-                           seed=NULL,
-                           trace=FALSE,
-                           use.correction=TRUE,
-                           ncsteps=200,
-                           getalpha = "TwoStep",
-                           rawMD2Dist="ChiSq",				
-                           MD2Dist="ChiSq",
-                           eta=0.025,   
-                           multiCmpCor="never",				
-                           getkdblstar="Twopplusone",
-                           outlin="MidPandLogR",
-                           trialmethod="simple",
-                           m=1,
-                           reweighted=TRUE,
-                           otpType="SetMD2andEst")
-{
-    new("RobEstControl", alpha = alpha,
-                         nsamp = nsamp,
-                         seed = seed,
-                         trace = trace,
-                         use.correction = use.correction,
-                         ncsteps=200,
-                         getalpha = getalpha,
-                         rawMD2Dist=rawMD2Dist,				
-                         MD2Dist=MD2Dist,				
-                         eta=eta,   
-                         multiCmpCor=multiCmpCor,				
-                         getkdblstar = getkdblstar,
-                         outlin =outlin,
-                         trialmethod = trialmethod,
-                         m=m,
-                         reweighted=reweighted,
-                         otpType = otpType )
-}
-
 fasttle1 <- function(data,CovCase,SelCrit,alpha,nsamp,ncsteps,trace,use.correction,
-  rawMD2Dist,eta,multiCmpCor,kdblstar,outlin,trialmethod,m,reweighted,otpType,Vnames=NULL,...)
+  rawMD2Dist,eta,multiCmpCor,kdblstar,outlin,trialmethod,m,reweighted,limlnk2,otpType,...)
 {
   datatype <- class(data)
   if (datatype!="IData" && datatype!="matrix" && datatype!="data.frame")  {
@@ -219,6 +190,8 @@ fasttle1 <- function(data,CovCase,SelCrit,alpha,nsamp,ncsteps,trace,use.correcti
   }  
 
   k <- robustbase::h.alpha.n(alpha,n,p)
+  if (k >=n || k <= p) stop("fasttle stopped because the choice of the trimming parameter implies trimmed samples so small\n", 
+   "that the resulting covariance matrix estimates would be singular.\n")
     
   c0 <- -0.5*(p*log(2*pi))
   if (SelCrit=="BIC") {
@@ -240,12 +213,14 @@ fasttle1 <- function(data,CovCase,SelCrit,alpha,nsamp,ncsteps,trace,use.correcti
         Cftmpsol <- Rfasttle(data,kdblstar,k,nsamp,2,SelCrit,maxrefstps=ncsteps,...)
       }  else {
         Cftmpsol <- .Call( "Cfasttle", X, n, p, Poolm, m, kdblstar, k, nsamp, Cnf,
-          c0, ncsteps, ClctSt, PACKAGE = "MAINT.Data" )
-        Cftmpsol$Set <- Cftmpsol$Set + 1 # Conversion of C 0-ind convention to R 1-ind convention
-        if (datatype=="IData") {
-          names(Cftmpsol$Set) <- data@ObsNames[Cftmpsol$Set]
-        } else {
-          names(Cftmpsol$Set) <- rownames(data)[Cftmpsol$Set]
+          c0, ncsteps, limlnk2, ClctSt,  PACKAGE = "MAINT.Data" )
+        if (!is.null(Cftmpsol$Set)) {
+          Cftmpsol$Set <- Cftmpsol$Set + 1 # Conversion of C 0-ind convention to R 1-ind convention
+          if (datatype=="IData") {
+            names(Cftmpsol$Set) <- data@ObsNames[Cftmpsol$Set]
+          } else {
+            names(Cftmpsol$Set) <- rownames(data)[Cftmpsol$Set]
+          }
         }
       }
       CmpCrt <- -2*Cftmpsol$LogLik + penC*npar(Cnf,p,p/2)
@@ -267,9 +242,11 @@ fasttle1 <- function(data,CovCase,SelCrit,alpha,nsamp,ncsteps,trace,use.correcti
     {
       CvCase <- CovCaseMap[Cnf]	
       Cftmpsol <- .Call( "Cfasttle", X, n, p, Poolm, m, kdblstar, k, nsamp, CvCase,
-        c0, ncsteps, ClctSt, PACKAGE = "MAINT.Data" )
-      Cftmpsol$Set <- Cftmpsol$Set + 1 # Conversion of C 0-ind convention to R 1-ind convention
-      CmpCrt <- -2*Cftmpsol$LogLik + penC*npar(Cnf,2*p,p)
+        c0, ncsteps, limlnk2, ClctSt, PACKAGE = "MAINT.Data" )
+      if (!is.null(Cftmpsol$Set)) {
+        Cftmpsol$Set <- Cftmpsol$Set + 1 # Conversion of C 0-ind convention to R 1-ind convention
+      }
+      CmpCrt <- -2*Cftmpsol$LogLik + penC*npar(Cnf,2*p,p)    
       if (otpType=="SetMD2EstandPrfSt") {
         RepSteps[[CvCase]] <- Cftmpsol$RepSteps
         maxnSteps <- max(RepSteps[[CvCase]])
@@ -286,44 +263,62 @@ fasttle1 <- function(data,CovCase,SelCrit,alpha,nsamp,ncsteps,trace,use.correcti
   }
 
   bestSet <- bestSetbyCvC[[which.min(bestCrt)]]
-  if (datatype!="IData") { data <- IData(as.data.frame(X),"AllMidP_AllLogR",VarNames=Vnames) }
+
+  if (is.null(bestSet)) {
+    cat("The fasttle search failed to find any data subset with a valid solution,\n",
+     "probably because all corresponding correlation matrices were found to be\nnumerically singular.\n",
+    "Try to increase the value of the alpha (subset size) or k2max (maximal condition number\n",
+    "for correlation matrices) arguments, or include a more restricted covariance configuration,\n", 
+    "using the CovCase argument.\n")
+    return(NULL)
+  }
+
+  if (datatype!="IData") { data <- IData(as.data.frame(X),"AllMidP_AllLogR") }
   bestsol <- IdtNmle(data[bestSet,],CovCaseArg=CovCaseArg,Config=Config,SelCrit=SelCrit)
-  
+  for (Cnf in Config) {
+    CvCase <- CovCaseMap[Cnf]	
+    bestsol@CovConfCases[[CvCase]]$mleSigEse <- bestsol@CovConfCases[[CvCase]]$mlevcov <- NULL   
+  }  
   dhn1 <- robustbase::.MCDcons(p,k/n)
   if (use.correction) {
     dhn <- dhn1*MCDcnp2(p,n,alpha)
   } else {
     dhn <- rep(dhn1,4)
   }
+
+  raw.cov <- bestsol@CovConfCases[[bestsol@BestModel]]$mleSigE
+  if (outlin=="MidPandLogR")
+  {
+    Xdev <- scale(X,center=bestsol@mleNmuE,scale=FALSE)
+    Sigma <- raw.cov <- dhn[bestsol@BestModel] * raw.cov       
+  } else { 
+    Xdev <- scale(X,center=bestsol@mleNmuE[Vind],scale=FALSE)
+    Sigma <- rawcov[Vind,Vind] <- dhn[bestsol@BestModel] * raw.cov[Vind,Vind]
+  }
+  SigmaI <- pdwt.solve(Sigma)
+
+  RobMD2 <- apply(Xdev,1,function(x) x%*%SigmaI%*%x)
+
   if (!reweighted)  {
     if (outlin=="MidPandLogR") {
       for (Cnf in Config) {
         CvCase <- CovCaseMap[Cnf]	
-        bestsol@CovConfCases[[CvCase]]$mleSigE <- dhn[CvCase] * bestsol@CovConfCases[[CvCase]]$mleSigE
+        bestsol@CovConfCases[[CvCase]]$RobSigE <- dhn[CvCase] * bestsol@CovConfCases[[CvCase]]$mleSigE
+        bestsol@CovConfCases[[CvCase]]$mleSigE <- NULL
       }
     } else {
       for (Cnf in Config) {
-         CvCase <- CovCaseMap[Cnf]	
-         bestsol@CovConfCases[[CvCase]]$mleSigE[Vind,Vind] <- dhn[CvCase] * bestsol@CovConfCases[[CvCase]]$mleSigE[Vind,Vind]
+        CvCase <- CovCaseMap[Cnf]	
+        bestsol@CovConfCases[[CvCase]]$RobSigE <- bestsol@CovConfCases[[CvCase]]$mleSigE
+        bestsol@CovConfCases[[CvCase]]$RobSigE[Vind,Vind] <- dhn[CvCase] * bestsol@CovConfCases[[CvCase]]$mleSigE[Vind,Vind]
+        bestsol@CovConfCases[[CvCase]]$mleSigE <- NULL
       }
     }  
-    RewghtdSet <- NULL
+    RewghtdSet <- bestSet
+    raw.cnp2 <- cnp2 <- c(dhn1,dhn[CvCase]/dhn1)
+    names(cnp2) <- names(raw.cnp2) <- NULL 
   } else {
-    raw.cov <- bestsol@CovConfCases[[bestsol@BestModel]]$mleSigE
-    for (Cnf in Config) {
-      bestsol@CovConfCases[[CovCaseMap[Cnf]]]$mleSigE <- NULL
-    }
-    if (outlin=="MidPandLogR")
-    {
-      Xdev <- scale(X,center=bestsol@mleNmuE,scale=FALSE)
-      Sigma <- raw.cov <- dhn[bestsol@BestModel] * raw.cov       
-    } else { 
-      Xdev <- scale(X,center=bestsol@mleNmuE[Vind],scale=FALSE)
-      Sigma <- raw.cov[Vind,Vind] <- dhn[bestsol@BestModel] * raw.cov[Vind,Vind]
-    }
-    SigmaI <- pdwt.solve(Sigma)
-    RobMD2 <- apply(Xdev,1,function(x) x%*%SigmaI%*%x)
-
+    for (Cnf in Config) bestsol@CovConfCases[[CovCaseMap[Cnf]]]$mleSigE <- NULL
     oneminuseta <- 1-eta
     if (multiCmpCor=="always" || multiCmpCor=="iterstep") {
       oneminusalpha <- oneminuseta^(1/n)
@@ -356,6 +351,12 @@ fasttle1 <- function(data,CovCase,SelCrit,alpha,nsamp,ncsteps,trace,use.correcti
     }
 
     bestsol <- IdtNmle(data[RewghtdSet,],CovCaseArg=CovCaseArg,Config=Config,SelCrit=SelCrit)
+    for (Cnf in Config) {
+      CvCase <- CovCaseMap[Cnf]	
+      names(bestsol@CovConfCases[[CvCase]])[which(names(bestsol@CovConfCases[[CvCase]])=="mleSigE")] <- "RobSigE" 
+      bestsol@CovConfCases[[CvCase]]$mleSigEse <- bestsol@CovConfCases[[CvCase]]$mlevcov <- NULL   
+    }
+
     m <- length(RewghtdSet)
     rdmhn1 <- robustbase::.MCDcons(p,m/n)
     if (outlin=="MidPandLogR")  {
@@ -366,7 +367,7 @@ fasttle1 <- function(data,CovCase,SelCrit,alpha,nsamp,ncsteps,trace,use.correcti
       }
       for (Cnf in Config) {
         CvCase <- CovCaseMap[Cnf]	
-        bestsol@CovConfCases[[CvCase]]$mleSigE <- rdmhn[CvCase] * bestsol@CovConfCases[[CvCase]]$mleSigE
+        bestsol@CovConfCases[[CvCase]]$RobSigE <- rdmhn[CvCase] * bestsol@CovConfCases[[CvCase]]$RobSigE
       }
     } else {
       if (use.correction) {
@@ -376,15 +377,15 @@ fasttle1 <- function(data,CovCase,SelCrit,alpha,nsamp,ncsteps,trace,use.correcti
       }
       for (Cnf in Config) {
         CvCase <- CovCaseMap[Cnf]	
-        bestsol@CovConfCases[[CvCase]]$mleSigE[Vind,Vind] <- rdmhn[CvCase] * bestsol@CovConfCases[[CvCase]]$mleSigE[Vind,Vind]
+        bestsol@CovConfCases[[CvCase]]$RobSigE[Vind,Vind] <- rdmhn[CvCase] * bestsol@CovConfCases[[CvCase]]$RobSigE[Vind,Vind]
       }
     }
+    cnp2 <- c(rdmhn1,rdmhn[bestsol@BestModel]/rdmhn1)
+    raw.cnp2 <- c(dhn1,dhn[bestsol@BestModel]/dhn1)
+    names(cnp2) <- names(raw.cnp2) <- NULL 
   }
 
   rawSet <- sort(bestSet)
-  cnp2 <- c(rdmhn1,rdmhn[bestsol@BestModel]/rdmhn1)
-  raw.cnp2 <- c(dhn1,dhn[bestsol@BestModel]/dhn1)
-  names(cnp2) <- names(raw.cnp2) <- NULL 
   if (otpType=="SetMD2EstandPrfSt") {
     PerfSt <- list(RepSteps=RepSteps,RepLogLik=RepLogLik,StpLogLik=StpLogLik)
   } else {
@@ -406,6 +407,45 @@ fasttle1 <- function(data,CovCase,SelCrit,alpha,nsamp,ncsteps,trace,use.correcti
   finalsol  # return(finalsol)
 }
 
+RobEstControl <- function (alpha=0.75,
+                           nsamp=500,
+                           seed=NULL,
+                           trace=FALSE,
+                           use.correction=TRUE,
+                           ncsteps=200,
+                           getalpha = "TwoStep",
+                           rawMD2Dist="ChiSq",				
+                           MD2Dist="ChiSq",
+                           eta=0.025,   
+                           multiCmpCor="never",				
+                           getkdblstar="Twopplusone",
+                           outlin="MidPandLogR",
+                           trialmethod="simple",
+                           m=1,
+                           reweighted=TRUE,
+                           k2max=1e6,
+                           otpType="SetMD2andEst" )
+{
+    new("RobEstControl", alpha = alpha,
+                         nsamp = nsamp,
+                         seed = seed,
+                         trace = trace,
+                         use.correction = use.correction,
+                         ncsteps=200,
+                         getalpha = getalpha,
+                         rawMD2Dist=rawMD2Dist,				
+                         MD2Dist=MD2Dist,				
+                         eta=eta,   
+                         multiCmpCor=multiCmpCor,				
+                         getkdblstar = getkdblstar,
+                         outlin =outlin,
+                         trialmethod = trialmethod,
+                         m=m,
+                         reweighted=reweighted,
+                         k2max=1e6,
+                         otpType="SetMD2andEst" )
+}
+
 getIdtOutl <- function(Idt,IdtE=NULL,muE=NULL,SigE=NULL,
   eta=0.025,Rewind=NULL,m=length(Rewind),
   RefDist=c("ChiSq","HardRockeAdjF","HardRockeAsF","CerioliBetaF"),
@@ -416,7 +456,6 @@ getIdtOutl <- function(Idt,IdtE=NULL,muE=NULL,SigE=NULL,
   outlin <- match.arg(outlin)
 
   if ( RefDist=="CerioliBetaF" && is.null(Rewind) ) {
-#    if ( class(IdtE)!="IdtSngNDRE" || is.null(IdtE@RewghtdSet) ) {
     if ( class(IdtE)[1]!="IdtSngNDRE" || is.null(IdtE@RewghtdSet) ) {
       stop(paste("\n\nCerioliBetaF reference distribution with missing information\nabout the observations used in the re-weighted MCD estimator.\n",
                  "You need to specify this information, either using the Rewind argument,\nor through a list with a RewghtdSet component in the IdtE argument.\n")

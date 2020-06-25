@@ -21,15 +21,13 @@
 \alias{names,IData-method}
 
 \alias{summary,IdtMANOVA-method}
-
 \alias{show,IdtOutl-method}
-
 
 \alias{sd}
 \alias{MidPoints}
 \alias{LogRanges}
 \alias{Ranges}
-
+\alias{NbMicroUnits}
 
 \alias{CovCase-methods}
 \alias{CovCase}

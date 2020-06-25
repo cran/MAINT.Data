@@ -135,15 +135,29 @@ ncovp <- function(Config,q,p=2*p)
   if (Config==5) return(p)                                              
 }
 
-GetCovPar <- function(S,Config=1) 
+
+GetCovPar <- function(S,Config=1,test=TRUE) 
 {
   if (!is.matrix(S) || !is.element(Config,1:5))  stop("Wrong argument types\n")
   p <- nrow(S)
+  q <- p/2
   if (ncol(S)!=p) stop("Matrix S is not squared\n")
-  Sr <- chol(S)
+  
+  if (Config==1 || Config==2) S1 <- S
+  if (Config==3 || Config==5) S1 <- diag(diag(S))
+  if (Config==3) for (v in 1:q) S1[v,q+v] <- S1[q+v,v] <- S[q+v,v]
+  if (Config==4) S1 <- rbind(cbind(S[1:q,1:q],matrix(0.,q,q)),cbind(matrix(0.,q,q),S[(q+1):p,(q+1):p]))
+    
+  #  Sr <- chol(S1)
+  if (test) {
+    Sr <- try(chol(S1, pivot = FALSE), silent = TRUE)
+    if(class(Sr)[1] == "try-error") return(NULL)
+  } else {
+    Sr <- chol(S)
+  }
   if (Config==1) return(c(diag(Sr),Sr[col(Sr)>row(Sr)]))
   if (Config==5) return(diag(Sr))
-
+  
   q <- p/2
   npar <- ncovp(Config,q,p)
   retpar <- array(dim=npar)  
@@ -152,7 +166,7 @@ GetCovPar <- function(S,Config=1)
   for (c in 2:p) for(r in 1:(c-1))  {
     if (  ( c==r+q && (Config==2 || Config==3) ) ||  
           ( ((r<=q && c<=q) || (r>q && c>q)) && (Config==2 || Config==4) ) 
-        )  
+    )  
     {
       rtpind <- rtpind+1
       retpar[rtpind] <- Sr[r,c]      
@@ -160,6 +174,37 @@ GetCovPar <- function(S,Config=1)
   }
   retpar
 } 
+
+# GetCovPar <- function(S,Config=1,test=TRUE) 
+# {
+#   if (!is.matrix(S) || !is.element(Config,1:5))  stop("Wrong argument types\n")
+#   p <- nrow(S)
+#   if (ncol(S)!=p) stop("Matrix S is not squared\n")
+#   if (test) {
+#     Sr <- try(chol(S, pivot = FALSE), silent = TRUE)
+#     if(class(Sr)[1] == "try-error") return(NULL)
+#   } else {
+#     Sr <- chol(S)
+#   }
+#   if (Config==1) return(c(diag(Sr),Sr[col(Sr)>row(Sr)]))
+#   if (Config==5) return(diag(Sr))
+# 
+#   q <- p/2
+#   npar <- ncovp(Config,q,p)
+#   retpar <- array(dim=npar)  
+#   retpar[1:p] <- diag(Sr)  
+#   rtpind <- p
+#   for (c in 2:p) for(r in 1:(c-1))  {
+#     if (  ( c==r+q && (Config==2 || Config==3) ) ||  
+#           ( ((r<=q && c<=q) || (r>q && c>q)) && (Config==2 || Config==4) ) 
+#         )  
+#     {
+#       rtpind <- rtpind+1
+#       retpar[rtpind] <- Sr[r,c]      
+#     }
+#   }
+#   retpar
+# } 
 
 ltind1 <- function(p,r,c) { # ordering lower-trg vec indices including diagonal 
   if (r < c || r > p) stop("Wrong argument values for ltind1\n")

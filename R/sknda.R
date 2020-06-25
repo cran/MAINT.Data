@@ -1,4 +1,4 @@
-Ilocsnda <- function(Conf,x,prior,W,B,mu,gamma1,alpha,ksi,egvtol)
+Ilocsnda <- function(Conf,x,prior,W,B,mu,gamma1,alpha,ksi,egvtol,limlnk2)
 {
   p <- 2*x@NIVar
   nk <- as.numeric(table(x@grouping))
@@ -10,8 +10,7 @@ Ilocsnda <- function(Conf,x,prior,W,B,mu,gamma1,alpha,ksi,egvtol)
 
   if (prior[1]=="proportions") { prior <- nk/N }
   names(prior) <- levels(x@grouping)
-#  Wi <- pdwt.solve(W)					
-  Wi <- pdwt.solve(W,silent=TRUE)
+  Wi <- Safepdsolve(W,maxlnk2=limlnk2,scale=TRUE)
   if (is.null(Wi)) {
     warning("Ilocsnda function received a singular matrix in the  W argument\n")
     return(NULL)
@@ -42,8 +41,9 @@ Ilocsnda <- function(Conf,x,prior,W,B,mu,gamma1,alpha,ksi,egvtol)
 
 setMethod("snda",
   signature(x = "IdtLocSNMANOVA"),
-  function(x, prior="proportions", selmodel=BestModel(H1res(x)), egvtol=1.0e-10, silent=FALSE, ...)
+  function(x, prior="proportions", selmodel=BestModel(H1res(x)), egvtol=1.0e-10, silent=FALSE, k2max=1e6, ...)
   {
+    limlnk2 <- log(k2max)
     if (is.character(selmodel)) { 
       selmodel <- sapply(selmodel,function(mod) which(mod==x@H0res@ModelNames))
     }
@@ -59,14 +59,15 @@ setMethod("snda",
 
     Ilocsnda(Conf=selmodel,x=x,prior=prior,W=W,B=x@H0res@CovConfCases[[selmodel]]$OmegaE-W,
       mu=x@H1res@CovConfCases[[selmodel]]$muE,gamma1=x@H1res@CovConfCases[[selmodel]]$gamma1E,
-      alpha=x@H1res@CovConfCases[[selmodel]]$alphaE,ksi=x@H1res@CovConfCases[[selmodel]]$ksiE,egvtol=egvtol)
+      alpha=x@H1res@CovConfCases[[selmodel]]$alphaE,ksi=x@H1res@CovConfCases[[selmodel]]$ksiE,egvtol=egvtol,limlnk2=limlnk2)
   }
 )
 
 setMethod("snda",
   signature(x = "IdtLocNSNMANOVA"),
-  function(x, prior="proportions", selmodel=BestModel(H1res(x)@SNMod), egvtol=1.0e-10, silent=FALSE, ...)
+  function(x, prior="proportions", selmodel=BestModel(H1res(x)@SNMod), egvtol=1.0e-10, silent=FALSE, k2max=1e6, ...)
   {
+    limlnk2 <- log(k2max)
     H0res <- H0res(x)@SNMod
     H1res <- H1res(x)@SNMod
     if (is.character(selmodel)) {
@@ -84,14 +85,14 @@ setMethod("snda",
 
     Ilocsnda(Conf=selmodel,x=x,prior=prior,W=W,B=H0res@CovConfCases[[selmodel]]$OmegaE-W,
       mu=H1res@CovConfCases[[selmodel]]$muE,gamma1=H1res@CovConfCases[[selmodel]]$gamma1E,
-      alpha=H1res@CovConfCases[[selmodel]]$alphaE,ksi=H1res@CovConfCases[[selmodel]]$ksiE,egvtol=egvtol)
+      alpha=H1res@CovConfCases[[selmodel]]$alphaE,ksi=H1res@CovConfCases[[selmodel]]$ksiE,egvtol=egvtol,limlnk2=limlnk2)
   }
 )
 
 setMethod("snda",
   signature(x = "IData"),
   function( x, grouping, prior="proportions", CVtol=1.0e-5, subset=1:nrow(x), CovCase=1:4, SelCrit=c("BIC","AIC"),
-    Mxt=c("Loc","Gen"), ... )
+    Mxt=c("Loc","Gen"), k2max=1e6, ... )
   {
     SelCrit <- match.arg(SelCrit)
     Mxt <- match.arg(Mxt)
@@ -120,7 +121,7 @@ setMethod("snda",
       stop("The data belongs to one single group. A partition into at least two different groups is required\n")
     }
 
-    snda(MANOVA(x,grouping,Mxt=Mxt,Model="SKNormal",Config=Config,SelCrit=SelCrit,CVtol=CVtol,...),
+    snda(MANOVA(x,grouping,Mxt=Mxt,Model="SKNormal",Config=Config,SelCrit=SelCrit,CVtol=CVtol,k2max=k2max,...),
       prior=prior)
   }
 )
@@ -141,7 +142,9 @@ setMethod("predict",
     sphksi <- object@ksi %*% object@scaling 
     Mahdistovertwo <- apply(sphdata, 1, function(x) apply(sphksi, 1, function(ksi) (sum((x-ksi)^2)/2)))
     skewcorr <- apply(newdata, 1, function(x) apply(object@ksi, 1, function(ksi) pnorm(object@eta%*%(x-ksi))))
-    wghtdensities <- sweep(exp(-Mahdistovertwo)*skewcorr,1,STATS=prior,FUN="*")
+#    wghtdensities <- sweep(exp(-Mahdistovertwo)*skewcorr,1,STATS=prior,FUN="*")
+    minhlfMD2 <- apply(Mahdistovertwo,2,min)
+    wghtdensities <- sweep(exp(sweep(-Mahdistovertwo,2,minhlfMD2,"+"))*skewcorr,1,prior,"*")
     ncnst <- apply(wghtdensities,2,sum)  			# normalizing constants
     posterior <- sweep(wghtdensities,2,STATS=ncnst,FUN="/")
     clres <- apply(posterior, 2, function(pst) return(dimnames(sphksi)[[1]][which.max(pst)]))
@@ -165,7 +168,8 @@ setMethod("show",
   }
 )
 
-Igensnda <- function(Conf,x,prior,Wg,mu,gamma1,alpha,ksi)
+#Igensnda <- function(Conf,x,prior,Wg,mu,gamma1,alpha,ksi)
+Igensnda <- function(Conf,x,prior,Wg,mu,gamma1,alpha,ksi,limlnk2,silent=FALSE)
 {
   p <- 2*x@NIVar
   nk <- as.numeric(table(x@grouping))
@@ -180,7 +184,13 @@ Igensnda <- function(Conf,x,prior,Wg,mu,gamma1,alpha,ksi)
   names(prior) <- lev
   for (g in 1:k)
   {
-    scaling[,,g] <- backsolve(chol(Wg[,,g]),diag(p))
+#    scaling[,,g] <- backsolve(chol(Wg[,,g]),diag(p))
+    scalingg <- Safepdsolve(Wg[,,g],maxlnk2=limlnk2,scale=TRUE)
+    if (is.null(scalingg)) {
+      warning("Found a non positive definite within group matrix\n")
+      return(NULL) 
+    }    
+    scaling[,,g] <- scalingg
     ldet[g] <- as.numeric(determinant(Wg[,,g],logarithm=TRUE)$modulus)/2
     eta[g,] <- alpha[g,] / sqrt(diag(Wg[,,g]))
   }
@@ -190,8 +200,10 @@ Igensnda <- function(Conf,x,prior,Wg,mu,gamma1,alpha,ksi)
 
 setMethod("snda",
   signature(x = "IdtGenSNMANOVA"),
-  function(x, prior="proportions", selmodel=BestModel(H1res(x)), silent=FALSE, ...)
+#  function(x, prior="proportions", selmodel=BestModel(H1res(x)), silent=FALSE, ...)
+  function(x, prior="proportions", selmodel=BestModel(H1res(x)), silent=FALSE, k2max=1e6, ...)
   {
+    limlnk2 <- log(k2max)
     if (is.character(selmodel))  { selmodel <- sapply(selmodel,function(mod) which(mod==x@H1res@ModelNames)) }
     if (!is.finite(x@H0res@logLiks[selmodel]) || !is.finite(x@H1res@logLiks[selmodel]))
     {
@@ -204,14 +216,17 @@ setMethod("snda",
 	
     Igensnda(Conf=selmodel,x=x,prior=prior,Wg=x@H1res@CovConfCases[[selmodel]]$OmegaE,
       mu=x@H1res@CovConfCases[[selmodel]]$muE,gamma1=x@H1res@CovConfCases[[selmodel]]$gamma1E,
-      alpha=x@H1res@CovConfCases[[selmodel]]$alphaE,ksi=x@H1res@CovConfCases[[selmodel]]$ksiE)
+#      alpha=x@H1res@CovConfCases[[selmodel]]$alphaE,ksi=x@H1res@CovConfCases[[selmodel]]$ksiE)
+      alpha=x@H1res@CovConfCases[[selmodel]]$alphaE,ksi=x@H1res@CovConfCases[[selmodel]]$ksiE,limlnk2=limlnk2)
   }
 )
 
 setMethod("snda",
   signature(x = "IdtGenNSNMANOVA"),
-  function(x, prior="proportions", selmodel=BestModel(H1res(x)@SNMod), silent=FALSE, ...)
+#  function(x, prior="proportions", selmodel=BestModel(H1res(x)@SNMod), silent=FALSE, ...)
+  function(x, prior="proportions", selmodel=BestModel(H1res(x)@SNMod), silent=FALSE, k2max=1e6, ...)
   {
+    limlnk2 <- log(k2max)
     H0res <- H0res(x)@SNMod
     H1res <- H1res(x)@SNMod
     if (is.character(selmodel))  { selmodel <- sapply(selmodel,function(mod) which(mod==H1res@ModelNames)) }
@@ -226,7 +241,8 @@ setMethod("snda",
 
     Igensnda(Conf=selmodel,x=x,prior=prior,Wg=H1res@CovConfCases[[selmodel]]$OmegaE,
       mu=H1res@CovConfCases[[selmodel]]$muE,gamma1=H1res@CovConfCases[[selmodel]]$gamma1E,
-      alpha=H1res@CovConfCases[[selmodel]]$alphaE,ksi=H1res@CovConfCases[[selmodel]]$ksiE)
+#      alpha=H1res@CovConfCases[[selmodel]]$alphaE,ksi=H1res@CovConfCases[[selmodel]]$ksiE)
+      alpha=H1res@CovConfCases[[selmodel]]$alphaE,ksi=H1res@CovConfCases[[selmodel]]$ksiE,limlnk2=limlnk2)
   }
 )
 
@@ -237,9 +253,11 @@ setMethod("predict",
     if (is(newdata,"IData")) { newdata <- as.matrix(cbind(newdata@MidP,newdata@LogR)) }
     if (is(newdata,"data.frame")) { newdata <- as.matrix(newdata) }
     n <- nrow(newdata)
-    p <- ncol(newdata)
+#    p <- ncol(newdata)
     k <- length(prior)
     grpnames <- dimnames(object@ksi)[[1]]
+#cat("n =",n,"k =",k,"grpnames =",grpnames,"\n")
+        
     Mahdistovertwo <- matrix(nrow=k,ncol=n,dimnames=list(grpnames,rownames(newdata)))
     skewcorr <- matrix(nrow=k,ncol=n,dimnames=list(grpnames,rownames(newdata)))
     for (g in 1:k)
@@ -249,11 +267,17 @@ setMethod("predict",
       Mahdistovertwo[g,] <- apply( sphdata, 1, function(x) sum((x-sphksig)^2)/2 )
       skewcorr[g,] <- apply( newdata, 1, function(x) pnorm(object@eta[g,]%*%(x-object@ksi[g,])) )
     } 
-    wghtdensities <- sweep(exp(sweep(-Mahdistovertwo,1,STATS=object@ldet,FUN="-"))*skewcorr,1,STATS=prior,FUN="*")
+#    wghtdensities <- sweep(exp(sweep(-Mahdistovertwo,1,STATS=object@ldet,FUN="-"))*skewcorr,1,STATS=prior,FUN="*")
+    minhlfMD2 <- apply(Mahdistovertwo,2,min)
+    nrmhlfMD2 <- sweep(Mahdistovertwo,2,minhlfMD2)
+    wghtdensities <- sweep(exp(sweep(-nrmhlfMD2,1,object@ldet))*skewcorr,1,prior,"*")
+#cat("wghtdensities =\n") ; print(wghtdensities)    
     ncnst <- apply(wghtdensities,2,sum)  			# normalizing constants
     posterior <- sweep(wghtdensities,2,STATS=ncnst,FUN="/")
+#cat("posterior =\n") ; print(posterior)    
     clres <- apply(posterior, 2, function(pst) return(grpnames[which.max(pst)]))
-   		
+#cat("clres =\n") ; print(clres)    
+    
     list(class=factor(clres,levels=grpnames),posterior=t(posterior))
   }
 ) 

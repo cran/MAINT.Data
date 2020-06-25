@@ -8,8 +8,8 @@ RepLOptim <- function(start, parsd, fr, gr=NULL, inphess=NULL, ..., method="nlmi
 # Needs to be explicitly set to TRUE if non-linear constraints are to be
 # strictly enforced (instead of using BigM penalties) by local optimizers.   
 
-  maxrepet_default <- 40
-  maxnoimprov_default <- 100
+  maxrepet_default <- 50
+  maxnoimprov_default <- 250
   maxreplic_default <- 1000
   maxiter_default <- 1500
   maxSANNiter_default <- 3000
@@ -44,7 +44,7 @@ RepLOptim <- function(start, parsd, fr, gr=NULL, inphess=NULL, ..., method="nlmi
   if (!is.null(control$rethess)) lower <- control$rethess 
   if (!is.null(control$parmstder)) parmstder <- control$parmstder 
   if (!is.null(control$EnfCnstrs)) EnfCnstrs <- control$EnfCnstrs 
-  
+
   npar <- length(start)
   values <- NULL
   if (is.null(lower)) lower <- rep(-Inf,npar)

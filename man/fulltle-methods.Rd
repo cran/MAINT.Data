@@ -13,7 +13,8 @@
                  "HardRockeAdjF"), MD2Dist = c("ChiSq",
                  "CerioliBetaF"), eta = 0.025, multiCmpCor = c("never",
                  "always", "iterstep"), outlin = c("MidPandLogR",
-                 "MidP", "LogR"), reweighted = TRUE, force = FALSE, \dots)
+                 "MidP", "LogR"), reweighted = TRUE, k2max=1e6, 
+                 force = FALSE, \dots)
 }
 
 \arguments{
@@ -41,7 +42,9 @@
 
     \item{reweighted}{should a (Re)weighted estimate of the covariance matrix be used in the computation of the trimmed likelihood or just a \dQuote{raw} covariance estimate; default is (Re)weighting.}
 
-    \item{force}{A boolean flag indicating whether, for moderate or large data sets the algorithm should proceed anyway, regardless of an expected long excution time, due to exponential explosions in the number of different subsets that need to be avaluated by fulltle}
+  \item{k2max}{Maximal allowed l2-norm condition number for correlation matrices. Correlation matrices with condition number above k2max are considered to be numerically singular, leading to degenerate results.}
+
+   \item{force}{A boolean flag indicating whether, for moderate or large data sets the algorithm should proceed anyway, regardless of an expected long excution time, due to exponential explosions in the number of different subsets that need to be avaluated by fulltle}
 
     \item{\dots}{Further arguments to be passed to internal functions of \sQuote{fulltle}.} 
 }

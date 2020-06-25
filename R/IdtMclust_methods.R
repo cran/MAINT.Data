@@ -1,9 +1,25 @@
 setMethod("pcoordplot",
   signature(x = "IdtMclust"),
-  function(x,title="Parallel Coordinate Plot",Seq=c("AllMidP_AllLogR","MidPLogR_VarbyVar"),G=BestG(x),...)
+  function(x, title="Parallel Coordinate Plot", Seq=c("AllMidP_AllLogR","MidPLogR_VarbyVar"), model="BestModel", ...)
   {
     if (requireNamespace("GGally",quietly=TRUE)==FALSE) {
       stop("Required package GGally is not installed\n")
+    }
+
+    if (model=="BestModel") {
+      G <- BestG(x)
+      x_mean  <- mean(x)
+    }  else {
+      nomodmsg <- paste("There is no model named",model,"in these Idtmclust results\n") 
+      if (substr(model,1,3)=="Hom") {
+        if (!is.element(model,names(x@allres$RepresHom))) stop(nomodmsg) 
+        G  <- x@allres$RepresHom[[model]]@nG
+        x_mean  <- x@allres$RepresHom[[model]]@parameters$mean
+      } else if (substr(model,1,3)=="Het") {
+        if (!is.element(model,names(x@allres$RepresHet))) stop(nomodmsg)
+        G  <- x@allres$RepresHet[[model]]@nG
+        x_mean <- x@allres$RepresHet[[model]]@parameters$mean
+      } else stop(nomodmsg) 
     }
 
     q <- x@NIVar   # Numbef or Interval-valued variables
@@ -11,9 +27,9 @@ setMethod("pcoordplot",
     
     Seq <- match.arg(Seq)
     if (Seq == "AllMidP_AllLogR")  {
-      DF <- as.data.frame(t(mean(x)))
+      DF <- as.data.frame(t(x_mean))
     }  else if (Seq == "MidPLogR_VarbyVar")  {
-      DF <- as.data.frame(t(mean(x)[rep(1:q,each=2)+rep(c(0,q),q),]))
+      DF <- as.data.frame(t(x_mean[rep(1:q,each=2)+rep(c(0,q),q),]))
     }
     DF <- cbind(DF,Component=paste("CP",1:G,sep=""))
     plt <- ggparcoord(DF, columns = 1:p, groupColumn = 'Component') + ggtitle(title) +
@@ -63,6 +79,60 @@ setMethod("pcoordplot",
   }
 )
 
+setMethod("plotInfCrt",
+  signature(object = "IdtMclust"),
+  function(object, crt=object@SelCrit,legpos="bottomleft", nprnt=5, ...)
+  {
+    if (crt=="BIC") {
+      IC_values <- object@BICs
+    } else if (crt=="AIC") {
+      IC_values <- object@AICs
+    } else {
+      stop("Wrong crt argument (it should equal either the string 'BIC' or the string 'AIC'.\n")
+    }   
+    if (length(IC_values)<2) stop("the argument to plotInfCrt does not include several (more than one) models to compare.\n")
+    
+    nn <- length(IC_values)
+    modnames <- names(IC_values)
+    Mxt <- substr(modnames,1,3)
+    Mxts <- unique(Mxt)
+    nMxts <- length(Mxts)
+    nGdigts <- nchar(modnames) - 5
+    G <- substr(names(IC_values),4,3+nGdigts)
+    Gs <- unique(G)
+    nGs <- length(Gs)
+    CovCase <- substr(names(IC_values),3+nGdigts+1,nGdigts+6)
+    CovCases <- unique(CovCase)
+    nCovCases <- length(CovCases)
+    MxbyCovC <- paste(rep(Mxts,each=nCovCases),rep(CovCases,nMxts),sep="") 
+    nMxbyCovC <- nMxts*nCovCases
+    if (nGs==1) {
+      if (nMxts==2) IC_values <- IC_values[rep(1:nCovCases,each=2) + rep(c(0,nCovCases),nCovCases)]
+      barplot(IC_values,ylab=crt,xlab="Model",space=10.,...)
+      abline(h=0)
+      return()  
+    }  
+    ICmat <- matrix(NA,nGs,nMxbyCovC,dimnames = list(Gs,MxbyCovC))
+    linetype <- ifelse(substr(MxbyCovC,1,3)=="Hom",1,9)
+    for (m in 1:nMxts) for (c in 1:nCovCases) 
+#      ICmat[,(m-1)*nCovCases+c] <- IC_values[Mxt==Mxts[m] & CovCase==CovCases[c]] 
+      ICmat[,(m-1)*nCovCases+c] <- -IC_values[Mxt==Mxts[m] & CovCase==CovCases[c]] 
+
+#    matplot(as.integer(substr(Gs,2,1+unique(nGdigts))),ICmat,type="b",lty=1,ylab=crt,xlab="Number of Components",
+    matplot(as.integer(substr(Gs,2,1+unique(nGdigts))),ICmat,type="b",lty=linetype,ylab=paste("minus",crt),xlab="Number of Components",
+            pch=substr(MxbyCovC,5,5),col=1:nMxbyCovC,...)
+#    if (max(ICmat[,1]) < max(ICmat[,nMxbyCovC])) legpos <- "topleft"
+#    else  legpos <- "topright"
+    legend(legpos,legend=MxbyCovC,lty=linetype,col=1:nMxbyCovC)
+
+    bestcrt <- sort(IC_values,index.return=TRUE)
+    cat("Best",crt,"values:\n")
+    cat("          ",names(IC_values)[bestcrt$ix[1:nprnt]],"\n",sep="   ")
+    cat(crt,"   ",bestcrt$x[1:nprnt],"\n",sep="   ")
+    cat(paste(crt,"diff"),"     ",bestcrt$x[1:nprnt]-bestcrt$x[1],"\n",sep="   ")
+  }
+)  
+
 setMethod("show",
   signature(object = "IdtMclust"),
   function(object)
@@ -80,33 +150,49 @@ setMethod("show",
 
 setMethod("summary",
   signature(object = "IdtMclust"),
-  function(object, parameters = FALSE, classification = FALSE, ...)
+  function(object, parameters = FALSE, classification = FALSE, model="BestModel", ...)
   {
-    G  <- object@BestG
-    pro <- object@parameters$pro
+    if (model=="BestModel") {
+      G  <- object@BestG
+      C  <- object@BestC
+      mod <- object
+    }  else {
+      nomodmsg <- paste("There is no model named",model,"in these Idtmclust results\n") 
+      if (substr(model,1,3)=="Hom") {
+        if (!is.element(model,names(object@allres$RepresHom))) stop(nomodmsg) 
+        mod <- object@allres$RepresHom[[model]]
+      } else if (substr(model,1,3)=="Het") {
+        if (!is.element(model,names(object@allres$RepresHet))) stop(nomodmsg)
+        mod <- object@allres$RepresHet[[model]]
+      } else stop(nomodmsg) 
+      G  <- mod@nG
+      C  <- mod@Conf
+    }
+    pro <- mod@parameters$pro
     if(is.null(pro)) pro <- 1
     names(pro) <- paste("CP",seq(G),sep="")
-    mean <- object@parameters$mean
-    covariance <- object@parameters$covariance
+    mean <- mod@parameters$mean
+    covariance <- mod@parameters$covariance
     title <- paste("Gaussian finite mixture model fitted by EM algorithm")
-    if (object@Hmcdt) {
-      str1 <- "Homecedastic"
+    if (mod@Hmcdt) {
+      str1 <- "Homoscedastic"
     } else { 
       str1 <- "Heteroscedastic"
     }
-    modelName <- paste(str1, " C",object@BestC,sep="") 
+    modelName <- paste(str1, " C",C,sep="") 
     obj <- list(
-      title = title, modelName =modelName,  Hmcdt = object@Hmcdt,     
-      NObs = object@NObs, NIVar = object@NIVar, G = G,  
-      loglik = object@logLik, bic = object@bic,
+      title = title, modelName =modelName,  Hmcdt = mod@Hmcdt,     
+      NObs = mod@NObs, NIVar = mod@NIVar, G = G,  
+      loglik = mod@logLik, bic = mod@bic,
       pro = pro, mean = mean, covariance = covariance,
-      classification = object@classification,
+      classification = mod@classification,
       printParameters = parameters, printClassification = classification
     )
     class(obj) <- "summaryIdtMclust"
     return(obj)
   }
 ) 
+ 
 
 print.summaryIdtMclust <- function(x, ...)
 {
@@ -156,11 +242,65 @@ print.summaryIdtMclust <- function(x, ...)
 
 #Accessor methods
 
-setMethod("parameters",signature(x = "IdtMclust"),function(x) x@parameters)
-setMethod("pro",signature(x = "IdtMclust"),function(x) x@parameters$pro)
-setMethod("mean",signature(x = "IdtMclust"),function(x) x@parameters$mean)
-setMethod("var",signature(x = "IdtMclust"),function(x) x@parameters$covariance)
-setMethod("classification",signature(x = "IdtMclust"),function(x) x@classification)
+setMethod("parameters",signature(x = "IdtMclust"),
+  function(x,model="BestModel") 
+  { 
+    if (model=="BestModel") return(x@parameters) 
+    nomodmsg <- paste("There is no model named",model,"in these Idtmclust results\n") 
+    if (substr(model,1,3)=="Hom") {
+      if (!is.element(model,names(x@allres$RepresHom))) stop(nomodmsg) 
+      return(x@allres$RepresHom[[model]]@parameters)
+    } else if (substr(model,1,3)=="Het") {
+      return(x@allres$RepresHet[[model]]@parameters)
+    } else stop(nomodmsg) 
+  }
+)
+
+setMethod("pro",signature(x = "IdtMclust"),
+  function(x,model="BestModel") 
+  { 
+    if (model=="BestModel") return(x@parameters$pro) 
+    nomodmsg <- paste("There is no model named",model,"in these Idtmclust results\n") 
+    if (substr(model,1,3)=="Hom") {
+      if (!is.element(model,names(x@allres$RepresHom))) stop(nomodmsg) 
+      return(x@allres$RepresHom[[model]]@parameters$pro)
+    } else if (substr(model,1,3)=="Het") {
+      return(x@allres$RepresHet[[model]]@parameters$pro)
+    } else stop(nomodmsg) 
+  }
+)
+
+setMethod("mean",signature(x = "IdtMclust"),
+  function(x,model="BestModel") 
+  { 
+    if (model=="BestModel") return(x@parameters$mean) 
+    nomodmsg <- paste("There is no model named",model,"in these Idtmclust results\n") 
+    if (substr(model,1,3)=="Hom") {
+      if (!is.element(model,names(x@allres$RepresHom))) stop(nomodmsg) 
+      return(x@allres$RepresHom[[model]]@parameters$mean)
+    } else if (substr(model,1,3)=="Het") {
+      return(x@allres$RepresHet[[model]]@parameters$mean)
+    } else stop(nomodmsg) 
+  }
+)
+
+setMethod("var",signature(x = "IdtMclust"),
+  function(x) return(x@parameters$covariance)
+)
+
+setMethod("classification",signature(x = "IdtMclust"),
+  function(x,model="BestModel") 
+  { 
+    if (model=="BestModel") return(factor(x@parameters$classification)) 
+    nomodmsg <- paste("There is no model named",model,"in these Idtmclust results\n") 
+    if (substr(model,1,3)=="Hom") {
+      if (!is.element(model,names(x@allres$RepresHom))) stop(nomodmsg) 
+      return(factor(x@allres$RepresHom[[model]]@parameters$classification))
+    } else if (substr(model,1,3)=="Het") {
+      return(factor(x@allres$RepresHet[[model]]@parameters$classification))
+    } else stop(nomodmsg) 
+  }
+)
 
 setMethod("SelCrit",signature(x = "IdtMclust"),function (x) x@SelCrit)
 setMethod("Hmcdt",signature(x = "IdtMclust"),function (x) x@Hmcdt)
@@ -173,21 +313,19 @@ setMethod("BIC",signature(x = "IdtMclust"),function(x) x@bic)
 setMethod("AIC",signature(x = "IdtMclust"),function(x) x@aic)
 
 setMethod("cor",signature(x ="IdtMclust"),
-  function(x)
- {
-    if (x@Hmcdt==TRUE) {
-      ncov <- 1 
-    } else {
-      ncov <- x@BestG
-    }
-
-    covdim <- 2*x@NIVar
-    covnames <- dimnames(x@parameters$covariance)[[1]]   
-    res <- array(dim=c(covdim,covdim,ncov),dimnames=list(covnames,covnames,NULL))
-    for (g in 1:ncov) res[,,g] <- cov2cor(x@parameters$covariance[,,g])
-
-    res
-  }
+ function(x)
+{
+   if (x@Hmcdt==TRUE) {
+     ncov <- 1
+   } else {
+     ncov <- x@BestG
+   }
+   covdim <- 2*x@NIVar
+   covnames <- dimnames(x@parameters$covariance)[[1]]
+   res <- array(dim=c(covdim,covdim,ncov),dimnames=list(covnames,covnames,NULL))
+   for (g in 1:ncov) res[,,g] <- cov2cor(x@parameters$covariance[,,g])
+   res
+ }
 ) 
 
 

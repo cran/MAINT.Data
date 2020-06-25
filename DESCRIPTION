@@ -1,8 +1,8 @@
 Package: MAINT.Data
 Type: Package
 Title: Model and Analyse Interval Data
-Version: 2.3.1
-Date: 2020-01-07
+Version: 2.4.0
+Date: 2020-06-24
 Author: Pedro Duarte Silva <psilva@porto.ucp.pt>, Paula Brito
     <mpbrito.fep.up.pt>
 Maintainer: Pedro Duarte Silva <psilva@porto.ucp.pt>
@@ -16,11 +16,11 @@ Description: Implements methodologies for modelling interval data by Normal
 License: GPL-2
 LazyLoad: yes
 LazyData: yes
-Depends: R (>= 3.1.0), Rcpp (>= 0.11.0), sn (>= 1.3.0)
+Depends: R (>= 3.5.0), Rcpp (>= 1.0.3), sn (>= 1.3.0)
 Imports: MASS, methods, miscTools, robustbase, rrcov, pcaPP, mclust,
         ggplot2, GGally
-LinkingTo: Rcpp, RcppEigen
+LinkingTo: Rcpp, RcppArmadillo (>= 0.9.500.2.0)
 NeedsCompilation: yes
-Packaged: 2020-01-07 04:39:37 UTC; antonio
+Packaged: 2020-06-24 22:10:06 UTC; antonio
 Repository: CRAN
-Date/Publication: 2020-01-07 11:10:03 UTC
+Date/Publication: 2020-06-25 04:50:03 UTC

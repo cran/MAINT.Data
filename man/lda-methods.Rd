@@ -13,16 +13,16 @@
 
 \usage{
 \S4method{lda}{IData}(x, grouping, prior="proportions", CVtol=1.0e-5, egvtol=1.0e-10, 
-  subset=1:nrow(x), CovCase=1:4, SelCrit=c("BIC","AIC"), silent=FALSE, \dots )
+  subset=1:nrow(x), CovCase=1:4, SelCrit=c("BIC","AIC"), silent=FALSE, k2max=1e6, \dots )
 
 \S4method{lda}{IdtMxtNDE}(x, prior="proportions", selmodel=BestModel(x), egvtol=1.0e-10,
-  silent=FALSE, \dots )
+  silent=FALSE, k2max=1e6, \dots )
 
 \S4method{lda}{IdtClMANOVA}( x, prior="proportions", selmodel=BestModel(H1res(x)),
-  egvtol=1.0e-10, silent=FALSE, \dots )
+  egvtol=1.0e-10, silent=FALSE, k2max=1e6, \dots )
 
 \S4method{lda}{IdtLocNSNMANOVA}( x, prior="proportions", 
-  selmodel=BestModel(H1res(x)@NMod), egvtol=1.0e-10, silent=FALSE, \dots )
+  selmodel=BestModel(H1res(x)@NMod), egvtol=1.0e-10, silent=FALSE, k2max=1e6, \dots )
 
 }
 
@@ -48,6 +48,8 @@ present, the probabilities should be specified in the order of the factor levels
   \item{silent}{A boolean flag indicating wether a warning message should be printed if the method fails.}
  
   \item{selmodel}{Selected model from a list of candidate models saved in object x.}
+
+  \item{k2max}{Maximal allowed l2-norm condition number for correlation matrices. Correlation matrices with condition number above k2max are considered to be numerically singular, leading to degenerate results.}
 
   \item{\dots}{Other named arguments.}
 }

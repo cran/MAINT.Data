@@ -2,23 +2,14 @@ useDynLib(MAINT.Data,.registration=TRUE)
 
 import(stats,methods,Rcpp,ggplot2,GGally)
 
-importFrom(utils,head)
-importFrom(utils,tail)
-importFrom(graphics,segments)
-importFrom(graphics,rect)
-importFrom("graphics", "abline", "axis", "points")
-importFrom(MASS,lda)
-importFrom(MASS,qda)
+importFrom(utils,head,tail)
+importFrom(graphics,segments,rect,abline,axis,points,barplot,legend,matplot,plot.default)
+importFrom(MASS,lda,qda)
 importFrom(miscTools,stdEr)
-importFrom(robustbase,h.alpha.n)
-importFrom(robustbase,.MCDcons)
-importFrom(robustbase,.MCDcnp2)
+importFrom(robustbase,h.alpha.n,.MCDcons,.MCDcnp2)
 importFrom(pcaPP,l1median)
-importFrom(sn,zeta)
-importFrom(sn,duplicationMatrix)
-importFrom(mclust,hclass)
-importFrom(mclust,hcEEE)
-importFrom(mclust,hcVVV)
+importFrom(sn,zeta,duplicationMatrix)
+importFrom(mclust,hclass,Mclust,mclustBIC)
 
 importClassesFrom(rrcov,CovControlMcd)
 
@@ -29,10 +20,10 @@ exportClasses(IData, LRTest, ConfTests, RobEstControl, Idtlda, Idtqda, IdtSNlocd
   IdtMANOVA, IdtClMANOVA, IdtHetNMANOVA, IdtLocSNMANOVA, IdtGenSNMANOVA, IdtLocNSNMANOVA, IdtGenNSNMANOVA
   )
 exportPattern("*.IData")
-exportMethods(show, summary, head, tail, nrow, ncol, rownames, colnames, MidPoints, LogRanges, Ranges, 
+exportMethods(show, summary, head, tail, nrow, ncol, rownames, colnames, MidPoints, LogRanges, Ranges, NbMicroUnits,
   mle, fulltle, fasttle, coef, stdEr, vcov, mean, sd, var, cor, Idtmclust, testMod, BestModel, CovCase, 
   MANOVA, H0res, H1res, RobMxtDEst, lda, qda, Roblda, Robqda, getMahaD2, geteta, getRefDist, getmultiCmpCor, 
-  snda, predict, testMod, ObsLogLiks, logLik, BIC, AIC, pcoordplot,
+  snda, predict, testMod, ObsLogLiks, logLik, BIC, AIC, pcoordplot, plotInfCrt,
   parameters, pro, classification, SelCrit, Hmcdt, BestG, BestC, PostProb)
 
 S3method(print,summaryIData)

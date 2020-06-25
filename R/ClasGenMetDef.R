@@ -4,7 +4,7 @@ setClassUnion("extnumeric",c("numeric","NULL"))
 setClassUnion("extcharacter",c("character","NULL"))
 setClassUnion("extinteger",c("integer","NULL"))
 setClass("IData",slots=c(MidP="data.frame",LogR="data.frame",ObsNames="character",VarNames="character",
-  NObs="numeric",NIVar="numeric"))
+  NObs="numeric",NIVar="numeric",NbMicroUnits="integer"))
 setClass("IdtE",slots=c(ModelNames="character",ModelType="character",ModelConfig="numeric",NIVar="numeric",SelCrit="character",
   logLiks="numeric",BICs="numeric",AICs="numeric",BestModel="numeric",SngD="logical"),contains="VIRTUAL")
 setClass("IdtMclust",slots=c(call="call",data="IData",NObs="numeric",NIVar="numeric",SelCrit="character",Hmcdt="logical",
@@ -58,6 +58,7 @@ setClass("RobEstControl",
     trialmethod="character",
     m="numeric",
     reweighted="logical",
+    k2max="numeric",
     otpType="character"
   ),
   prototype = list(
@@ -72,14 +73,16 @@ setClass("RobEstControl",
     trialmethod="simple",
     m=1,
     reweighted=TRUE,
+    k2max=1e6,
     otpType="SetMD2andEst"
   ),
   contains="CovControlMcd"
 )
 
 setClass("EMControl",
-  slots=c(nrep="numeric", maxiter="numeric", convtol="numeric", protol="numeric", seed="extnumeric"),
-  prototype = list(nrep = 100, maxiter=1000, convtol=0.01, protol=1e-6, seed=NULL)
+  slots=c(nrep="numeric", maxiter="numeric", convtol="numeric", protol="numeric", 
+    seed="extnumeric", pertubfct="numeric", k2max="numeric", MaxVarGRt="numeric"),
+  prototype = list(nrep = 0, maxiter=1000, convtol=0.01, protol=1e-3, seed=NULL, pertubfct=1, k2max=1e6, MaxVarGRt=1e6)
 )
 setClass("IdtOutl",slots=c(outliers="extinteger", MD2="numeric",eta="numeric",RefDist="character",
   multiCmpCor="character",NObs="numeric",p="numeric",h="numeric",boolRewind="extlogical"))
@@ -107,10 +110,12 @@ setGeneric("MidPoints",function(Idt) standardGeneric("MidPoints"))
 setGeneric("LogRanges",function(Idt) standardGeneric("LogRanges"))
 setGeneric("Ranges",function(Idt) standardGeneric("Ranges"))
 setGeneric("mle",
-  function(Idt, Model="Normal", CovCase=1:4, SelCrit=c("BIC","AIC"), OptCntrl=list() ,... )
+#  function(Idt, Model="Normal", CovCase=1:4, SelCrit=c("BIC","AIC"), OptCntrl=list() ,... )
+  function(Idt, Model="Normal", CovCase=1:4, SelCrit=c("BIC","AIC"), k2max=1e6, OptCntrl=list() ,... )
   standardGeneric("mle"))
 setGeneric("MANOVA",function(Idt, grouping, Model=c("Normal","SKNormal","NrmandSKN"), CovCase=1:4, SelCrit=c("BIC","AIC"), 
-      Mxt=c("Hom","Het","Loc","Gen"), CVtol=1.0e-5, OptCntrl=list(), onerror=c("stop","warning","silentNull"), ...)
+#      Mxt=c("Hom","Het","Loc","Gen"), CVtol=1.0e-5, OptCntrl=list(), onerror=c("stop","warning","silentNull"), ...)
+      Mxt=c("Hom","Het","Loc","Gen"), CVtol=1.0e-5, k2max=1e6, OptCntrl=list(), onerror=c("stop","warning","silentNull"), ...)
   standardGeneric("MANOVA"))
 setGeneric("BestModel",function(ModE,SelCrit=c("IdtCrt","BIC","AIC"))  standardGeneric("BestModel"))
 setGeneric("CovCase",function(object)  standardGeneric("CovCase"))
@@ -124,7 +129,7 @@ setGeneric("ObsLogLiks",function(object,Idt,Conf=object@BestModel) standardGener
 setGeneric("fulltle",
   function(Idt, CovCase=1:4, SelCrit=c("BIC","AIC"), alpha=0.75, use.correction=TRUE, getalpha="TwoStep", 
     rawMD2Dist=c("ChiSq","HardRockeAsF","HardRockeAdjF"), MD2Dist=c("ChiSq","CerioliBetaF"),
-    eta=0.025,multiCmpCor=c("never","always","iterstep"), outlin=c("MidPandLogR","MidP","LogR"), reweighted=TRUE, 
+    eta=0.025,multiCmpCor=c("never","always","iterstep"), outlin=c("MidPandLogR","MidP","LogR"), reweighted=TRUE, k2max=1e6,
     force=FALSE, ...)
   standardGeneric("fulltle"))
 
@@ -148,6 +153,7 @@ setGeneric("fasttle",
     trialmethod=control@trialmethod,
     m=control@m,
     reweighted = control@reweighted,
+    k2max = control@k2max,
     otpType=control@otpType,
     control=RobEstControl(), ...)
   standardGeneric("fasttle"))
@@ -169,7 +175,7 @@ setGeneric("Roblda",
 setGeneric("Robqda",
   function(x, grouping, prior="proportions", CVtol=1.0e-5, subset=1:nrow(x),
     CovCase=1:4, SelCrit=c("BIC","AIC"), silent=FALSE, SngDMet=c("fasttle","fulltle"),
-      Robcontrol=RobEstControl(), ...) 
+    Robcontrol=RobEstControl(), ...) 
   standardGeneric("Robqda"))
 
 setGeneric("Idtmclust",
@@ -180,10 +186,8 @@ setGeneric("pcoordplot",
   function(x,title="Parallel Coordinate Plot",Seq=c("AllMidP_AllLogR","MidPLogR_VarbyVar"),G=BestG(x),...)
   standardGeneric("pcoordplot"))
 
+setGeneric("plotInfCrt", function(object,crt=object@SelCrit,legpos="bottomleft",...) standardGeneric("plotInfCrt"))
 
-setGeneric("parameters",function(x) standardGeneric("parameters"))
-setGeneric("pro",function(x) standardGeneric("pro"))
-setGeneric("classification",function(x) standardGeneric("classification"))
 setGeneric("SelCrit",function (x) standardGeneric("SelCrit"))
 setGeneric("Hmcdt",function (x) standardGeneric("Hmcdt"))
 setGeneric("BestG",function (x) standardGeneric("BestG"))
@@ -192,6 +196,11 @@ setGeneric("PostProb",function(x) standardGeneric("PostProb"))
 setGeneric("logLik",function(x) standardGeneric("logLik"))
 setGeneric("BIC",function(x) standardGeneric("BIC"))
 setGeneric("AIC",function(x) standardGeneric("AIC"))
+
+setGeneric("parameters",function(x,model="BestModel") standardGeneric("parameters"))
+setGeneric("pro",function(x,model="BestModel") standardGeneric("pro"))
+setGeneric("classification",function(x,model="BestModel") standardGeneric("classification"))
+setGeneric("NbMicroUnits",function(x) standardGeneric("NbMicroUnits"))
 
 
 
