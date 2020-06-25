@@ -1,5 +1,5 @@
-37761b8caa8dd059d5836458fa67bfea *CHANGELOG
-25979fb2a802fb18e886981f2169984d *DESCRIPTION
+2e0e54f27bbc6ecc7ccb6c820cbc366a *CHANGELOG
+99d5f1adc6b32c1967e5c151ffc6e15f *DESCRIPTION
 e9b3058b94d1f7eb07ab9dfab17e0198 *NAMESPACE
 4359cd5ca03eb0660c6c750dfc8273dd *R/AgrMcDt.R
 fdbe73aed0a9e7b98a3fddedb3e794d9 *R/Azzalini_sn_code.R
@@ -89,7 +89,7 @@ f7ad11ab52669e423ac0aa38fca00c07 *man/InfCrt-methods.Rd
 504dc3b9209665c32c3493a6499e8ad5 *man/LoansbyRskLvs_minmaxDt.Rd
 8fba1fb23080c8a71253e9d08dd5f0bf *man/LoansbyRskLvs_qntlDt.Rd
 d1abc175686d4f7d11ec184ef6866d26 *man/MAINT.Data-internal.Rd
-339e01371663217fcb0f488110ff9cd7 *man/MAINT.Data-package.Rd
+8dfd3dffcbcf9062d3e77064f02c62e7 *man/MAINT.Data-package.Rd
 1d001e0cebb9c74811615ebf8b8ace4e *man/MANOVA-methods.Rd
 18bb158b23794667c9dd02dc6da3a263 *man/MANOVAPermTest.Rd
 777d2d2f270428fb3bc8344042fb5f23 *man/RepLOptim.Rd
@@ -123,9 +123,9 @@ b55a3ff3186dbb0852cb7d670e3c7a69 *man/vcov-methods.Rd
 921ce1d99bbb5b8e2746820bd39b19c7 *src/AdMatAlgFoo.h
 730bb2489c115df21239384eb569ac59 *src/AuxFoo.cpp
 29ccd134cbd459efd330ea022bf6eff5 *src/AuxFoo.h
-29abdcd004c0b70264375aeb11807757 *src/CEMGauss.cpp
+fa9069d594f1553fdc7d799be6905a60 *src/CEMGauss.cpp
 239a03b34e5be866ebc9a7921e3a69c1 *src/CEMGauss.h
-08c3c82cde89ae32e697a1ba8780c49b *src/MDataGaussLogLik.cpp
+834294df59c12d553fd822bcbcf5bbeb *src/MDataGaussLogLik.cpp
 5b12be8b0b1dd43f9ce5c8554e18c8cf *src/MDataGaussLogLik.h
 9bc5aa7d4334d43640f515c9a1fd70bd *src/Makevars
 ee03cff16b26889c9c08cde5740d7b8b *src/MinMaxEgval.cpp

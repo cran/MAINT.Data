@@ -194,7 +194,6 @@ void MDataGaussLogLik(const int n, const int p, const int Cf, const arma::mat& X
 
         if (detj <= ZERO) {  
           validsol = false;
-// if (!validsol) Rprintf("MDataGaussLogLik 8 -- Cf = %u found invalid solution here\n",Cf);
           penalty = -INF;
           for (int obs=0;obs<n;++obs) res[obs] = penalty;
           return;
@@ -204,7 +203,6 @@ void MDataGaussLogLik(const int n, const int p, const int Cf, const arma::mat& X
         if (chksing) {
           if (lndetj < MINLNDET) {
             validsol = false;
-// if (!validsol) Rprintf("MDataGaussLogLik 9 -- Cf = %u found invalid solution here\n",Cf);
             penalty = -PenF*(MINLNDET-lndetj);
             for (int obs=0;obs<n;++obs) res[obs] = penalty;
             return;

@@ -1,9 +1,13 @@
-########## Versions 2.2.0 throught 2.2.3 (May-December 2019) ###################
+########## Versions 2.4.0 and 2.4.1 (June 2020) ###################
+
+
+
+########## Versions 2.2.0 throught 2.3.0 (May-August 2019) ###################
 
 
 ########## Versions 2.1.0 and 2.1.1 (April 2019) ###################
 
-Versions 2.1.0 and 2.1.1 implement the follwoing changes:
+Versions 2.1.0 and 2.1.1 implement the following changes:
 
 1) Improved plot methods and new extractors (e.g. colnames, rownames, MidPoints, LogRanges,
    Lbounds, Ubounds, for objects of class IData).

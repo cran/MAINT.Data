@@ -99,69 +99,10 @@ SEXP CEMGauss(SEXP X_s, SEXP k_s, SEXP Cf_s, SEXP Homoc_s, SEXP maxiter_s, SEXP 
 
   bool converg(false);
   if (startwithM) {
-//     validsol = FillParm(X,z0,Cf,Homoc,tautol,n,p,k,nk,Wk,wdev,tau0,muk0,Sigma0,Sigmak0);
      validsol = FillParm(X,z0,Cf,Homoc,tautol,MaxVarGRt,n,p,k,nk,Wk,wdev,tau0,muk0,Sigma0,Sigmak0);
      if (!validsol) return R_NilValue;
   }
 
-/*
-// ############################################################
-
-// Compute initial likelihood 
-
-
-  if (!std::isfinite(LnLik)) LnLik = -INF;
-//  if (print) {
-
-    LnLik1 = 0.;
-//    if (Homoc) validsol = safepdsolve(Sigma0,SigmaInv,SiglnDet,viol,MINLNDET,maxlnk2,true);
-    if (Homoc) validsol = safepdsolve(Sigma0,SigmaInv,SiglnDet,viol,mincorregv,maxcorregv,MINLNDET,maxlnk2,true); 
-    for (int g=0; g<k; ++g)  {
-      vec mukg(muk0.begin()+g*p,p); 
-      if (Homoc) {
-//        MDataGaussLogLik(n,p,Cf,X,mukg,0,&SigmaInv,&SiglnDet,tmpvct,validsol,print,maxlnk2,MaxSctlnEgvlRt,false);
-        MDataGaussLogLik(n,p,Cf,X,mukg,0,&SigmaInv,&SiglnDet,tmpvct,validsol,print,maxlnk2,false);
-      } else {
-        mat Sigmakg = Sigmak0.slice(g);           
-//        MDataGaussLogLik(n,p,Cf,X,mukg,&Sigmakg,0,&SiglnDet,tmpvct,validsol,print,maxlnk2,MaxSctlnEgvlRt,true);
-        MDataGaussLogLik(n,p,Cf,X,mukg,&Sigmakg,0,&SiglnDet,tmpvct,validsol,print,maxlnk2,true);
-      }         
-      if (!validsol) break;         
-      for (int obs=0;obs<n;++obs) LikExp(obs,g) = tmpvct[obs];
-    }
-
-    if (validsol) {
-      for (int obs=0;obs<n;++obs) {
-        nrmfct(obs) = 0.;
-        double maxLikExp = LikExp(obs,0);
-        for (int g=1;g<k;++g) maxLikExp = fmax(LikExp(obs,g),maxLikExp);
-        if (maxLikExp < MINLIKEXP) { 
-          for (int g=0;g<k;++g) LikExp(obs,g) -= maxLikExp;
-          nrmfct(obs) = maxLikExp;
-        }
-        for (int g=0;g<k;++g) Likk(obs,g) =  tau0(g) * exp(LikExp(obs,g));
-      }     
-      for (int obs=0;obs<n;++obs) {
-        Likall = 0.;
-        for (int g=0;g<k;++g) Likall += Likk(obs,g);
-        LnLik1 += nrmfct(obs) + log(Likall);
-      }
-    }
-
-    if (!validsol) {
-      Rprintf("C code: %u group solution (Homoc = %u; Cf = %u)  -- Reported log-likelihhod = %g found to correspond to an unvalid solution\n",
-              k,Homoc,Cf,LnLik);
-      return R_NilValue;
-    }
- 
-    Rprintf("C code: %u group solution (Homoc = %u; Cf = %u)  -- Reported log-likelihhod = %g -- computed log-likelihhod = %g\n",
-             k,Homoc,Cf,LnLik,LnLik1);
-
-//}
-
-      
-// ############################################################
-*/
 
   int iter=0;   
   while (!converg && iter<maxiter)  {
@@ -201,7 +142,6 @@ SEXP CEMGauss(SEXP X_s, SEXP k_s, SEXP Cf_s, SEXP Homoc_s, SEXP maxiter_s, SEXP 
 
   //  M-step
   
-//    if (validsol) validsol = FillParm(X,*zpout,Cf,Homoc,tautol,n,p,k,nk,Wk,wdev,*taupout,*mukpout,*Sigmapout,*Sigmakpout);
     if (validsol) 
       validsol = FillParm(X,*zpout,Cf,Homoc,tautol,MaxVarGRt,n,p,k,nk,Wk,wdev,*taupout,*mukpout,*Sigmapout,*Sigmakpout);
     if (!validsol) LnLik1=-INF;
@@ -238,7 +178,6 @@ SEXP CEMGauss(SEXP X_s, SEXP k_s, SEXP Cf_s, SEXP Homoc_s, SEXP maxiter_s, SEXP 
             minSctlnLogREgvl = fmin(minSctlnLogREgvl,minlregval);
             maxSctlnLogREgvl = fmax(maxSctlnLogREgvl,maxlregval);
           }
-//          MDataGaussLogLik(n,p,Cf,X,mukg,&Sigmakg,0,&SiglnDet,tmpvct,validsol,print,maxlnk2,MaxSctlnEgvlRt,true);
           MDataGaussLogLik(n,p,Cf,X,mukg,&Sigmakg,0,&SiglnDet,tmpvct,validsol,print,maxlnk2,true);
         }
 
@@ -318,7 +257,8 @@ SEXP CEMGauss(SEXP X_s, SEXP k_s, SEXP Cf_s, SEXP Homoc_s, SEXP maxiter_s, SEXP 
   else if (Cf==4) Sigmapar = p;
   if (Homoc) npar = p*k + Sigmapar + k-1;		
   else npar = (p+Sigmapar)*k + k-1;
-  double BIC = -2*LnLik + log(n)*npar;	 		
+//  double BIC = -2*LnLik + log(n)*npar;	 		
+  double BIC = -2*LnLik + log(static_cast<double>(n))*npar;	 		
   double AIC = -2*LnLik + 2*npar;	 		    
       
   if (Homoc) return List::create(
