@@ -115,10 +115,10 @@ SEXP CEMGauss(SEXP X_s, SEXP k_s, SEXP Cf_s, SEXP Homoc_s, SEXP maxiter_s, SEXP 
     for (int g=0; validsol && g<k; ++g)  {
         vec mukg(mukpin->begin()+g*p,p); 
       if (Homoc) {
-        MDataGaussLogLik(n,p,Cf,X,mukg,0,&SigmaInv,&SiglnDet,tmpvct,validsol,print,maxlnk2,false);
+        MDataGaussLogLik(n,p,Cf,X,mukg,0,&SigmaInv,&SiglnDet,tmpvct,validsol,maxlnk2,false);
       } else {
         mat Sigmakg = Sigmakpin->slice(g);           
-        MDataGaussLogLik(n,p,Cf,X,mukg,&Sigmakg,0,&SiglnDet,tmpvct,validsol,print,maxlnk2,true);
+        MDataGaussLogLik(n,p,Cf,X,mukg,&Sigmakg,0,&SiglnDet,tmpvct,validsol,maxlnk2,true);
       }          
       for (int obs=0;obs<n;++obs) LikExp(obs,g) = tmpvct[obs];
     }
@@ -164,7 +164,7 @@ SEXP CEMGauss(SEXP X_s, SEXP k_s, SEXP Cf_s, SEXP Homoc_s, SEXP maxiter_s, SEXP 
       for (int g=0; validsol && g<k; ++g)  {
         vec mukg(mukpout->begin()+g*p,p); 
         if (Homoc) {
-          MDataGaussLogLik(n,p,Cf,X,mukg,0,&SigmaInv,&SiglnDet,tmpvct,validsol,print,maxlnk2,false);
+          MDataGaussLogLik(n,p,Cf,X,mukg,0,&SigmaInv,&SiglnDet,tmpvct,validsol,maxlnk2,false);
         } else {
           mat Sigmakg = Sigmakpout->slice(g);           
           if (SctEgvCnstr) {
@@ -178,7 +178,7 @@ SEXP CEMGauss(SEXP X_s, SEXP k_s, SEXP Cf_s, SEXP Homoc_s, SEXP maxiter_s, SEXP 
             minSctlnLogREgvl = fmin(minSctlnLogREgvl,minlregval);
             maxSctlnLogREgvl = fmax(maxSctlnLogREgvl,maxlregval);
           }
-          MDataGaussLogLik(n,p,Cf,X,mukg,&Sigmakg,0,&SiglnDet,tmpvct,validsol,print,maxlnk2,true);
+          MDataGaussLogLik(n,p,Cf,X,mukg,&Sigmakg,0,&SiglnDet,tmpvct,validsol,maxlnk2,true);
         }
 
         for (int obs=0;obs<n;++obs) LikExp(obs,g) = tmpvct[obs];

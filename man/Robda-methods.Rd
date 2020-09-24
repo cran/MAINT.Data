@@ -15,12 +15,12 @@
 
 \S4method{Roblda}{IData}( x, grouping, prior="proportions", CVtol=1.0e-5, egvtol=1.0e-10,
   subset=1:nrow(x), CovCase=1:4, SelCrit=c("BIC","AIC"), silent=FALSE, 
-  CovEstMet=c("Pooled","Globdev"), SngDMet=c("fasttle","fulltle"),
+  CovEstMet=c("Pooled","Globdev"), SngDMet=c("fasttle","fulltle"), k2max=1e6,
   Robcontrol=RobEstControl(), \dots )
 
 \S4method{Robqda}{IData}( x, grouping, prior="proportions", CVtol=1.0e-5, 
   subset=1:nrow(x), CovCase=1:4, SelCrit=c("BIC","AIC"), silent=FALSE,
-  SngDMet=c("fasttle","fulltle"), Robcontrol=RobEstControl(), \dots )
+  SngDMet=c("fasttle","fulltle"), k2max=1e6, Robcontrol=RobEstControl(), \dots )
 
 }
 
@@ -49,6 +49,8 @@ present, the probabilities should be specified in the order of the factor levels
  
   \item{SngDMet}{Algorithm used to find the robust estimates of location and scatter. Alternatives are \dQuote{fasttle} (default) and \dQuote{fulltle}.}
  
+  \item{k2max}{Maximal allowed l2-norm condition number for correlation matrices. Correlation matrices with condition number above k2max are considered to be numerically singular, leading to degenerate results.}
+
   \item{Robcontrol}{A control object (S4) of class \code{\link{RobEstControl-class}}
     containing estimation options - same as these provided in the function
     specification. If the control object is supplied, the parameters from it

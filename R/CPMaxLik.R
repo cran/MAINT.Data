@@ -42,14 +42,14 @@ SNCMaxLik <- function(Data, Config, grouping=NULL, initpar=NULL, prevMod=NULL,
     }  
     Spar <- GetCovPar(Sigma,Config=Config)
     if (is.null(Spar)) {
-      cat("Data seems to be colinear (In GetCovPar 1: sample covariance matrix for Config",Config,"is not positive-definite\n")
-#      warning("Data seems to be colinear (sample covariance matrix is not positive-definite\n")
+      cat("Data seems to be collinear (In GetCovPar 1: sample covariance matrix for Config",Config,"is not positive-definite)\n")
+#      warning("Data seems to be collinear (sample covariance matrix is not positive-definite\n")
     } else {
       SigmaI <- Safepdsolve(Sigma,maxlnk2=limlnk2,scale=TRUE)
     } 
       if (is.null(Spar) || is.null(SigmaI)) {
-      cat("Data seems to be colinear (In Safepdsolve: sample covariance matrix for Config",Config,"is not positive-definite\n")
-#      warning("Data seems to be colinear (sample covariance matrix is not positive-definite\n")
+      cat("Data seems to be collinear (In Safepdsolve: sample covariance matrix for Config",Config,"is not positive-definite)\n")
+#      warning("Data seems to be collinear (sample covariance matrix is not positive-definite\n")
         return(list(lnLik=-Inf,ksi=NULL,Omega=NULL,Omega.cor=NULL,alpha=NULL,delta=NULL,
              mu=NULL,beta2k=NULL,Sigma=NULL,gamma1=NULL,admissible=NULL,c2=NULL,optres=NULL))
     }
@@ -74,6 +74,7 @@ SNCMaxLik <- function(Data, Config, grouping=NULL, initpar=NULL, prevMod=NULL,
         prevModinitpar <- c(colMeans(Data),Spar,gamma1)   # Check later if this is indeed righ... is prevMod$mu really a vector?? 
       }  
     }
+
     prevModdev0 <- msnCP.dev(prevModinitpar,y=Data,grpind=grpind,Config=Config,k=k,limlnk2=limlnk2,nopenalty=TRUE)
     if (Config==2)  {
       C2res <- Cnf2MaxLik(Data,OptCntrl=OptCntrl)
@@ -83,8 +84,8 @@ SNCMaxLik <- function(Data, Config, grouping=NULL, initpar=NULL, prevMod=NULL,
       S[-RestCovInd(p,Config)] <- 0.
       SigmaSrpar <- GetCovPar(S,Config) 
       if (is.null(SigmaSrpar)) {
-      cat("Data seems to be colinear (In GetCovPar 2: sample covariance matrix for Config",Config,"is not positive-definite\n")
-#        warning("Data seems to be colinear (Sample covariance matrix is not positive-definite)\n")
+      cat("Data seems to be collinear (In GetCovPar 2: sample covariance matrix for Config",Config,"is not positive-definite)\n")
+#        warning("Data seems to be collinear (Sample covariance matrix is not positive-definite)\n")
         return(list(lnLik=-Inf,ksi=NULL,Omega=NULL,Omega.cor=NULL,alpha=NULL,delta=NULL,
              mu=NULL,beta2k=NULL,Sigma=NULL,gamma1=NULL,admissible=NULL,c2=NULL,optres=NULL))
       }

@@ -300,7 +300,8 @@ void msnCP_ll_grad(const NumericVector& mu1, const NumericMatrix& beta2k, const 
 NumericVector msnCP_dev_grad1(NumericVector& param, const NumericMatrix& y, const IntegerVector& grpind,
   const int Config, const int n, const int p, const int k, const double limlnk2,
   const bool trace, const double c2tol, const double ldRtol, const double beta0tol, 
-  const double PenF, const double MachineEPS, const bool FixedArrays)
+//  const double PenF, const double MachineEPS, const bool FixedArrays)
+  const double PenF, const double MachineEPS, const bool FixedArrays, const bool Srpar)
 {
   int q(p/2), nvcovpar(p*(p+1)/2), nvcovsrpar(ncovp(Config,q,p));
   int CPgradl((k+1)*p+nvcovpar), gradl((k+1)*p+nvcovsrpar);
@@ -314,11 +315,26 @@ NumericVector msnCP_dev_grad1(NumericVector& param, const NumericMatrix& y, cons
   static NumericMatrix beta2k;
   static vec CPgrad;
   static rowvec tmpv;
-  static mat SigmaSrgrad;
+  static rowvec SigmaSrgrad;
   static mat DSigSigSr,tmpM;   // Try sparse matrix representation for DSigSigSr !!! 
+
+  std::vector<int> SigtoSrindmap(nvcovsrpar);
+  for (int i=0;i<p;i++) SigtoSrindmap[i] = i*(p+1)-i*(i+1)/2;
+  for (int i0=0,i=p,c=0;c<p;c++) for (int r=c;r<p;r++,i0++) if (c!=r) {
+    if ( (c<q && r<q) || (c>=q && r>=q) ) {
+      if (Config==1 || Config==4) SigtoSrindmap[i++] = i0;
+    } else { 
+      if ( Config==1 || (Config==3 && r==c+q) ) SigtoSrindmap[i++] = i0;
+    }
+  }
 
   static NumericVector paramgrad;
   if (paramgrad.size()!=gradl) paramgrad = clone(param); 
+/*
+for (int i=0;i<gradl;i++) paramgrad(i) = 0.;
+return paramgrad;
+*/
+
   SetZero(DSigSigSr,nvcovpar,nvcovsrpar,true); 
   if (SigmaSrgrad.size()!=nvcovsrpar)  SigmaSrgrad.set_size(nvcovsrpar);
   if (tmpM.n_rows!=nvcovpar || tmpM.n_cols!=nvcovsrpar) tmpM.set_size(nvcovpar,nvcovsrpar);
@@ -330,7 +346,7 @@ NumericVector msnCP_dev_grad1(NumericVector& param, const NumericMatrix& y, cons
   
   NumericVector mu1(mu1ptr,mu1ptr+p);
   if (k>1)  beta2k = NumericMatrix(k-1,p,beta2kptr);
-  Sigma = RestCov(q,Sigmaptr,Config,FixedArrays);
+  Sigma = RestCov(q,Sigmaptr,Config,FixedArrays,Srpar);
   NumericVector gamma1(gamma1ptr,gamma1ptr+p);
 
   msnCP_ll_grad( mu1,beta2k,Sigma,gamma1,y,grpind,n,p,k,nvcovpar,limlnk2,trace,
@@ -342,18 +358,22 @@ NumericVector msnCP_dev_grad1(NumericVector& param, const NumericMatrix& y, cons
     for (int i=0;i<gradl;i++) paramgrad(i) = 0.;
     return paramgrad;
   }
-  RestCov_grad<mat,mat,vec>(p,q,nvcovpar,Config,param.begin()+k*p,FixedArrays,DSigSigSr);
-
-  for (int c=0,ind=0;c<p;c++) for (int r=c;r<p;r++,ind++) {
-    tmpv(ind) = CPgrad(p*k+ind);
-    tmpM.row(ind) = DSigSigSr.row(utind1(c,r));
-  }
-
-  SigmaSrgrad = tmpv * tmpM; 
   for (int i=0;i<k*p;i++) paramgrad(i) = -2*CPgrad(i);
-  for (int i0=0,i1=k*p;i0<nvcovsrpar;i0++,i1++) paramgrad(i1) = -2*SigmaSrgrad(i0);
   for (int i0=k*p+nvcovpar,i1=k*p+nvcovsrpar;i0<CPgradl;i0++,i1++) paramgrad(i1) = -2*CPgrad(i0);
 
+  if (Srpar) {
+    RestCov_grad<mat,mat,vec>(p,q,nvcovpar,Config,param.begin()+k*p,FixedArrays,DSigSigSr);
+    for (int c=0,ind=0;c<p;c++) for (int r=c;r<p;r++,ind++) {
+      tmpv(ind) = CPgrad(p*k+ind);
+      tmpM.row(ind) = DSigSigSr.row(utind1(c,r));
+    }
+    SigmaSrgrad = tmpv * tmpM; 
+    for (int i0=0,i1=k*p;i0<nvcovsrpar;i0++,i1++) paramgrad(i1) = -2*SigmaSrgrad(i0);
+  } else { 
+      for (int i0=0,i1=k*p;i0<nvcovsrpar;i0++,i1++) paramgrad(i1) = -2*CPgrad(k*p+SigtoSrindmap[i0]);
+  }
+
   return paramgrad;
+
 }
 

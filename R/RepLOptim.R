@@ -15,14 +15,14 @@ RepLOptim <- function(start, parsd, fr, gr=NULL, inphess=NULL, ..., method="nlmi
   maxSANNiter_default <- 3000
   maxeval_default <- 2000
   srMachinetol <- sqrt(.Machine$double.eps)
-  RLOtol_default <- srMachinetol
+#  RLOtol_default <- srMachinetol
+  RLOtol_default <- 1e-3
   reltol_default <- srMachinetol
   
   if (!is.null(control$maxrepet)) maxrepet <- control$maxrepet else maxrepet <- maxrepet_default  
   if (!is.null(control$maxnoimprov)) maxnoimprov <- control$maxnoimprov else maxnoimprov <- maxnoimprov_default
   if (!is.null(control$maxreplic)) maxreplic <- control$maxreplic else maxreplic <- maxreplic_default
   if (!is.null(control$maxiter)) maxiter <- control$maxiter 
-#  else if (class(method)!="character") maxiter <- maxiter_default
   else if (class(method)[1]!="character") maxiter <- maxiter_default
     else if (method!="SANN") maxiter <- maxiter_default
       else maxiter <-  maxSANNiter_default
@@ -43,7 +43,10 @@ RepLOptim <- function(start, parsd, fr, gr=NULL, inphess=NULL, ..., method="nlmi
   if (!is.null(control$upper)) upper <- control$upper 
   if (!is.null(control$rethess)) lower <- control$rethess 
   if (!is.null(control$parmstder)) parmstder <- control$parmstder 
-  if (!is.null(control$EnfCnstrs)) EnfCnstrs <- control$EnfCnstrs 
+  if (!is.null(control$EnfCnstrs)) EnfCnstrs <- control$EnfCnstrs
+
+  if (is.na(as.integer(maxrepet)) || length(maxrepet) > 1 || maxrepet<1) 
+    stop("Wrong value (=",maxrepet,") for the control$maxrepet parameter\n")   
 
   npar <- length(start)
   values <- NULL
@@ -63,8 +66,6 @@ RepLOptim <- function(start, parsd, fr, gr=NULL, inphess=NULL, ..., method="nlmi
     cat("npar =",npar," -- start =",start,"\nupper =",upper,"\n")
     stop("Incorrect length of the upper limits vector\n") 
   }
-
-
 
   bestres <- NULL	
   bestval <- Inf
@@ -90,9 +91,10 @@ RepLOptim <- function(start, parsd, fr, gr=NULL, inphess=NULL, ..., method="nlmi
         }
         else if (method == "nlm") 
           tmpres <- nlm(fr,p=initpar,lbound=lower,ubound=upper,iterlim=maxiter,...)
-        else if (method == "L-BFGS-B")
+        else if (method == "L-BFGS-B") {
           tmpres <- optim(initpar,fr,gr=gr,method=method,lower=lower,upper=upper,
             control=list(maxit=maxiter),hessian=rethess,...)
+        } 
         else if (method == "Nelder-Mead" || method == "BFGS" || method == "CG" || method == "SANN")
           tmpres <- optim(initpar,fr,gr=gr,method=method,control=list(maxit=maxiter),
             lbound=lower,ubound=upper,hessian=rethess,...)

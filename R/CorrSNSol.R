@@ -1,15 +1,15 @@
-CorrSNSol <- function(Nres,SNres,CvCase,Conf,Xscld,Xmean,Xsd,XsdOutPrd,lglikdif,limlnk2,OptCntrl,bordertol=1e-2,maxsk=0.99527)
+#CorrSNSol <- function(Nres,SNres,CvCase,Conf,Xscld,Xmean,Xsd,XsdOutPrd,lglikdif,limlnk2,OptCntrl,bordertol=1e-2,maxsk=0.99527)
+CorrSNSol <- function(Nres,SNres,CvCase,Conf,Xscld,Xmean,Xsd,XsdOutPrd,lglikdif,limlnk2,OptCntrl,getvcov=TRUE,bordertol=1e-2,maxsk=0.99527)
 {
-
   GetvcovSingD <- function(Res)
   {
     SngDparnam <- paste("mu_",Xnames,sep="")
     for (i in 1:p)  SngDparnam <- c(SngDparnam,paste("Sigma_",Xnames[i],"_",Xnames[i:p],sep=""))
     SngDparnam <- c(SngDparnam,paste("gamma1_",Xnames,sep=""))
     npar <- SKnpar(Conf,p,p/2)
-    InFData <- mysn.infoMv( dp=list(xi=Res$ksi,Omega=Res$Omega,alpha=Res$alpha),y=Xscld, w=n1scvct, limlnk2=limlnk2)
-    if (InFData$status!="Regular") {
-      return( list(mleCPvcov=NULL,muEse=NULL,SigmaEse=NULL,gamma1Ese=NULL,status=InFData$status) )
+    InFData <- try( sn.infoMv( dp=list(xi=Res$ksi,Omega=Res$Omega,alpha=Res$alpha), y=Xscld, x=matrix(1,nrow=n,ncol=1) ) )
+    if ( is.null(InFData) || class(InFData)[1] == "try-error" || is.null(InFData$asyvar.cp) )  {
+      return( list(mleCPvcov=NULL,muEse=NULL,SigmaEse=NULL,gamma1Ese=NULL,status="Invalid") )
     }
     if (Conf==1)  {
       mleCPvcov <- InFData$asyvar.cp
@@ -83,16 +83,21 @@ CorrSNSol <- function(Nres,SNres,CvCase,Conf,Xscld,Xmean,Xsd,XsdOutPrd,lglikdif,
     dimnames(NewSNres$OmegaE)[[1]] <- dimnames(NewSNres$OmegaE)[[2]] <- Xnames
   }  
 
-  if ( (SNStdDtRes$c2 > bordertol) || (maxsk-max(abs(SNStdDtRes$gamma1)) < bordertol) )
-  {
-    vcovl <- GetvcovSingD(SNStdDtRes)
-    NewSNres$status <- vcovl$status
-    NewSNres$mleCPvcov <- vcovl$mleCPvcov
-    NewSNres$muEse <- vcovl$muEse
-    NewSNres$SigmaEse <- vcovl$SigmaEse
-    NewSNres$gamma1Ese <- vcovl$gamma1Ese
+  if (getvcov) {
+    if ( (SNStdDtRes$c2 > bordertol) || (maxsk-max(abs(SNStdDtRes$gamma1)) < bordertol) )
+    {
+      vcovl <- GetvcovSingD(SNStdDtRes)
+      NewSNres$status <- vcovl$status
+      NewSNres$mleCPvcov <- vcovl$mleCPvcov
+      NewSNres$muEse <- vcovl$muEse
+      NewSNres$SigmaEse <- vcovl$SigmaEse
+      NewSNres$gamma1Ese <- vcovl$gamma1Ese
+    } else {
+      NewSNres$status <- "Onborder"
+    }
   } else {
-    NewSNres$status <- "Onborder"
+    NewSNres$status <- "OnHold"
+    NewSNres$mleCPvcov <- NewSNres$muEse <- NewSNres$SigmaEse <- NewSNres$gamma1Ese <- NULL
   }
 
   NewSNres  #  return(NewSNres)

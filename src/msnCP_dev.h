@@ -64,13 +64,10 @@ double msnCP_dev1(NumericVector& param, const NumericMatrix& y, const IntegerVec
 		const int Config, const int n, const int p, const int k, const double limlnk2, 
 		const bool trace, const double c2tol, const double ldRtol, 
 		const double PenF, const double PenC, const bool nopenalty,
-		const double MachineEPS, const bool FixedArrays);
+		const double MachineEPS, const bool FixedArrays, const bool Srpar);
 
 
 RcppExport SEXP msnCP_dev(SEXP param_s, SEXP y_s, SEXP grpind_s, SEXP Config_s, SEXP n_s, SEXP p_s, SEXP k_s, SEXP limlnk2_s, 
-  SEXP trace_s, SEXP c2tol_s, SEXP ldRtol_s, SEXP PenF_s, SEXP PenC_s, SEXP nopenalty_s, SEXP MachineEPS_s) ;
-
-RcppExport SEXP msnCP_dev_grad(SEXP param_s, SEXP y_s, SEXP grpind_s, SEXP Config_s, SEXP n_s, SEXP p_s, SEXP k_s, SEXP limlnk2_s, 
-  SEXP trace_s, SEXP c2tol_s, SEXP ldRtol_s, SEXP beta0tol_s, SEXP PenF_s, SEXP MachineEPS_s) ;
+  SEXP trace_s, SEXP c2tol_s, SEXP ldRtol_s, SEXP PenF_s, SEXP PenC_s, SEXP nopenalty_s, SEXP MachineEPS_s, SEXP Srpar_s);
 
 #endif

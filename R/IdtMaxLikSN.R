@@ -1,3 +1,33 @@
+devbymsn.mle <- function(
+    start, x, y, w, k, trace = FALSE,
+    opt.method = c("nlminb", "Nelder-Mead", "BFGS", "CG", "SANN"), 
+    control = list(), ... )
+{
+  if (is.matrix(y)) {
+    n <- nrow(y)
+    p <- ncol(y)
+  } else if (is.numeric(y)) {
+    n <- length(y)
+    p <- 1  
+  } else {
+   stop("class(y) =",class(y),"is neither numeric nor matrix\n")
+  }
+
+  beta <- matrix(start[1:(k*p)],nrow=k,ncol=p)
+  if (k==1) dev <- scale(y,center=as.numeric(beta),scale=FALSE)
+  else dev <- y - x %*% beta
+  Omega <- t(dev) %*% dev/n
+  eta  <- start[(k*p+1):((k+1)*p)]
+  alpha <- eta*sqrt(diag(Omega))
+
+#  res <- msn.mle(x,y,start=list(beta=beta,Omega=Omega,alpha=alpha),w,trace,opt.method,control)
+   try( res <- msn.mle(x,y,start=list(beta=beta,Omega=Omega,alpha=alpha),w,trace,opt.method,control) )
+   if ( is.null(res) || class(res)[1] == "try-error" || !is.finite(res$logL) )  {
+     return( list(par=c(as.numeric(beta),eta),value=.Machine$double.xmax) )
+   }
+   list(par=c(as.numeric(res$dp$beta),res$dp$alpha/sqrt(diag(res$dp$Omega))),value=-2*res$logL)
+}  
+
 SNCnf1MaxLik <- function(Data,grouping=NULL,initpar=NULL,EPS=1E-6,limlnk2,OptCntrl=list())
 {
 #  Note  -  The Data argument should be a matrix containing the mid-points in the first columns and the log-ranges in the next columns 
@@ -23,16 +53,16 @@ SNCnf1MaxLik <- function(Data,grouping=NULL,initpar=NULL,EPS=1E-6,limlnk2,OptCnt
 
   if (is.null(grouping))  {
     k <- 1  
-#    parsd <- rep(sd0,2*p)      	# standard deviation hyper-parameters - used to generate random starting points
     parsd <- sd0*c(rep(1./sqrt(n),p),rep(0.1,p))   # standard deviation hyper-parameters
     if (is.null(initpar))  { 
-      initpar <- mymsn.mle(NULL,y=Data,limlnk2=limlnk2,control=mymsncontrol)$par 
-      if (is.null(initpar))  { 
+      msnmlesol <- try(msn.mle(x=matrix(1,nrow=n,ncol=1),y=Data))
+      if (class(msnmlesol)[1] == "try-error")  { 
         return(list(lnLik=-Inf,ksi=NULL,beta2k=NULL,Omega=NULL,Omega.cor=NULL,alpha=NULL,
-             delta=NULL,mu=NULL,Sigma=NULL,gamma1=NULL,admissible=NULL,c2=NULL,optres=NULL))
+               delta=NULL,mu=NULL,Sigma=NULL,gamma1=NULL,admissible=NULL,c2=NULL,optres=NULL))
       }
+      initpar <- c(as.numeric(msnmlesol$dp$beta),msnmlesol$dp$alpha/sqrt(diag(msnmlesol$dp$Omega))) 
     }
-    res <- RepLOptim(initpar,parsd,fr=NULL,method=mymsn.mle,y=Data,limlnk2=limlnk2,control=OptCntrl)
+    res <- RepLOptim(initpar,parsd,fr=NULL,method=devbymsn.mle,y=Data,x=matrix(1,nrow=n,ncol=1),k=1)
     ksi <- res$par[1:p]
     beta2k <- NULL
     dev <- scale(Data,center=ksi,scale=FALSE)
@@ -41,15 +71,16 @@ SNCnf1MaxLik <- function(Data,grouping=NULL,initpar=NULL,EPS=1E-6,limlnk2,OptCnt
     k <- length(lev)
     parsd <- rep(sd0,(k+1)*p)      	# standard deviation hyper-parameters - used to generate random starting points
     parsd <- sd0*c(rep(1./sqrt(n),k*p),rep(0.1,p))   # standard deviation hyper-parameters
-    X <- model.matrix(Data ~ grouping)
+    X <- model.matrix(~ grouping)
     if (is.null(initpar))  { 
-      initpar <- mymsn.mle(NULL,y=Data,x=X,limlnk2=limlnk2,control=mymsncontrol)$par
-      if (is.null(initpar)) {
+      msnmlesol <- try(msn.mle(x=X,y=Data))
+      if (class(msnmlesol)[1] == "try-error")  { 
         return(list(lnLik=-Inf,ksi=NULL,beta2k=NULL,Omega=NULL,Omega.cor=NULL,alpha=NULL,
              delta=NULL,mu=NULL,Sigma=NULL,gamma1=NULL,admissible=NULL,c2=NULL,optres=NULL))
       }
+      initpar <- c(as.numeric(msnmlesol$dp$beta),msnmlesol$dp$alpha/sqrt(diag(msnmlesol$dp$Omega))) 
     }
-    res <- RepLOptim(initpar,parsd,fr=NULL,method=mymsn.mle,y=Data,x=X,limlnk2=limlnk2,control=OptCntrl)
+    res <- RepLOptim(initpar,parsd,fr=NULL,method=devbymsn.mle,y=Data,x=X,k=k)
     beta <- matrix(res$par[1:(k*p)],nrow=k,ncol=p)
     beta2k <- beta[-1,]
     ksi <- matrix(nrow=k,ncol=p)
@@ -86,6 +117,7 @@ SNCnf1MaxLik <- function(Data,grouping=NULL,initpar=NULL,EPS=1E-6,limlnk2,OptCnt
       mu[2,] <- beta2k + mu[1,]
     }
   }
+
   list(lnLik=res$val/(-2),ksi=ksi,beta2k=beta2k,Omega=Omega,Omega.cor=Omegabar,alpha=alpha,
     delta=delta,mu=mu,Sigma=CP$Sigma,gamma1=CP$gamma1,admissible=TRUE,c2=c2,optres=res)
 }
@@ -176,8 +208,9 @@ SNVCovscaling <- function(Conf,p,stdv,k=1)  # Creates a scaling matrix in order 
   outer(sclvct,sclvct)  
 }
 
-IdtSNmle <- function(Idt, grouping=NULL, Type=c("SingDst","HomMxt"), CVtol=1.0e-5, bordertol=1e-2, 
-  OptCntrl=list(), onerror=c("stop","warning","silentNull"), limlnk2, CovCaseArg, Config, SelCrit)
+IdtSNmle <- function(Idt, grouping=NULL, Type=c("SingDst","HomMxt"), getvcov=TRUE, CVtol=1.0e-5, bordertol=1e-2, 
+#IdtSNmle <- function(Idt, grouping=NULL, Type=c("SingDst","HomMxt"), getvcov, CVtol=1.0e-5, bordertol=1e-2, 
+  OptCntrl=list(), onerror=c("stop","warning","silentNull"), limlnk2, CovCaseArg, Config, SelCrit, EPS=1E-6)
 {
 
 ##########################################################################
@@ -196,7 +229,6 @@ IdtSNmle <- function(Idt, grouping=NULL, Type=c("SingDst","HomMxt"), CVtol=1.0e-
       newpar <- c(DP$ksi,DP$alpha/DP$omega)
       FullModel <- SNCnf1MaxLik(Xscld,initpar=newpar,grouping=grouping,limlnk2=limlnk2,OptCntrl=OptCntrl)
     }  else  {
-#      SigmaSrpar <- GetCovPar(RestModel$Sigma,FullConf) 
       SigmaSrpar <- GetCovPar(RestModel$Sigma,FullConf,test=FALSE) 
       if (Type=="SingDst")  {
         newpar <- c(RestModel$mu,SigmaSrpar,RestModel$gamma1)
@@ -209,62 +241,85 @@ IdtSNmle <- function(Idt, grouping=NULL, Type=c("SingDst","HomMxt"), CVtol=1.0e-
     FullModel
   }
 
-  Getvcov <- function(Res)
+  Getvcov <- function(Res,Conf)
   {
-    if (Type=="SingDst")
-    {
+
+    nCoVarpar <- ncovp(Conf,q,p)    # Number of free paramters in the VarCov matrix
+    lb <- c(rep(-Inf,k*p),rep(EPS,p),rep(-Inf,nCoVarpar-p),rep(-maxsk,p)) # Lower and upper bounds for optimization routines
+    ub <- c(rep(Inf,k*p+nCoVarpar),rep(maxsk,p))
+
+    if (Type=="SingDst")  {
+
       SngDparnam <- paste("mu_",Xnames,sep="")
       for (i in 1:p) SngDparnam <- c(SngDparnam,paste("Sigma_",Xnames[i],"_",Xnames[i:p],sep=""))
       SngDparnam <- c(SngDparnam,paste("gamma1_",Xnames,sep=""))
       npar <- SKnpar(Conf,p,p/2)
-      InFData <- mysn.infoMv( dp=list(xi=Res$ksi,Omega=Res$Omega,alpha=Res$alpha),
-        y=Xscld, w=n1scvct, limlnk2=limlnk2)
-      if (InFData$status!="Regular") {
-        return( list(mleCPvcov=NULL,muEse=NULL,SigmaEse=NULL,gamma1Ese=NULL,status=InFData$status) )
-      }
-      if (Conf==1)  {
-        mleCPvcov <- InFData$asyvar.cp
-        rownames(mleCPvcov) <- colnames(mleCPvcov) <- SngDparnam
-      }  else  {
-        nparC1 <- 2*p + p*(p+1)/2  
-        parind <- c(1:p,p+SigCind(Conf,p/2),(nparC1-p+1):nparC1)
-        mleCPvcov <- Safepdsolve(InFData$info.cp[parind,parind],maxlnk2=limlnk2,scale=TRUE)
-        if ( !is.null(mleCPvcov) ) { rownames(mleCPvcov) <- colnames(mleCPvcov) <- SngDparnam[parind] }
-      }
+       if (Conf==1)  {
+         InFData <- try( 
+           sn.infoMv( dp=list(xi=Res$ksi,Omega=Res$Omega,alpha=Res$alpha), y=Xscld, x=matrix(1,nrow=n,ncol=1), at.MLE=TRUE ) 
+         )
+         if ( is.null(InFData) || class(InFData)[1] == "try-error" || (is.null(InFData$asyvar.cp)) )  {
+           return( list(mleCPvcov=NULL,muEse=NULL,SigmaEse=NULL,gamma1Ese=NULL,status="Invalid") )
+         }
+         mleCPvcov <- InFData$asyvar.cp
+         rownames(mleCPvcov) <- colnames(mleCPvcov) <- SngDparnam
+       }  else  {
+         optres <- optim(Res$optres$par, fn=msnCP.dev, gr=msnCP.dev.grad, lower=lb, upper=ub, method="L-BFGS-B",
+           y=Xscld, grpind=rep(as.integer(-1),n), Config=Conf, k=1, hessian=TRUE, Srpar=FALSE, control=list(maxit=0) )
+         if ( !is.null(optres$hessian) )  {
+           mleCPvcov <- Safepdsolve(optres$hessian/2,maxlnk2=limlnk2,scale=TRUE)
+         } 
+         if ( is.null(optres$hessian) || is.null(mleCPvcov) )  {
+           return( list(mleCPvcov=NULL,muEse=NULL,SigmaEse=NULL,gamma1Ese=NULL,status="Invalid") )
+         }
+         nparC1 <- 2*p + p*(p+1)/2  
+         parind <- c(1:p,p+SigCind(Conf,q),(nparC1-p+1):nparC1)
+         rownames(mleCPvcov) <- colnames(mleCPvcov) <- SngDparnam[parind]
+       }  
+
     }  else if (Type=="HomMxt") {
+
       HoMxtparnam <- paste("mu_",Xnames,"_",grplvls[1],sep="")
       for (g in 2:k) HoMxtparnam <- c(HoMxtparnam,paste("mu_",Xnames,"_",grplvls[g],sep=""))
       for (i in 1:p) HoMxtparnam <- c(HoMxtparnam,paste("Sigma_",Xnames[i],"_",Xnames[i:p],sep=""))
       HoMxtparnam <- c(HoMxtparnam,paste("gamma1_",Xnames,sep=""))
       npar <- SKnpar(Conf,p,p/2,Ngrps=k)
-      InFData <- mysn.infoMv( dp=list(beta=rbind(Res$ksi[1,],Res$beta2k),Omega=Res$Omega,alpha=Res$alpha),
-        y=Xscld, x=grpModMat, w=n1scvct, limlnk2=limlnk2)
-      if (InFData$status!="Regular") {
-        return( list(mleCPvcov=NULL,muEse=NULL,SigmaEse=NULL,gamma1Ese=NULL,status=InFData$status) )
-      }
       if (Conf==1)  {
+        InFData <- try( 
+          sn.infoMv( dp=list(beta=as.matrix(rbind.data.frame(Res$ksi[1,],Res$beta2k)),Omega=Res$Omega,alpha=Res$alpha), 
+                   y=Xscld, x=model.matrix(~ grouping), at.MLE=TRUE )  
+        ) 
+        if ( is.null(InFData) || class(InFData)[1] == "try-error" || is.null(InFData$asyvar.cp) )  {
+          return( list(mleCPvcov=NULL,muEse=NULL,SigmaEse=NULL,gamma1Ese=NULL,status="Invalid") )
+        }
         betavcov <- InFData$asyvar.cp
         nSpar <- p*(p+1)/2
       }  else  {
-        nparC1 <- (k+1)*p + p*(p+1)/2  
-        parind <- c(1:(k*p),(k*p)+SigCind(Conf,p/2),(nparC1-p+1):nparC1)
-        nSpar <- length(parind) - (k+1)*p
-        betavcov <- Safepdsolve(InFData$info.cp[parind,parind],maxlnk2=limlnk2,scale=TRUE)
+        optres <- optim(Res$optres$par, fn=msnCP.dev, gr=msnCP.dev.grad, lower=lb, upper=ub, method="L-BFGS-B",
+          y=Xscld, grpind=as.integer(grouping)-as.integer(2), Config=Conf, k=k, hessian=TRUE, Srpar=FALSE, control=list(maxit=0) )
+        betavcov <- Safepdsolve(optres$hessian/2,maxlnk2=limlnk2,scale=TRUE)
       }
-      if ( !is.null(betavcov) )
-      {
+      if ( !is.null(betavcov) )  {
         mleCPvcov <- matrix(nrow=npar,ncol=npar)		
-        muind <- 1:(p*k)
-        nmugind <- NULL
-        for (g in 1:k) nmugind <- c(nmugind,(0:(p-1))*k+g)
+        muind0 <- 1:p
         Sind <- p*k + 1:nSpar
         gamma1ind <- p*k + nSpar + 1:p
         Sgamma1ind <- c(Sind,gamma1ind)
-        M <- kronecker(diag(p),Gmat)
-        mleCPvcov[muind,muind] <- (M %*% betavcov[muind,muind] %*% t(M))[nmugind,nmugind]
-        mleCPvcov[muind,Sgamma1ind] <- (M %*% betavcov[muind,Sgamma1ind])[nmugind,]
-        mleCPvcov[Sgamma1ind,muind] <- t(mleCPvcov[muind,Sgamma1ind])
-        mleCPvcov[Sgamma1ind,Sgamma1ind] <- betavcov[Sgamma1ind,Sgamma1ind]
+        Sind0 <- p + 1:nSpar
+        gamma1ind0 <- p + nSpar + 1:p
+        Sgamma1ind0 <- c(Sind0,gamma1ind0)
+        vcovmu0mu0 <- betavcov[muind0,muind0]
+        vcovmu0Sgamma1 <- betavcov[muind0,Sgamma1ind0]
+        for (g1 in 1:k) {
+          muind1 <- ((g1-1)*p)+(1:p)
+          for (g2 in 1:k) {
+            muind2 <- ((g2-1)*p)+(1:p)
+            mleCPvcov[muind1,muind2] <- vcovmu0mu0
+          }
+          mleCPvcov[muind1,Sgamma1ind] <- vcovmu0Sgamma1
+          mleCPvcov[Sgamma1ind,muind1] <- t(mleCPvcov[muind1,Sgamma1ind])
+        }        
+        mleCPvcov[Sgamma1ind,Sgamma1ind] <- betavcov[Sgamma1ind0,Sgamma1ind0]
         if (Conf==1)  {
           rownames(mleCPvcov) <- colnames(mleCPvcov) <- HoMxtparnam
         } else  {
@@ -274,6 +329,7 @@ IdtSNmle <- function(Idt, grouping=NULL, Type=c("SingDst","HomMxt"), CVtol=1.0e-
         mleCPvcov <- NULL
       }
     }
+    
     if (is.null(mleCPvcov))  {
      return( list(mleCPvcov=NULL,muEse=NULL,SigmaEse=NULL,gamma1Ese=NULL) )
     }  
@@ -342,7 +398,7 @@ IdtSNmle <- function(Idt, grouping=NULL, Type=c("SingDst","HomMxt"), CVtol=1.0e-
   }
   Config <- sort(Config)  
 
-  X <- cbind(Idt@MidP,Idt@LogR)
+  X <- cbind.data.frame(Idt@MidP,Idt@LogR)
   Xnames <- names(X)
   if (CovCaseArg)  {
     nCovCases <- 4 
@@ -426,7 +482,7 @@ IdtSNmle <- function(Idt, grouping=NULL, Type=c("SingDst","HomMxt"), CVtol=1.0e-
       }  else {
         StdDtRes[[CovCaseMap[Conf]]] <- SNCMaxLik(Xscld,Config=Conf,limlnk2=limlnk2,OptCntrl=OptCntrl,prevMod=prevMod)
         if (is.null(StdDtRes[[CovCaseMap[Conf]]]$admissible))
-          cat("Data seems to be colinear (Covariance matrix estimate for CovCase",CovCaseMap[Conf],"is found not to be positive-definite\n")
+          cat("Data seems to be collinear (Covariance matrix estimate for CovCase",CovCaseMap[Conf],"is found not to be positive-definite)\n")
 
       } 
     }  else if (Type=="HomMxt")
@@ -441,7 +497,7 @@ IdtSNmle <- function(Idt, grouping=NULL, Type=c("SingDst","HomMxt"), CVtol=1.0e-
       }  else  {
         StdDtRes[[CovCaseMap[Conf]]] <- SNCMaxLik(Xscld,Config=Conf,grouping=grouping,limlnk2=limlnk2,OptCntrl=OptCntrl,prevMod=prevMod) 
         if (is.null(StdDtRes[[CovCaseMap[Conf]]]$admissible))
-          cat("Data seems to be colinear (Covariance matrix estimate for CovCase",CovCaseMap[Conf],"is found not to be positive-definite\n")
+          cat("Data seems to be collinear (Covariance matrix estimate for CovCase",CovCaseMap[Conf],"is found not to be positive-definite)\n")
       }
     }
   }	
@@ -478,7 +534,6 @@ IdtSNmle <- function(Idt, grouping=NULL, Type=c("SingDst","HomMxt"), CVtol=1.0e-
 
   for (Conf in Config)
   {
-#    if (!is.null(StdDtRes[[CovCaseMap[Conf]]]$optres$par))
     CvCase <- CovCaseMap[Conf]	
     if (!is.null(StdDtRes[[CvCase]]$optres$par))
     {
@@ -518,17 +573,26 @@ IdtSNmle <- function(Idt, grouping=NULL, Type=c("SingDst","HomMxt"), CVtol=1.0e-
       AICs[CvCase] <- CovConfCases[[CvCase]]$AIC <- -2*CovConfCases[[CvCase]]$logLik + 2*SKnpar(Conf,p,q,Ngrps=k)
       BICs[CvCase] <- CovConfCases[[CvCase]]$BIC <- -2*CovConfCases[[CvCase]]$logLik + log(n)*SKnpar(Conf,p,q,Ngrps=k)
 #    } # Note: In previous versions this conditonal loop was closed here
-     if ( (StdDtRes[[CvCase]]$c2 > bordertol) || (maxsk-max(abs(StdDtRes[[CvCase]]$gamma1)) < bordertol) )
-     {
-       vcovl <- Getvcov(StdDtRes[[CvCase]])
-       CovConfCases[[CvCase]]$status <- vcovl$status
-       CovConfCases[[CvCase]]$mleCPvcov <- vcovl$mleCPvcov
-       CovConfCases[[CvCase]]$muEse <- vcovl$muEse
-       CovConfCases[[CvCase]]$SigmaEse <- vcovl$SigmaEse
-       CovConfCases[[CvCase]]$gamma1Ese <- vcovl$gamma1Ese
+
+#     if ( (StdDtRes[[CvCase]]$c2 > bordertol) || (maxsk-max(abs(StdDtRes[[CvCase]]$gamma1)) < bordertol) )
+      if (getvcov) {
+        if ( (StdDtRes[[CvCase]]$c2 > bordertol) && (maxsk-max(abs(StdDtRes[[CvCase]]$gamma1)) > bordertol) )
+        {
+          vcovl <- Getvcov(StdDtRes[[CvCase]],Conf)
+          CovConfCases[[CvCase]]$status <- vcovl$status
+          CovConfCases[[CvCase]]$mleCPvcov <- vcovl$mleCPvcov
+          CovConfCases[[CvCase]]$muEse <- vcovl$muEse
+          CovConfCases[[CvCase]]$SigmaEse <- vcovl$SigmaEse
+          CovConfCases[[CvCase]]$gamma1Ese <- vcovl$gamma1Ese
+       } else {
+         CovConfCases[[CvCase]]$status <- "Onborder"
+       }
      } else {
-       CovConfCases[[CvCase]]$status <- "Onborder"
+       CovConfCases[[CvCase]]$status <- "OnHold"
+       CovConfCases[[CvCase]]$mleCPvcov <- CovConfCases[[CvCase]]$muEse <- 
+       CovConfCases[[CvCase]]$SigmaEse <- CovConfCases[[CvCase]]$gamma1Ese <- NULL
      }
+
     }  # Note: In previous versions this conditonal loop was closed above    
   }
   if (SelCrit=="AIC")  {
@@ -547,7 +611,8 @@ IdtSNmle <- function(Idt, grouping=NULL, Type=c("SingDst","HomMxt"), CVtol=1.0e-
   }
 }
 
-IdtFDMxtSNmle <- function(Idt, grouping, CVtol=1.0e-5, OptCntrl=list(), limlnk2, CovCaseArg, Config, SelCrit)
+#IdtFDMxtSNmle <- function(Idt, grouping, getvcov=TRUE, CVtol=1.0e-5, OptCntrl=list(), limlnk2, CovCaseArg, Config, SelCrit)
+IdtFDMxtSNmle <- function(Idt, grouping, getvcov, CVtol=1.0e-5, OptCntrl=list(), limlnk2, CovCaseArg, Config, SelCrit)
 {
   n <- Idt@NObs
   q <- Idt@NIVar
@@ -592,7 +657,7 @@ IdtFDMxtSNmle <- function(Idt, grouping, CVtol=1.0e-5, OptCntrl=list(), limlnk2,
   }
   for (g in 1:k) {
     Idtg <- Idt[grouping==lev[g],]
-    IdtgDF <- cbind(Idtg@MidP,Idtg@LogR)
+    IdtgDF <- cbind.data.frame(Idtg@MidP,Idtg@LogR)
     Xbar <- colMeans(IdtgDF)
     Xstdev <- sapply(IdtgDF,sd)
     CnstV <- which(Xstdev/abs(Xbar)<CVtol)
@@ -601,31 +666,37 @@ IdtFDMxtSNmle <- function(Idt, grouping, CVtol=1.0e-5, OptCntrl=list(), limlnk2,
     }  else if (length(CnstV)>1)  {
       stop("Variables ",paste(names(CnstV),collapse=" ")," appear to be constant in group ",lev[g],"\n")
     }
-    pres <- IdtSNmle(Idtg,Type="SingDst",CVtol=CVtol,OptCntrl=OptCntrl, limlnk2=limlnk2,
+#    pres <- IdtSNmle(Idtg,Type="SingDst",CVtol=CVtol,OptCntrl=OptCntrl, limlnk2=limlnk2,
+#      CovCaseArg=CovCaseArg,Config=Config,SelCrit=SelCrit)
+    pres <- IdtSNmle(Idtg,Type="SingDst",getvcov=getvcov,CVtol=CVtol,OptCntrl=OptCntrl, limlnk2=limlnk2,
       CovCaseArg=CovCaseArg,Config=Config,SelCrit=SelCrit)
     for (model in Config)
     { 
-      CvCase <- CovCaseMap[model]	
-      CovConfCases[[CvCase]]$muE[g,] <- pres@CovConfCases[[CvCase]]$muE
-      CovConfCases[[CvCase]]$ksiE[g,] <- pres@CovConfCases[[CvCase]]$ksiE
-      CovConfCases[[CvCase]]$gamma1E[g,] <- pres@CovConfCases[[CvCase]]$gamma1E
-      CovConfCases[[CvCase]]$alphaE[g,] <- pres@CovConfCases[[CvCase]]$alphaE
-      CovConfCases[[CvCase]]$SigmaE[,,g] <- pres@CovConfCases[[CvCase]]$SigmaE
-      CovConfCases[[CvCase]]$OmegaE[,,g] <- pres@CovConfCases[[CvCase]]$OmegaE
-      CovConfCases[[CvCase]]$logLik <- CovConfCases[[CvCase]]$logLik + pres@CovConfCases[[CvCase]]$logLik
-      CovConfCases[[CvCase]]$optres[[g]] <- pres@CovConfCases[[CvCase]]$optres
-      if (!is.null(pres@CovConfCases[[CvCase]]$muEse))
-        { CovConfCases[[CvCase]]$muEse[g,] <- pres@CovConfCases[[CvCase]]$muEse }
-      if (!is.null(pres@CovConfCases[[CvCase]]$gamma1Ese))
-        { CovConfCases[[CvCase]]$gamma1Ese[g,] <- pres@CovConfCases[[CvCase]]$gamma1Ese }
-      if (!is.null(pres@CovConfCases[[CvCase]]$SigmaEse))
-        { CovConfCases[[CvCase]]$SigmaEse[,,g] <- pres@CovConfCases[[CvCase]]$SigmaEse }
+      CvCase <- CovCaseMap[model]
       if (!is.null(pres@CovConfCases[[CvCase]]$mleCPvcov))  {
         CovConfCases[[CvCase]]$mleCPvcov[,,g] <- pres@CovConfCases[[CvCase]]$mleCPvcov
         if (g==1) {
           dimnames(CovConfCases[[CvCase]]$mleCPvcov)[[1]]  <- dimnames(CovConfCases[[CvCase]]$mleCPvcov)[[2]] <- 
             rownames(pres@CovConfCases[[CvCase]]$mleCPvcov)
         }
+      }
+      if (is.finite(pres@CovConfCases[[CvCase]]$logLik)) {	
+        CovConfCases[[CvCase]]$muE[g,] <- pres@CovConfCases[[CvCase]]$muE
+        CovConfCases[[CvCase]]$ksiE[g,] <- pres@CovConfCases[[CvCase]]$ksiE
+        CovConfCases[[CvCase]]$gamma1E[g,] <- pres@CovConfCases[[CvCase]]$gamma1E
+        CovConfCases[[CvCase]]$alphaE[g,] <- pres@CovConfCases[[CvCase]]$alphaE
+        CovConfCases[[CvCase]]$SigmaE[,,g] <- pres@CovConfCases[[CvCase]]$SigmaE
+        CovConfCases[[CvCase]]$OmegaE[,,g] <- pres@CovConfCases[[CvCase]]$OmegaE
+        CovConfCases[[CvCase]]$logLik <- CovConfCases[[CvCase]]$logLik + pres@CovConfCases[[CvCase]]$logLik
+        CovConfCases[[CvCase]]$optres[[g]] <- pres@CovConfCases[[CvCase]]$optres
+        if (!is.null(pres@CovConfCases[[CvCase]]$muEse))
+          { CovConfCases[[CvCase]]$muEse[g,] <- pres@CovConfCases[[CvCase]]$muEse }
+        if (!is.null(pres@CovConfCases[[CvCase]]$gamma1Ese))
+          { CovConfCases[[CvCase]]$gamma1Ese[g,] <- pres@CovConfCases[[CvCase]]$gamma1Ese }
+        if (!is.null(pres@CovConfCases[[CvCase]]$SigmaEse))
+          { CovConfCases[[CvCase]]$SigmaEse[,,g] <- pres@CovConfCases[[CvCase]]$SigmaEse }
+      } else {
+        CovConfCases[[CvCase]]$logLik <- -Inf
       }
     }            
   }

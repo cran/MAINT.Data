@@ -83,37 +83,31 @@ Hardin, J. and Rocke, A. (2005), The Distribution of Robust Distances.
 
 CarsIdt <- IData(Cars[1:8],VarNames=c("Price","EngineCapacity","TopSpeed","Acceleration"))
 
-#Display the first and last observations
-
-print(head(CarsIdt))
-
-print(tail(CarsIdt))
-
 # Estimate parameters by the full trimmed maximum likelihood estimator, 
-# using a two-step procedure to select the triming parameter, a reweighted 
+# using a two-step procedure to select the trimming parameter, a reweighed 
 # MCD estimate, and the classical 97.5\% chi-squared quantile cut-offs.
 
 CarsTE1 <- fulltle(CarsIdt)
-cat("Cars data -- normal maximum trimmed likelhiood estimation results:\n")
+cat("Cars data -- normal maximum trimmed likelihood estimation results:\n")
 print(CarsTE1)
-
+		
 # Estimate parameters by the full trimmed maximum likelihood estimator, using
-# the triming parameter that maximizes breakdown, and a reweighted MCD estimate
+# the triming parameter that maximizes breakdown, and a reweighed MCD estimate
 # based on the 97.5\% quantiles of Hardin and Rocke adjusted F distributions.
-
+		
 CarsTE2 <- fulltle(CarsIdt,alpha=0.5,getalpha=FALSE,rawMD2Dist="HardRockeAdjF")
-cat("Cars data -- normal maximum trimmed likelhiood estimation results:\n")
+cat("Cars data -- normal maximum trimmed likelihood estimation results:\n")
 print(CarsTE2)
-
+		
 # Estimate parameters by the full trimmed maximum likelihood estimator, using 
-# a two-step procedure to select the triming parameter, and a reweighted MCD estimate 
+# a two-step procedure to select the trimming parameter, and a reweighed MCD estimate 
 # based on Hardin and Rocke adjusted F distributions, 95\% quantiles, and 
 # the Cerioli Beta and F distributions together with his iterated procedure 
 # to identify outliers in the first step.
-
+		
 CarsTE3 <- fulltle(CarsIdt,rawMD2Dist="HardRockeAdjF",eta=0.05,MD2Dist="CerioliBetaF",
-  multiCmpCor="iterstep")
-cat("Cars data -- normal maximum trimmed likelhiood estimation results:\n")
+multiCmpCor="iterstep")
+cat("Cars data -- normal maximum trimmed likelihood estimation results:\n")
 print(CarsTE3)
 
 }

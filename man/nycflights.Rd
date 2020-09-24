@@ -5,7 +5,7 @@
 \alias{FlightsUnits}
 \alias{FlightsIdt}
 \title{New York City flights Data Set}
-\description{A interval-valued data set containing 142 units and four interval-valued variables (dep_delay, arr_delay, air_time and distance), created from from the flights dataset in the R package nycflights13
+\description{A interval-valued data set containing 142 units and four interval-valued variables (dep_delay, arr_delay, air_time and distance), created from from the flights data set in the R package nycflights13
 (on-time data for all flights that departed the JFK, LGA or EWR airports in 2013), after removing all rows with missing observations, and aggregating by month and carrier.}
 \usage{data(nycflights)}
 \format{FlightsDF: A data frame containing the original 327346 valid (i.e. with non missing values) flights from the nycflights13 package, described by the 4 variables: dep_delay, arr_delay, air_time and distance.\cr

@@ -34,7 +34,7 @@
 \section{Methods}{
   \describe{
     \item{show}{\code{signature(object = "IdtOutl")}: show S4 method for the IdtOutl-class.}
-%    \item{plot}{\code{signature(x = "IdtOutl")}: plot S4 methods for the IdtOutl-class.}
+    \item{plot}{\code{signature(x = "IdtOutl")}: plot S4 methods for the IdtOutl-class.}
     \item{getMahaD2}{\code{signature(x = "IdtOutl")}: retrieves the vector of squared robust Mahalanobis distances for all data units.}
     \item{geteta}{\code{signature(x = "IdtOutl")}: retrieves the nominal size of the null hypothesis used to flag observations as outliers.}
     \item{getRefDist}{\code{signature(x = "IdtOutl")}: retrieves the assumed reference distributions used to find cutoffs defining the observations assumed as outliers.}

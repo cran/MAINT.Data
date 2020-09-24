@@ -11,19 +11,19 @@
 
 \title{Class IdtMANOVA}
 \description{IdtMANOVA extends \code{\linkS4class{LRTest}} directly, containing the results of MANOVA tests on the interval-valued data. This class is not used directly, but is the basis for different specializations according to the model assumed for the
-distribution in each group. In paticular, the following specializations of IdtMANOVA are currently implemented:\cr
+distribution in each group. In particular, the following specializations of IdtMANOVA are currently implemented:\cr
 
-\code{\linkS4class{IdtClMANOVA}} extends IdtMANOVA, assuming a classical (i.e., homocedastic gaussian) setup.\cr
+\code{\linkS4class{IdtClMANOVA}} extends IdtMANOVA, assuming a classical (i.e., homoscedastic gaussian) setup.\cr
 
-\code{\linkS4class{IdtHetNMANOVA}} extends IdtMANOVA, assuming a heterocedastic gaussian set-up.\cr
+\code{\linkS4class{IdtHetNMANOVA}} extends IdtMANOVA, assuming a heteroscedastic gaussian set-up.\cr
 
 \code{\linkS4class{IdtLocSNMANOVA}} extends IdtMANOVA, assuming a Skew-Normal location model set-up.\cr
 
-\code{\linkS4class{IdtLocNSNMANOVA}} extends IdtMANOVA, assuming either a homocedastic gaussian or Skew-Normal location model set-up.\cr
+\code{\linkS4class{IdtLocNSNMANOVA}} extends IdtMANOVA, assuming either a homoscedastic gaussian or Skew-Normal location model set-up.\cr
 
 \code{\linkS4class{IdtGenSNMANOVA}} extends IdtMANOVA, assuming a Skew-Normal general model set-up.\cr
 
-\code{\linkS4class{IdtGenNSNMANOVA}} extends IdtMANOVA, assuming either a heterocedastic gaussian or Skew-Normal general model set-up.
+\code{\linkS4class{IdtGenNSNMANOVA}} extends IdtMANOVA, assuming either a heteroscedastic gaussian or Skew-Normal general model set-up.
 }
 
 \section{Slots}{

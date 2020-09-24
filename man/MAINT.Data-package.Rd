@@ -24,8 +24,8 @@ Methods for (M)ANOVA, Discriminant Analysis (Duarte Silva and Brito (2015)) and 
 \tabular{ll}{
 Package: \tab MAINT.Data\cr
 Type: \tab Package\cr
-Version: \tab 2.4.1\cr
-Date: \tab 2020-06-25\cr
+Version: \tab 2.5.0\cr
+Date: \tab 2020-09-24\cr
 License: \tab GPL-2\cr
 LazyLoad: \tab yes\cr
 LazyData: \tab yes\cr
@@ -78,7 +78,7 @@ summary(ChinaT)
 
 ChinaWT <- ChinaT[,c(1,4)]
 
-# Estimate normal distributuion parameters by maximum likelihood, assuming 
+# Estimate normal distribution parameters by maximum likelihood, assuming 
 # the classical (unrestricted) covariance configuration Case 1
 
 ChinaWTE.C1 <- mle(ChinaWT,CovCase=1)
@@ -86,15 +86,15 @@ cat("Winter temperatures of China -- normal maximum likelhiood estimation result
 print(ChinaWTE.C1)
 cat("Standard Errors of Estimators:\n") ; print(stdEr(ChinaWTE.C1))
 
-# Estimate normal distributuion parameters by maximum likelihood, 
+# Estimate normal distribution parameters by maximum likelihood, 
 # assuming that one of the C2, C3 or C4 restricted covariance configuration cases hold
 
 ChinaWTE.C234 <- mle(ChinaWT,CovCase=2:4)
-cat("Winter temperatures of China -- normal maximum likelhiood estimation results:\n")
+cat("Winter temperatures of China -- normal maximum likelihood estimation results:\n")
 print(ChinaWTE.C234)
 cat("Standard Errors of Estimators:\n") ; print(stdEr(ChinaWTE.C234))
 
-# Estimate normal distributuion  parameters robustly by fast maximun trimmed likelihood, 
+# Estimate normal distribution  parameters robustly by fast maximun trimmed likelihood, 
 # assuming that one of the C2, C3 or C4 restricted covariance configuration cases hold
 
 \dontrun{
@@ -102,7 +102,7 @@ ChinaWTE.C234 <- fasttle(ChinaWT,CovCase=2:4)
 cat("Winter temperatures of China -- normal maximum trimmed likelhiood estimation results:\n")
 print(ChinaWTE.C234)
 
-# Estimate skew-normal distributuion  parameters 
+# Estimate skew-normal distribution  parameters 
 
 ChinaWTE.SkN <- mle(ChinaWT,Model="SKNormal")
 cat("Winter temperatures of China -- Skew-Normal maximum likelhiood estimation results:\n")
@@ -130,10 +130,6 @@ print(predict(ChinaWT.lda,ChinaWT)$class)
 
 CVlda <- DACrossVal(ChinaWT,ChinaTemp$GeoReg,TrainAlg=lda,
 CovCase=BestModel(H1res(ManvChinaWT.C13)),CVrep=1)
-summary(CVlda[,,"Clerr"])
-glberrors <- 
-  apply(CVlda[,,"Nk"]*CVlda[,,"Clerr"],1,sum)/apply(CVlda[,,"Nk"],1,sum)
-cat("Average global classification error =",mean(glberrors),"\n")
 
 #Robust Quadratic Discriminant Analysis
 
@@ -142,38 +138,6 @@ cat("Winter temperatures of China -- robust quadratic discriminant analysis resu
 print(ChinaWT.rqda)
 cat("robust qda prediction results:\n")
 print(predict(ChinaWT.rqda,ChinaWT)$class)
-}
-
-# Create an Interval-Data object containing the intervals for characteristics 
-# of 27 cars models.
-
-CarsIdt <- IData(Cars[1:8],VarNames=c("Price","EngineCapacity","TopSpeed","Acceleration"))
-
-#Display the first and last observations
-
-head(CarsIdt)
-tail(CarsIdt)
-
-# Estimate normal distributuion parameters 
-
-CarsNE <- mle(CarsIdt)
-cat("Cars data -- normal maximum likelhiood estimation results:\n")
-print(CarsNE)
-cat("Standard Errors of Estimators:\n") ; print(stdEr(CarsNE))
-
-# Estimate normal distributuion  parameters robustly by full maximum trimmed likelihood, 
-
-\dontrun{
-CarsTE <- fulltle(CarsIdt)
-cat("Cars data -- normal maximum trimmed likelhiood estimation results:\n")
-print(CarsTE)
-
-# Estimate parameters searching through normal and Skew-Normal distributions.
-
-CarsNSNE <- mle(CarsIdt,Model="NrmandSKN")
-cat("Cars data  -- Maximum likelhiood estimation results:\n")
-print(CarsNSNE)
-cat("Standard Errors of Estimators:\n") ; print(stdEr(CarsNSNE))
 }
 
 # Create an Interval-Data object containing the intervals of loan data
@@ -186,14 +150,17 @@ print(LbyPIdt)
 
 \dontrun{
 
-#Fit homocedastic Gaussian mixtures with up to four components
+#Fit homoscedastic Gaussian mixtures with up to six components
 
-mclustres <- Idtmclust(LbyPIdt,G=1:4)
+mclustres <- Idtmclust(LbyPIdt,G=1:6)
+plotInfCrt(mclustres,legpos="bottomright")
 print(mclustres)
 
 #Display the results of the best mixture according to the BIC
 
 summary(mclustres,parameters=TRUE,classification=TRUE)
+pcoordplot(mclustres)
+
 }
 
 

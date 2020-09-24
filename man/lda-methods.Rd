@@ -45,7 +45,7 @@ present, the probabilities should be specified in the order of the factor levels
 
   \item{SelCrit}{The model selection criterion.}
 
-  \item{silent}{A boolean flag indicating wether a warning message should be printed if the method fails.}
+  \item{silent}{A boolean flag indicating whether a warning message should be printed if the method fails.}
  
   \item{selmodel}{Selected model from a list of candidate models saved in object x.}
 

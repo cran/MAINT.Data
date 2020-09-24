@@ -30,9 +30,9 @@
 
 	\item{upper}{Vector of parameter upper bounds. Set to \sQuote{Inf} (no bounds) by default.}
 
-	\item{rethess}{Bolean flag indicating wether a numerically evaluated hessian matrix at the optimum should be computed and returned. Not available for the \dQuote{nlminb} method.}
+	\item{rethess}{Boolean flag indicating whether a numerically evaluated hessian matrix at the optimum should be computed and returned. Not available for the \dQuote{nlminb} method.}
 
-	\item{parmstder}{Bolean flag indicating wether parameter assymptotic standard errors based on the inverse hessian approximation to the Fisher information matrix should be computed and returned. Only available if hessian is set to TRUE and if a local miminum with a positive-definite hessian was indeed found. This requirement may fail if \sQuote{nrep} and \sQuote{niter} (and maybe \sQuote{neval}) are not large enough, and for non-trivial problems of moderate or high dimensionality may never be satisfied because of numerical difficulties.}
+	\item{parmstder}{Boolean flag indicating whether parameter assymptotic standard errors based on the inverse hessian approximation to the Fisher information matrix should be computed and returned. Only available if hessian is set to TRUE and if a local miminum with a positive-definite hessian was indeed found. This requirement may fail if \sQuote{nrep} and \sQuote{niter} (and maybe \sQuote{neval}) are not large enough, and for non-trivial problems of moderate or high dimensionality may never be satisfied because of numerical difficulties.}
 
 	\item{control}{A list of control parameters. See below for details.} 
 } 
@@ -81,7 +81,7 @@ Arguments for controling the behaviour of the local optimizer can be specified a
 RepLOptim is stoped and the current best solution is returned. By default set to 2.} 
 
   \item{maxnoimprov}{Maximum number of times the local optimizer is called without improvements
-in the minimum objective value, before RepLOptim is stoped and the current best solution is returned.
+in the minimum objective value, before RepLOptim is stopped and the current best solution is returned.
 By default set to 50.} 
 
   \item{maxreplic}{Maximum number of times the local optimizer is called and returns a valid solution

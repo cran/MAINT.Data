@@ -54,9 +54,11 @@ setMethod("plot",
         plot.default(MD2,main="Robust Mahalanobis Distances (log scale)",xlab="",xaxt="n",type="n",log="y",...)
         axis(1,1:n,labels=names(MD2),las=2,...)
       }
-      axis(1,1:n,labels=names(MD2),las=2,...)
-      points(MD2[RewSet],pch=19,col="red")
-      points(MD2[!RewSet],pch=19,col="blue")
+      axis(1,1:n,labels=names(MD2),las=2,...)      
+      RewSetInd <- which(RewSet==TRUE)
+      UnRewSetInd <- which(RewSet==FALSE)
+      points(x=RewSetInd,y=MD2[RewSet],pch=19,col="blue")
+      points(x=UnRewSetInd,y=MD2[!RewSet],pch=19,col="red")
       abline(h=delta1,col="blue")
       abline(h=delta2,col="red")
    }

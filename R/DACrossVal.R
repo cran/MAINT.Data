@@ -71,7 +71,7 @@ DACrossVal <- function(data,grouping,TrainAlg,EvalAlg=EvalClrule,Strfolds=TRUE,k
     msg <- paste(msg,"with argument")
     if(ndotargs>1) msg <- paste(msg,"s",sep="")
     for (i in 1:ndotargs) {
-      msg <- paste(msg," ",names(mcall$...)[i],"=",mcall$...[[i]],sep="")
+      msg <- paste(msg," ",names(mcall$...)[i],"=",deparse(mcall$...[[i]]),sep="")
     }
   }
 

@@ -1,8 +1,62 @@
+########## Version 2.5.0 (September 2020) ###################
+
+Version 2.5.0 implements the following changes:
+
+1)  All remaining MAINT.Data specific S3 methods and classes were converted into S4
+    methods and classes.
+
+2)  The MAINT.Data definition of several generic methods (ex: sd, BIC, AIC, logLik) already
+    defined in other packages has beed droped, avoiding unecessary masking.
+
+3)  A dim method was added to the IData class.
+
+4)  THe dependency on the sn package was changed, so that MAINT.Data always calls se functions
+    when necessary, and it no longer copies its code in the R directory
+
+5)  Several new examples have been added to the manual, which was also corrected for some
+    spelling mistakes.
+
 ########## Versions 2.4.0 and 2.4.1 (June 2020) ###################
 
+Versions 2.4.0 and 2.4.1 implement the following changes:
 
+1)  The linear algebra routines were changed so that the multicolinearity is now always checked
+    beased on the l2-condition norm of correlation (instead of covariance) matrices, with
+    an upper limit on numerical non-singular covariance matrix given by an argument (k2max, defaulting
+    to 1e8) that may be changed by the user.
+
+2) The IData class and AgrMcDt functions were modified in order to accept inputs from any class that
+   inherits from data.frames.
+
+3) The IData class was extended with the slot NbMicroUnits that gives the number of micro-data units
+   aggregated (when applicable) in each statistical IData unit.   
+
+4) The C++ linear algebra computations are now based on the RcppArmadillo package instead of being
+   based on the RcppEigen package, as it was the case in previous versions.
 
 ########## Versions 2.2.0 throught 2.3.0 (May-August 2019) ###################
+
+Versions 2.2.0 through 2.3.0 implement the following changes:
+
+1)  The function AgrMcDt now prints an warning when degenerate interval were found in the microdata.
+
+2)  New accessor methods were added to class IData, in order to acces data frames with the MidPoints, LogRanges and Ranges
+    without having to look directly of the IData slots.
+
+3)  A new class named IdtOutl was creasted, saving the information about the outliers found by the function  getIdtOutl into an S4 object.
+    This classes has corresponding print, summary, plot and several accessor methods for better inspection and visualization of 
+    its content.
+
+4)  A new function named pcoordplot was added. This function plots paralel coordinate plots, helping the interpretation of
+    a model based clustering analysis of interval-valued data.
+
+5) The function DACrossVal now prints automatically its error rate estimates every time it is run.  
+
+6) New accessor methods were added to class IdtMclust, in order to acces the results of a model based clustering analysis of 
+   interval-valued data, without having to look directly of the IdtMclust slots.
+
+7) A new function named MANOVAPermTest was added. This function implements a permutation test in order to find p-values
+   of Interval-valued MANOVA analysis on small samples, where the asymptotic chi-square approximation is not reliable.
 
 
 ########## Versions 2.1.0 and 2.1.1 (April 2019) ###################
@@ -21,13 +75,13 @@ Versions 2.1.0 and 2.1.1 implement the following changes:
 
 ########## Version 2.0.0 (September 2018) ###################
 
-This is a major upgrade of the package. The most important extensions of version 2.0.0 are:
+Version 2.0.0 implements the following major changes:
 
-1) A new function (AgrMcDt) for the cretation of IData objectos from the agregation of microdata 
+1) A new function (AgrMcDt) for the cretation of IData objectos from the agregation of microdata. 
 
-2)  
+2) The IData class was extended with plot, rbind and cbind methods. 
 
-Furthermore, among other new features, version 2.0.0 also includes...   
+In additional several small bugs were corrected and algorithmic aspects of the implementation were improved.
 
 
 ########## Version 1.2.3 (August 2018) ###################

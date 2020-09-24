@@ -24,24 +24,27 @@ setMethod("stdEr",
     modres <- x@CovConfCases[[selmodel]]
     if (modres$status!="Regular")
     {
-      if (modres$status=="SingInf") {
+      if (modres$status=="Invalid") {
         warning("Standard errors were not computed for model ",x@ModelNames[selmodel],"\n",
-         "because the mle estimates were too close to the singularity point where all gamma1 equal 0.\n")
-      }  else if (modres$status=="InstInf") {
-        warning("Standard errors were not computed for model ",x@ModelNames[selmodel],"\n",
-        "because the mle estimates resulted in a numerically unstable information matrix.\n")
+         "because the computation of the observed Information Matrix was not successful.\n")
+#      } else if (modres$status=="SingInf") {
+#        warning("Standard errors were not computed for model ",x@ModelNames[selmodel],"\n",
+#         "because the mle estimates were too close to the singularity point where all gamma1 equal 0.\n")
+#      }  else if (modres$status=="InstInf") {
+#        warning("Standard errors were not computed for model ",x@ModelNames[selmodel],"\n",
+#        "because the mle estimates resulted in a numerically unstable information matrix.\n")
       }  else if (modres$status=="Onborder") {
         warning("Standard errors were not computed for model ",x@ModelNames[selmodel]," because the mle estimates are too close \n",
         "to the frontier of the parameter space, where classical maximum likeklihood theory does not apply.\n")
-      }  else if (modres$status=="PositiveScore") {
-        warning("Standard errors were not computed for model ",x@ModelNames[selmodel]," because at the current estimate the score\n", 
-         "function (i.e., the derivative of the log-likelihhod) is stricty positive\n")
-      }  else if (modres$status=="SingOmega") {
-        warning("Standard errors were not computed for model ",x@ModelNames[selmodel],"\n",
-        "because the mle estimates resulted in a singular Omega matrix.\n")
+#      }  else if (modres$status=="PositiveScore") {
+#        warning("Standard errors were not computed for model ",x@ModelNames[selmodel]," because at the current estimate the score\n", 
+#         "function (i.e., the derivative of the log-likelihhod) is stricty positive\n")
+#      }  else if (modres$status=="SingOmega") {
+#        warning("Standard errors were not computed for model ",x@ModelNames[selmodel],"\n",
+#        "because the mle estimates resulted in a singular Omega matrix.\n")
       }
       return(NULL)
-    }
+    }   
     list(mu=modres$muEse,Sigma=modres$SigmaEse,gamma1=modres$gamma1Ese)
   }
 )
@@ -53,12 +56,15 @@ setMethod("vcov",
     modres <- object@CovConfCases[[selmodel]]
     if (modres$status!="Regular")
     {
-      if (modres$status=="SingInf") {
+      if (modres$status=="Invalid") {
         warning("The asymptotic covariance matrix was not computed for model ",object@ModelNames[selmodel],"\n",
-         "because the mle estimates were too close to the singularity point where all gamma1 equal 0.\n")
-      }  else if (modres$status=="InstInf") {
-        warning("The asymptotic covariance matrix was not computed for model ",object@ModelNames[selmodel],"\n",
-        "because the mle estimates resulted in a numerically unstable information matrix.\n")
+         "because the computation of the observed Information Matrix was not successful.\n")
+#      } else if (modres$status=="SingInf") {
+#        warning("The asymptotic covariance matrix was not computed for model ",object@ModelNames[selmodel],"\n",
+#         "because the mle estimates were too close to the singularity point where all gamma1 equal 0.\n")
+#      }  else if (modres$status=="InstInf") {
+#        warning("The asymptotic covariance matrix was not computed for model ",object@ModelNames[selmodel],"\n",
+#        "because the mle estimates resulted in a numerically unstable information matrix.\n")
       }  else if (modres$status=="Onborder") {
         warning("The asymptotic covariance matrix was not computed for model ",object@ModelNames[selmodel],
          " because the mle estimates are too close\nto the frontier of the parameter space, where",
@@ -73,6 +79,7 @@ setMethod("vcov",
       }
       return(NULL)
     }
+    object@CovConfCases[[selmodel]]$mleCPvcov
   }
 )
 
@@ -80,6 +87,32 @@ setMethod("vcov",
   signature(object = "IdtMxSNDE"),
   function(object,selmodel=BestModel(object),group=NULL,...)
   {
+    modres <- object@CovConfCases[[selmodel]]
+    if (modres$status!="Regular")
+    {
+      if (modres$status=="Invalid") {
+        warning("The asymptotic covariance matrix was not computed for model ",object@ModelNames[selmodel],"\n",
+         "because the computation of the observed Information Matrix was not successful.\n")
+#      } else if (modres$status=="SingInf") {
+#        warning("The asymptotic covariance matrix was not computed for model ",object@ModelNames[selmodel],"\n",
+#         "because the mle estimates were too close to the singularity point where all gamma1 equal 0.\n")
+#      }  else if (modres$status=="InstInf") {
+#        warning("The asymptotic covariance matrix was not computed for model ",object@ModelNames[selmodel],"\n",
+#        "because the mle estimates resulted in a numerically unstable information matrix.\n")
+      }  else if (modres$status=="Onborder") {
+        warning("The asymptotic covariance matrix was not computed for model ",object@ModelNames[selmodel],
+         " because the mle estimates are too close\nto the frontier of the parameter space, where",
+         " classical maximum likeklihood theory does not apply.\n")
+      }  else if (modres$status=="PositiveScore") {
+        warning("The asymptotic covariance matrix was not computed for model ",object@ModelNames[selmodel],
+         " because at the current estimate the score\n", 
+         "function (i.e., the derivative of the log-likelihhod) is stricty positive\n")
+      }  else if (modres$status=="SingOmega") {
+        warning("Standard errors were not computed for model ",object@ModelNames[selmodel],"\n",
+        "because the mle estimates resulted in a singular Omega matrix.\n")
+      }
+      return(NULL)
+    }
     if (object@Hmcdt)  {
       object@CovConfCases[[selmodel]]$mleCPvcov
     } else {

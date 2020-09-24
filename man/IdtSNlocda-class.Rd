@@ -13,10 +13,10 @@
   \describe{
     \item{\code{prior}:}{Prior probabilities of class membership; if unspecified, the class proportions for the training set are used; if present, the probabilities should be specified in the order of the factor levels.}
     \item{\code{ksi}:}{Matrix with the direct location parameter ("ksi") estimates for each group.}
-    \item{\code{eta}:}{Vector with the direct scaled skweness parameter ("eta") estimates.}
+    \item{\code{eta}:}{Vector with the direct scaled skewness parameter ("eta") estimates.}
     \item{\code{scaling}:}{Matrix which transforms observations to discriminant functions, normalized so that the within groups scale-association matrix ("Omega") is spherical.}
     \item{\code{mu}:}{Matrix with the centred location parameter ("mu") estimates for each group.}
-    \item{\code{gamma1}:}{Vector with the centred skweness parameter ("gamma1") estimates.}
+    \item{\code{gamma1}:}{Vector with the centred skewness parameter ("gamma1") estimates.}
     \item{\code{N}:}{Number of observations.}
     \item{\code{CovCase}:}{Configuration case of the variance-covariance matrix: Case 1 through Case 4}
   }

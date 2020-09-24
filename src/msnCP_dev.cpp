@@ -74,7 +74,8 @@ double msnCP_dev1(NumericVector& param, const NumericMatrix& y, const IntegerVec
 		const int Config, const int n, const int p, const int k, const double limlnk2, 
 		const bool trace, const double c2tol, const double ldRtol, 
 		const double PenF, const double PenC, const bool nopenalty,
-		const double MachineEPS, const bool FixedArrays)
+//		const double MachineEPS, const bool FixedArrays)
+		const double MachineEPS, const bool FixedArrays, const bool Srpar)
 {
   double dbltmp,penalty,DPc2,DPviol;
   bool DPadmissible;
@@ -104,7 +105,11 @@ double msnCP_dev1(NumericVector& param, const NumericMatrix& y, const IntegerVec
     if (DPdelta.size()!=p) DPdelta.set_size(p);
   }
 
-  Sigma = RestCov(q,Sigmaptr,Config,FixedArrays);
+//  Sigma = RestCov(q,Sigmaptr,Config,FixedArrays);
+  Sigma = RestCov(q,Sigmaptr,Config,FixedArrays,Srpar);
+
+// Rprintf("Srpar = %u Sigma =\n",Srpar);
+// RprintM<mat>(p,p,Sigma);
 
   double ldR(log_det(Sigma).real());
   if ( !(nopenalty) && ldR < ldRtol ) {

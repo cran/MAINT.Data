@@ -13,7 +13,7 @@ VarNames=NULL, ObsNames=row.names(Data))
 }
 
 \arguments{
-  \item{Data}{a data frame of interval bounds or MidPoint/LogRange values.}
+  \item{Data}{a data frame or matrix of interval bounds or MidPoint/LogRange values.}
   \item{Seq}{the format of \sQuote{Data} data frame. Available options are:\cr
 \dQuote{LbUb_VarbyVar}: lower bounds followed by upper bounds, variable by variable.\cr
 \dQuote{MidPLogR_VarbyVar}: MidPoints followed by LogRanges, variable by variable.\cr
@@ -35,7 +35,7 @@ VarNames=NULL, ObsNames=row.names(Data))
 \examples{
 ChinaT <- IData(ChinaTemp[1:8],VarNames=c("T1","T2","T3","T4"))
 cat("Summary of the ChinaT IData object:\n")  ; print(summary(ChinaT))
-cat("ChinaT first ant last observations:\n")  
+cat("ChinaT first ant last three observations:\n")  
 print(head(ChinaT,n=3))
 cat("\n...\n")
 print(tail(ChinaT,n=3))

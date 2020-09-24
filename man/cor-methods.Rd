@@ -36,3 +36,19 @@
   \code{\link{var}} 
 }
 
+\examples{
+
+# Create an Interval-Data object containing the intervals for 899 observations 
+# on the temperatures by quarter in 60 Chinese meteorological stations.
+
+ChinaT <- IData(ChinaTemp[1:8],VarNames=c("T1","T2","T3","T4"))
+
+ChinaT_NE <- mle(ChinaT)
+
+# Display correlation estimates
+
+print(cor(ChinaT_NE))
+
+ 
+}
+

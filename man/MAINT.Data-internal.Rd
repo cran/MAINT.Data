@@ -5,17 +5,17 @@
 \alias{SigEf_betas}
 \alias{SigEf_gammas}
 
-\alias{print.summaryIData}
-\alias{==.IData}
-\alias{!=.IData}
-\alias{[.IData}
-\alias{[<-.IData}
-\alias{rbind.IData}
-\alias{cbind.IData}
+\alias{==,IData,IData-method}
+\alias{!=,IData,IData-method}
+\alias{[,IData-method}
+\alias{[<-,IData-method}
+\alias{rbind,IData-method}
+\alias{cbind,IData-method}
 
 \alias{show,IData-method}
 \alias{nrow,IData-method}
 \alias{ncol,IData-method}
+\alias{dim,IData-method}
 \alias{rownames,IData-method}
 \alias{colnames,IData-method}
 \alias{names,IData-method}
@@ -23,7 +23,6 @@
 \alias{summary,IdtMANOVA-method}
 \alias{show,IdtOutl-method}
 
-\alias{sd}
 \alias{MidPoints}
 \alias{LogRanges}
 \alias{Ranges}
@@ -180,6 +179,11 @@
 \alias{casy}
 \alias{CHmasy}
 \alias{HDmpred}
+
+\alias{summaryIData-class}
+\alias{summaryIdtMclust-class}
+\alias{show,summaryIData-method}
+\alias{show,summaryIdtMclust-method}
 
 \title{Operators, functions and other Internal MAINT.Data objects.}
 \description{Internal MAINT.Data objects.}

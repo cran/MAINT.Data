@@ -62,7 +62,8 @@ void C2CPgrad(const int p,const int q,const int nvcovpar,
     if (SigmaSrU.n_rows!=p || SigmaSrU.n_cols!=p) SigmaSrU.set_size(p,p);
     if (fullpar.size()!=nvcovpar)  fullpar.set_size(nvcovpar);
   }
-  Sigma = RestCov(q,xpos,2,FixedArrays);
+//  Sigma = RestCov(q,xpos,2,FixedArrays);
+  Sigma = RestCov(q,xpos,2,FixedArrays,true);
   SigmaSrU = chol(Sigma);      
   for (int c=0,i=p;c<p;c++)  {		
     fullpar(c) = SigmaSrU(c,c);

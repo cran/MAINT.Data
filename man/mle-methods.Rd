@@ -51,10 +51,9 @@ Brito, P., Duarte Silva, A. P.  (2012): "Modelling Interval Data with Normal and
 
 ChinaT <- IData(ChinaTemp[1:8])
 
-# Estimate parameters by maximum likelihood, assuming that one of 
-# the C2, C3 or C4 restricted Covariance configurations holds
+# Estimate parameters by maximum likelihood assuming a Gaussian distribution
 
-ChinaE <- mle(ChinaT,CovCase=2:4)
+ChinaE <- mle(ChinaT)
 cat("China maximum likelhiood estimation results =\n")
 print(ChinaE)
 cat("Standard Errors of Estimators:\n")

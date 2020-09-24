@@ -10,7 +10,7 @@
 \alias{show,IdtMANOVA-method}
 
 \title{Methods for Function MANOVA in Package `MAINT.Data'}
-\description{Function MANOVA performs MANOVA tests based on likelihood ratios allowing for both Gaussian and Skew-Normal distribtuions and homocedastic or heterocedastic setups. Methods H0res and H1res retrieve the model estimates under the null and alternative hypothesis, and method show displays the  MANOVA results.}
+\description{Function MANOVA performs MANOVA tests based on likelihood ratios allowing for both Gaussian and Skew-Normal distributions and homoscedastic or heteroscedastic setups. Methods H0res and H1res retrieve the model estimates under the null and alternative hypothesis, and method show displays the  MANOVA results.}
 
 \usage{
 
@@ -39,7 +39,7 @@ distributions, \dQuote{SKNormal} for Skew-Normal and \dQuote{NrmandSKN} for both
 
    \item{SelCrit}{The model selection criterion.}
 
-   \item{Mxt}{Indicates the type of mixing distributions to be considered. Current alternatives are \dQuote{Hom} (homocedastic) and \dQuote{Het} (hetereocedasic) for Gaussian models, \dQuote{Loc} (location model -- groups differ only on their location parameters) and \dQuote{Gen} \dQuote{Loc} (general model -- groups differ on all parameters) for Skew-Normal models.}
+	\item{Mxt}{Indicates the type of mixing distributions to be considered. Current alternatives are \dQuote{Hom} (homoscedastic) and \dQuote{Het} (heteroscedastic) for Gaussian models, \dQuote{Loc} (location model -- groups differ only on their location parameters) and \dQuote{Gen} \dQuote{Loc} (general model -- groups differ on all parameters) for Skew-Normal models.}
 
   \item{CVtol}{Tolerance level for absolute value of the coefficient of variation of non-constant variables. When a MidPoint or LogRange has an absolute value within-groups coefficient of variation below CVtol, it is considered to be a constant.}
 
@@ -69,30 +69,28 @@ distributions, \dQuote{SKNormal} for Skew-Normal and \dQuote{NrmandSKN} for both
 # for 899 Chinese meteorological stations.
 ChinaT <- IData(ChinaTemp[1:8])
 
-#MANOVA tests assuming that one of C2, C3 or C4 restricted configuration cases hold
+#Classical (homoscedastic) MANOVA tests
 
-#Classical (homocedastic) MANOVA tests
-
-ManvChina <- MANOVA(ChinaT,ChinaTemp$GeoReg,CovCase=2:4)
+ManvChina <- MANOVA(ChinaT,ChinaTemp$GeoReg)
 cat("China, MANOVA by geografical regions results =\n")
 print(ManvChina)
 
-#Heterocedastic MANOVA tests
+#Heteroscedastic MANOVA tests
 
-HetManvChina <- MANOVA(ChinaT,ChinaTemp$GeoReg,Mxt="Het",CovCase=2:4)
+HetManvChina <- MANOVA(ChinaT,ChinaTemp$GeoReg,Mxt="Het")
 cat("China, heterocedastic MANOVA by geografical regions results =\n")
 print(HetManvChina)
 
 #Skew-Normal based MANOVA assuming the the groups differ only according to location parameters
 \dontrun{
 
-SKNLocManvChina <- MANOVA(ChinaT,ChinaTemp$GeoReg,Model="SKNormal",Mxt="Loc",CovCase=2:4)
+SKNLocManvChina <- MANOVA(ChinaT,ChinaTemp$GeoReg,Model="SKNormal",Mxt="Loc")
 cat("China, Skew-Normal MANOVA (location model) by geografical regions results =\n")
 print(SKNLocManvChina)
 
 #Skew-Normal based MANOVA assuming the the groups may differ in all parameters
 
-SKNGenManvChina <- MANOVA(ChinaT,ChinaTemp$GeoReg,Model="SKNormal",Mxt="Gen",CovCase=2:4)
+SKNGenManvChina <- MANOVA(ChinaT,ChinaTemp$GeoReg,Model="SKNormal",Mxt="Gen")
 cat("China, Skew-Normal MANOVA (general model)  by geografical regions results =\n")
 print(SKNGenManvChina)
 

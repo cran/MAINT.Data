@@ -9,7 +9,7 @@
 
 \section{Slots}{
   \describe{
-     \item{\code{Hmcdt}:}{Indicates whether we consider an homocedastic location model (TRUE) or a general model (FALSE)}
+     \item{\code{Hmcdt}:}{Indicates whether we consider an homoscedastic location model (TRUE) or a general model (FALSE)}
      \item{\code{CovConfCases}:}{List of the considered configurations}
      \item{\code{grouping}:}{Inherited from class \code{\linkS4class{IdtMxE}}. Factor indicating the group to which each observation belongs to}
      \item{\code{ModelNames}:}{Inherited from class \code{\linkS4class{IdtE}}. The model acronym, indicating the model type (currently, N for Normal and SN for Skew-Normal), and the configuration (Case 1 through Case 4)}

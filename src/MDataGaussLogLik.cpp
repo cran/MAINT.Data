@@ -8,8 +8,8 @@ const double INF = std::numeric_limits<double>::infinity();
 
 void MDataGaussLogLik(const int n, const int p, const int Cf, const arma::mat& X, const arma::vec& u, 
                       arma::mat* Sigmap, arma::mat* SigmaInvp, double* lndetSigp, std::vector<double>& res, bool& validsol, 
-//                      const bool print, const double maxlnk2, const double MaxSctlnEgvlRt, const bool chksing)
-                      const bool print, const double maxlnk2, const bool chksing)
+//                     const double maxlnk2, const double MaxSctlnEgvlRt, const bool chksing)
+                      const double maxlnk2, const bool chksing)
 {
   const double ZERO = std::numeric_limits<double>::min();  //  small value that is considered to be numerically identical to zero
   static const double PenF = 1e6;	  // penalty factor for numerically singular covariance matrices	

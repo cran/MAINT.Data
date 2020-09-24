@@ -28,7 +28,7 @@ AgrMcDt <- function(MicDtDF,agrby,agrcrt="minmax")
   if (length(unique(agrby))!=length(levels(agrby)))  agrby <- factor(agrby)
   grplvls <- levels(agrby)
   lbDF <- ubDF <- data.frame(MicDtDF[1,])
-  bndsDF <- cbind(lbDF,ubDF)
+  bndsDF <- cbind.data.frame(lbDF,ubDF)
 
   ngrps <- length(grplvls)
   nvar <- ncol(MicDtDF)
@@ -71,6 +71,11 @@ AgrMcDt <- function(MicDtDF,agrby,agrcrt="minmax")
     res <- res[-DegInT,]
   }
   res@NbMicroUnits <- NbMicroUnits[-DegInT] 
+  if (length(DegInT)>0) {
+    res@NbMicroUnits <- NbMicroUnits[-DegInT]
+  } else {
+    res@NbMicroUnits <- NbMicroUnits
+  }  
   names(res@NbMicroUnits) <- res@ObsNames
   
   res

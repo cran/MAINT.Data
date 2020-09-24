@@ -1,4 +1,5 @@
-CorrHetSNSol <- function(Nres,SNres,CvCase,Conf,Xscld,Xmean,Xsd,XsdOutPrd,grouping,Mxt,lglikdif,limlnk2,OptCntrl,bordertol=1e-2,maxsk=0.99527)
+#CorrHetSNSol <- function(Nres,SNres,CvCase,Conf,Xscld,Xmean,Xsd,XsdOutPrd,grouping,Mxt,lglikdif,limlnk2,OptCntrl,bordertol=1e-2,maxsk=0.99527)
+CorrHetSNSol <- function(Nres,SNres,CvCase,Conf,Xscld,Xmean,Xsd,XsdOutPrd,grouping,Mxt,lglikdif,limlnk2,OptCntrl,getvcov=TRUE,bordertol=1e-2,maxsk=0.99527)
 {
 
   GetvcovHetD <- function(Res)
@@ -10,10 +11,9 @@ CorrHetSNSol <- function(Nres,SNres,CvCase,Conf,Xscld,Xmean,Xsd,XsdOutPrd,groupi
     npar <- SKnpar(Conf,p,p/2,Ngrps=k)
     grpModMat <- model.matrix(~ grouping)
     Gmat <- model.matrix(~ grplvls)
-    InFData <- mysn.infoMv( dp=list(beta=rbind(Res$ksi[1,],Res$beta2k),Omega=Res$Omega,alpha=Res$alpha),
-      y=Xscld, x=grpModMat, w=n1scvct, limlnk2=limlnk2)
-    if (InFData$status!="Regular") {
-      return( list(mleCPvcov=NULL,muEse=NULL,SigmaEse=NULL,gamma1Ese=NULL,status=InFData$status) )
+    InFData <- try( sn.infoMv( dp=list(beta=as.matrix(rbind.data.frame(Res$ksi[1,],Res$beta2k)),Omega=Res$Omega,alpha=Res$alpha), y=Xscld, x=grpModMat ) )
+    if ( is.null(InFData) || class(InFData)[1] == "try-error" || is.null(InFData$asyvar.cp) )  {
+      return( list(mleCPvcov=NULL,muEse=NULL,SigmaEse=NULL,gamma1Ese=NULL,status="Invalid") )
     }
     if (Conf==1)  {
       betavcov <- InFData$asyvar.cp
@@ -76,9 +76,9 @@ CorrHetSNSol <- function(Nres,SNres,CvCase,Conf,Xscld,Xmean,Xsd,XsdOutPrd,groupi
     for (i in 1:p)  SngDparnam <- c(SngDparnam,paste("Sigma_",Xnames[i],"_",Xnames[i:p],sep=""))
     SngDparnam <- c(SngDparnam,paste("gamma1_",Xnames,sep=""))
     npar <- SKnpar(Conf,p,p/2)
-    InFData <- mysn.infoMv( dp=list(xi=Res$ksi,Omega=Res$Omega,alpha=Res$alpha),y=Xscld, w=n1scvct, limlnk2=limlnk2)
-    if (InFData$status!="Regular") {
-      return( list(mleCPvcov=NULL,muEse=NULL,SigmaEse=NULL,gamma1Ese=NULL,status=InFData$status) )
+    InFData <- try( sn.infoMv( dp=list(xi=Res$ksi,Omega=Res$Omega,alpha=Res$alpha), y=Xscld, x=matrix(1,nrow=n,ncol=1) ) )
+    if ( is.null(InFData) || class(InFData)[1] == "try-error" || is.null(InFData$asyvar.cp) )  {
+      return( list(mleCPvcov=NULL,muEse=NULL,SigmaEse=NULL,gamma1Ese=NULL,status="Invalid") )
     }
     if (Conf==1)  {
       mleCPvcov <- InFData$asyvar.cp
@@ -130,19 +130,18 @@ CorrHetSNSol <- function(Nres,SNres,CvCase,Conf,Xscld,Xmean,Xsd,XsdOutPrd,groupi
   NewSNres <- list()
 
   if (Mxt=="Hom" || Mxt=="Loc")  {
+    zmug1 <- zmu[1,]
+    if (k>2) {
+      beta2k <- scale(zmu[-1,],center=zmug1,scale=FALSE)
+    } else {
+      beta2k <- zmu[-1,] - zmug1
+    }
     zSigma <- Nres@CovConfCases[[CvCase]]$mleSigE/XsdOutPrd 
     if (Conf==1) {
-      DP <- cnvCPtoDP(p,zmu[1,],zSigma,rep(0.,p),limlnk2=limlnk2) # check if this is correct !!!
-      newpar <- c(DP$ksi,DP$alpha/DP$omega)
+      DP <- cnvCPtoDP(p,zmu[1,],zSigma,rep(0.,p),limlnk2=limlnk2) # check if this is correct (it not -- we need the betas !!!
+      newpar <- c(DP$ksi,beta2k,DP$alpha/DP$omega)
       SNStdDtRes <- SNCnf1MaxLik(Xscld,initpar=newpar,grouping=grouping,limlnk2=limlnk2,OptCntrl=OptCntrl)
     } else {
-      zmug1 <- zmu[1,]
-      if (k>2) {
-        beta2k <- scale(zmu[-1,],center=zmug1,scale=FALSE)
-      } else {
-        beta2k <- zmu[-1,] - zmug1
-      }
-#      SigmaSrpar <- GetCovPar(zSigma ,Conf) 
       SigmaSrpar <- GetCovPar(zSigma,Conf,test=FALSE) 
       newpar <- c(zmug1,beta2k,SigmaSrpar,rep(0.,p))
       SNStdDtRes <- SNCMaxLik(Xscld,Config=Conf,initpar=newpar,grouping=grouping,limlnk2=limlnk2,OptCntrl=OptCntrl)    
@@ -176,12 +175,18 @@ CorrHetSNSol <- function(Nres,SNres,CvCase,Conf,Xscld,Xmean,Xsd,XsdOutPrd,groupi
     mnams <- list(grplvls,Xnames)
     NewSNres$SigmaE <- array(dim=c(p,p,k),dimnames=anams)
     NewSNres$OmegaE <- array(dim=c(p,p,k),dimnames=anams)
-    NewSNres$muEse <- matrix(nrow=k,ncol=p,dimnames=mnams)
-    NewSNres$gamma1Ese <- matrix(nrow=k,ncol=p,dimnames=mnams)
-    NewSNres$SigmaEse <- array(dim=c(p,p,k),dimnames=anams)
-    NewSNres$mleCPvcov <- array(dim=c(nparbyg,nparbyg,k),dimnames=list(NULL,NULL,grplvls))
-    NewSNres$status <- "Regular"
     NewSNres$logLik <- 0. 
+
+    if (getvcov) {
+      NewSNres$status <- "Regular"
+      NewSNres$mleCPvcov <- array(dim=c(nparbyg,nparbyg,k),dimnames=list(NULL,NULL,grplvls))
+      NewSNres$muEse <- matrix(nrow=k,ncol=p,dimnames=mnams)
+      NewSNres$SigmaEse <- array(dim=c(p,p,k),dimnames=anams)
+      NewSNres$gamma1Ese <- matrix(nrow=k,ncol=p,dimnames=mnams)
+     } else {
+       NewSNres$status <- "OnHold"
+       NewSNres$mleCPvcov <- NewSNres$muEse <- NewSNres$SigmaEse <- NewSNres$gamma1Ese <- NULL
+     }
 
     for (g in 1:k) {
       Xscldg <- Xscld[grouping==grplvls[g],] 
@@ -189,12 +194,10 @@ CorrHetSNSol <- function(Nres,SNres,CvCase,Conf,Xscld,Xmean,Xsd,XsdOutPrd,groupi
       if (Conf==1) {
         DP <- cnvCPtoDP(p,zmu[g,],zSigma,rep(0.,p),limlnk2=limlnk2) # check if this is correct !!!
         newpar <- c(DP$ksi,DP$alpha/DP$omega)
-#       newpar <- c(zmu[g,],rep(0.,p))  rep(0.,p) # This should replace the three previous lines with the same results, but faster -- check it !!!
         SNStdDtRes <- SNCnf1MaxLik(Xscldg,initpar=newpar,grouping=NULL,limlnk2=limlnk2,OptCntrl=OptCntrl)
       } else {
         SigmaSrpar <- GetCovPar(zSigma,Conf,test=FALSE) 
         newpar <- c(zmu[g,],SigmaSrpar,rep(0.,p))
-
         SNStdDtRes <- SNCMaxLik(Xscldg,Config=Conf,initpar=newpar,grouping=NULL,limlnk2=limlnk2,OptCntrl=OptCntrl)
       }
       NewSNres$muE[g,] <- SNStdDtRes$mu/sclfactor-displcmnt
@@ -205,19 +208,21 @@ CorrHetSNSol <- function(Nres,SNres,CvCase,Conf,Xscld,Xmean,Xsd,XsdOutPrd,groupi
       if (!is.null(SNStdDtRes$alpha)) NewSNres$alphaE[g,] <- SNStdDtRes$alpha
       NewSNres$logLik <- NewSNres$logLik + SNStdDtRes$lnLik
 
-      if ( (!is.null(SNStdDtRes$c2) && SNStdDtRes$c2 > bordertol) || (maxsk-max(abs(SNStdDtRes$gamma1)) < bordertol) )
-      {
-        vcovl <- GetvcovSingD(SNStdDtRes)
-        if (!is.null(vcovl$muEse))  NewSNres$muEse[g,] <- vcovl$muEse 
-        if (!is.null(vcovl$gamma1Ese))NewSNres$gamma1Ese[g,] <- vcovl$gamma1Ese 
-        if (!is.null(vcovl$SigmaEse)) NewSNres$SigmaEse[,,g] <- vcovl$SigmaEse
-        if (!is.null(vcovl$mleCPvcov))  {
-          NewSNres$mleCPvcov[,,g] <- vcovl$mleCPvcov
-          if (g==1) dimnames(NewSNres$mleCPvcov)[[1]]  <- dimnames(NewSNres$mleCPvcov)[[2]] <- rownames(NewSNres$mleCPvcov)
+      if (getvcov) {
+        if ( (!is.null(SNStdDtRes$c2) && SNStdDtRes$c2 > bordertol) || (maxsk-max(abs(SNStdDtRes$gamma1)) < bordertol) )
+        {
+          vcovl <- GetvcovSingD(SNStdDtRes)
+          if (!is.null(vcovl$muEse))  NewSNres$muEse[g,] <- vcovl$muEse 
+          if (!is.null(vcovl$gamma1Ese))NewSNres$gamma1Ese[g,] <- vcovl$gamma1Ese 
+          if (!is.null(vcovl$SigmaEse)) NewSNres$SigmaEse[,,g] <- vcovl$SigmaEse
+          if (!is.null(vcovl$mleCPvcov))  {
+            NewSNres$mleCPvcov[,,g] <- vcovl$mleCPvcov
+            if (g==1) dimnames(NewSNres$mleCPvcov)[[1]]  <- dimnames(NewSNres$mleCPvcov)[[2]] <- rownames(NewSNres$mleCPvcov)
+          }
+        } else {
+          NewSNres$status <- "Onborder"
         }
-      } else {
-        NewSNres$status <- "Onborder"
-      }
+     }
 
     }
     NewSNres$logLik <- NewSNres$logLik + lglikdif

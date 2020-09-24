@@ -11,8 +11,8 @@
 
 \arguments{
   \item{ModE}{An object of class \code{\linkS4class{IdtE}} representing the estimates of a model fitted to a data set of interval-value variables}
-  \item{RestMod}{Indices of the restricted models beeing evaluated in the NULL hypothesis}
-  \item{FullMod}{Either indices of the general models beeing evaluated in the alternative hypothesis or the strings "Next" (default) or "All". In the former case a Restricted model is always compared against the most parsimonious alternative that encompasses it, and in latter all possible comparisons are performed}
+  \item{RestMod}{Indices of the restricted models being evaluated in the NULL hypothesis}
+  \item{FullMod}{Either indices of the general models being evaluated in the alternative hypothesis or the strings "Next" (default) or "All". In the former case a Restricted model is always compared against the most parsimonious alternative that encompasses it, and in latter all possible comparisons are performed}
 
 }
 

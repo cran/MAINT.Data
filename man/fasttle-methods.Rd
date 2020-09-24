@@ -120,7 +120,7 @@ Todorov V. and Filzmoser P. (2009), An Object Oriented Framework for Robust Mult
 ChinaT <- IData(ChinaTemp[1:8])
 
 # Estimate parameters by the fast trimmed maximum likelihood estimator, 
-# using a two-step procedure to select the triming parameter, a reweighted 
+# using a two-step procedure to select the trimming parameter, a reweighted 
 # MCD estimate, and the classical 97.5\% chi-squared quantile cut-offs.
 
 Chinafasttle1 <- fasttle(ChinaT)
@@ -136,12 +136,12 @@ cat("China maximum trimmed likelihood estimation results =\n")
 print(Chinafasttle2)
 
 # Estimate parameters by the fast trimmed maximum likelihood estimator, using a two-step procedure
-# to select the triming parameter, a reweighted MCD estimate based on Hardin and Rocke adjusted 
+# to select the triming parameter, a reweighed MCD estimate based on Hardin and Rocke adjusted 
 # F distributions, and 95\% quantiles, and the Cerioli Beta and F distributions together
 # with Cerioli iterated procedure to identify outliers in the first step.
 
 Chinafasttle3 <- fasttle(ChinaT,rawMD2Dist="HardRockeAdjF",eta=0.05,MD2Dist="CerioliBetaF",
-  multiCmpCor="iterstep")
+multiCmpCor="iterstep")
 cat("China maximum trimmed likelihood estimation results =\n")
 print(Chinafasttle3)
 

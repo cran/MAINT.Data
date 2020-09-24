@@ -31,7 +31,8 @@ setMethod("pcoordplot",
     }  else if (Seq == "MidPLogR_VarbyVar")  {
       DF <- as.data.frame(t(x_mean[rep(1:q,each=2)+rep(c(0,q),q),]))
     }
-    DF <- cbind(DF,Component=paste("CP",1:G,sep=""))
+#    DF <- cbind(DF,Component=paste("CP",1:G,sep=""))
+    DF <- cbind.data.frame(DF,Component=paste("CP",1:G,sep=""))
     plt <- ggparcoord(DF, columns = 1:p, groupColumn = 'Component') + ggtitle(title) +
       theme_minimal() + theme(plot.title=element_text(hjust=0.5)) + theme(axis.text.x=element_text(angle=90,hjust=1)) 
        
@@ -180,65 +181,119 @@ setMethod("summary",
       str1 <- "Heteroscedastic"
     }
     modelName <- paste(str1, " C",C,sep="") 
-    obj <- list(
-      title = title, modelName =modelName,  Hmcdt = mod@Hmcdt,     
-      NObs = mod@NObs, NIVar = mod@NIVar, G = G,  
-      loglik = mod@logLik, bic = mod@bic,
-      pro = pro, mean = mean, covariance = covariance,
-      classification = mod@classification,
-      printParameters = parameters, printClassification = classification
-    )
-    class(obj) <- "summaryIdtMclust"
-    return(obj)
+
+#    obj <- list(
+#      title = title, modelName =modelName,  Hmcdt = mod@Hmcdt,     
+#      NObs = mod@NObs, NIVar = mod@NIVar, G = G,  
+#      loglik = mod@logLik, bic = mod@bic,
+#      pro = pro, mean = mean, covariance = covariance,
+#      classification = mod@classification,
+#      printParameters = parameters, printClassification = classification
+#    )
+#    class(obj) <- "summaryIdtMclust"
+#    return(obj)
+
+   new("summaryIdtMclust",title=title,modelName=modelName,Hmcdt=mod@Hmcdt,     
+      NObs=mod@NObs,NIVar=mod@NIVar,G=G,loglik=mod@logLik,bic=mod@bic,
+      pro=pro,mean=mean,covariance=covariance,classification=mod@classification,
+      printParameters=parameters,printClassification=classification)
   }
 ) 
  
+#print.summaryIdtMclust <- function(x, ...)
+#{
+#   n <- x$NObs
+#   p <- 2*x$NIVar
+#   cat(rep("-", nchar(x$title)),"\n",sep="")
+#   cat(x$title, "\n")
+#   cat(rep("-", nchar(x$title)),"\n",sep="")
+#   cat(x$modelName," model with ", x$G, ifelse(x$G > 1, " components\n", " component\n"),sep = "") 
+#   tab <- data.frame("log-likelihood" = x$loglik, "NObs" = n, "BIC" = x$bic, row.names = "")
+#   print(tab)
+#   cat("\nClustering table:")
+#   if (x$G==1) {
+#     cat("\nCP1\n",n,"\n")
+#   } else {
+#     print(table(factor(x$classification, levels = paste("CP",seq_len(x$G),sep=""))))
+#   }
+#   if(x$printParameters) {
+#     cat("\nMixing probabilities:\n")
+#     print(x$pro)
+#     cat("\nMeans:\n")
+#     print(x$mean)
+#     cat("\nStandard deviations:\n")
+#     if (x$Hmcdt) {
+#       print(sqrt(diag(x$covariance[,,1])))
+#     } else {
+#       stdv <- matrix(nrow=p,ncol=x$G,dimnames=list(rownames(x$mean),colnames(x$mean)))
+#       for(g in 1:x$G) stdv[,g] <- sqrt(diag(x$covariance[,,g]))
+#       print(stdv)
+#     }
+#     cat("\nCorrelations:\n")
+#     if (x$Hmcdt) {
+#       print(cov2cor(x$covariance[,,1]))
+#     } else { 
+#       for(g in 1:x$G) { 
+#         cat("[,,CP", g, "]\n", sep = "")
+#         print(cov2cor(x$covariance[,,g])) 
+#       }
+#     }
+#   }
+#   if(x$printClassification) {
+#     cat("\nClassification:\n")
+#     print(x$classification)
+#   }
+#   invisible(x)
+#}
 
-print.summaryIdtMclust <- function(x, ...)
-{
-   n <- x$NObs
-   p <- 2*x$NIVar
-   cat(rep("-", nchar(x$title)),"\n",sep="")
-   cat(x$title, "\n")
-   cat(rep("-", nchar(x$title)),"\n",sep="")
-   cat(x$modelName," model with ", x$G, ifelse(x$G > 1, " components\n", " component\n"),sep = "") 
-   tab <- data.frame("log-likelihood" = x$loglik, "NObs" = n, "BIC" = x$bic, row.names = "")
+setMethod("show",
+  signature(object = "summaryIdtMclust"),
+  function(object)
+  {
+   n <- object@NObs
+   p <- 2*object@NIVar
+   cat(rep("-", nchar(object@title)),"\n",sep="")
+   cat(object@title, "\n")
+   cat(rep("-", nchar(object@title)),"\n",sep="")
+   cat(object@modelName," model with ", object@G, ifelse(object@G > 1, " components\n", " component\n"),sep = "") 
+   tab <- data.frame("log-likelihood" = object@loglik, "NObs" = n, "BIC" = object@bic, row.names = "")
    print(tab)
    cat("\nClustering table:")
-   if (x$G==1) {
+   if (object@G==1) {
      cat("\nCP1\n",n,"\n")
    } else {
-     print(table(factor(x$classification, levels = paste("CP",seq_len(x$G),sep=""))))
+     print(table(factor(object@classification, levels = paste("CP",seq_len(object@G),sep=""))))
    }
-   if(x$printParameters) {
+   if(object@printParameters) {
      cat("\nMixing probabilities:\n")
-     print(x$pro)
+     print(object@pro)
      cat("\nMeans:\n")
-     print(x$mean)
+     print(object@mean)
      cat("\nStandard deviations:\n")
-     if (x$Hmcdt) {
-       print(sqrt(diag(x$covariance[,,1])))
+     if (object@Hmcdt) {
+       print(sqrt(diag(object@covariance[,,1])))
      } else {
-       stdv <- matrix(nrow=p,ncol=x$G,dimnames=list(rownames(x$mean),colnames(x$mean)))
-       for(g in 1:x$G) stdv[,g] <- sqrt(diag(x$covariance[,,g]))
+       stdv <- matrix(nrow=p,ncol=object@G,dimnames=list(rownames(object@mean),colnames(object@mean)))
+       for(g in 1:object@G) stdv[,g] <- sqrt(diag(object@covariance[,,g]))
        print(stdv)
      }
      cat("\nCorrelations:\n")
-     if (x$Hmcdt) {
-       print(cov2cor(x$covariance[,,1]))
+     if (object@Hmcdt) {
+       print(cov2cor(object@covariance[,,1]))
      } else { 
-       for(g in 1:x$G) { 
+       for(g in 1:object@G) { 
          cat("[,,CP", g, "]\n", sep = "")
-         print(cov2cor(x$covariance[,,g])) 
+         print(cov2cor(object@covariance[,,g])) 
        }
      }
    }
-   if(x$printClassification) {
+   if(object@printClassification) {
      cat("\nClassification:\n")
-     print(x$classification)
+     print(object@classification)
    }
-   invisible(x)
- }
+   invisible(object)
+  }
+)
 
 #Accessor methods
 
@@ -291,13 +346,16 @@ setMethod("var",signature(x = "IdtMclust"),
 setMethod("classification",signature(x = "IdtMclust"),
   function(x,model="BestModel") 
   { 
-    if (model=="BestModel") return(factor(x@parameters$classification)) 
+#    if (model=="BestModel") return(factor(x@parameters$classification)) 
+    if (model=="BestModel") return(factor(x@classification)) 
     nomodmsg <- paste("There is no model named",model,"in these Idtmclust results\n") 
     if (substr(model,1,3)=="Hom") {
       if (!is.element(model,names(x@allres$RepresHom))) stop(nomodmsg) 
-      return(factor(x@allres$RepresHom[[model]]@parameters$classification))
+#      return(factor(x@allres$RepresHom[[model]]@parameters$classification))
+      return(factor(x@allres$RepresHom[[model]]@classification))
     } else if (substr(model,1,3)=="Het") {
-      return(factor(x@allres$RepresHet[[model]]@parameters$classification))
+#      return(factor(x@allres$RepresHet[[model]]@parameters$classification))
+      return(factor(x@allres$RepresHet[[model]]@lassification))
     } else stop(nomodmsg) 
   }
 )
@@ -307,10 +365,9 @@ setMethod("Hmcdt",signature(x = "IdtMclust"),function (x) x@Hmcdt)
 setMethod("BestG",signature(x = "IdtMclust"),function (x) x@BestG)
 setMethod("BestC",signature(x = "IdtMclust"),function (x) x@BestC)
 setMethod("PostProb",signature(x = "IdtMclust"),function(x) x@z)
-
-setMethod("logLik",signature(x = "IdtMclust"),function(x) x@logLik)
-setMethod("BIC",signature(x = "IdtMclust"),function(x) x@bic)
-setMethod("AIC",signature(x = "IdtMclust"),function(x) x@aic)
+setMethod("logLik",signature(object = "IdtMclust"),function(object,..) object@logLik)
+setMethod("BIC",signature(object = "IdtMclust"),function(object,...) object@bic)
+setMethod("AIC",signature(object = "IdtMclust"),function(object,...,k=2) object@aic)
 
 setMethod("cor",signature(x ="IdtMclust"),
  function(x)

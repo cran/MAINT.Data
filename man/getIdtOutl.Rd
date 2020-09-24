@@ -47,7 +47,42 @@ Hardin, J. and Rocke, A. (2005), The Distribution of Robust Distances.
 \emph{Journal of Computational and Graphical Statistics} \bold{14}, 910--927.
 }
 
-\seealso{ \code{\link{fasttle}}, \code{\link{fulltle} }
+\seealso{ \code{\link{fasttle}}, \code{\link{fulltle}} }
 
+\examples{
+
+\dontrun{
+
+# Create an Interval-Data object containing the intervals for characteristics 
+# of 27 cars models.
+
+CarsIdt <- IData(Cars[1:8],VarNames=c("Price","EngineCapacity","TopSpeed","Acceleration"))
+
+# Estimate parameters by the fast trimmed maximum likelihood estimator, 
+# using a two-step procedure to select the trimming parameter, a reweighed 
+# MCD estimate, and the classical 97.5\% chi-squared quantile cut-offs.
+			
+Carstle1 <- fulltle(CarsIdt)
+			
+# Get and display the outliers using the classical 97.5\% chi-squared quantile cut-offs.
+		
+CarsOtl1 <- getIdtOutl(CarsIdt,Carstle1)
+print(CarsOtl1)
+plot(CarsOtl1)
+			
+# Estimate parameters by the fast trimmed maximum likelihood estimator, 
+# using a two-step procedure to select the trimming parameter, and a reweighed  
+# based on the 97.5\% quantiles of Hardin and Rocke adjusted F distributions.
+			
+Carstle2 <- fulltle(CarsIdt,rawMD2Dist="HardRockeAdjF")
+			
+# Get and display the outliers using the 97.5% qunatiles of Cerioli Beta and F distributions.
+			
+CarsTtl2 <- getIdtOutl(CarsIdt,Carstle2,RefDist="CerioliBetaF")
+print(CarsTtl2)
+plot(CarsTtl2)
+
+
+}
 
 }

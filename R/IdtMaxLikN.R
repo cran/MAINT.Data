@@ -45,7 +45,7 @@ IdtNmle <- function(Idt, grouping=NULL, Type=c("SingDst","HomMxt"), CVtol=1.0e-5
   logLiks <- AICs <- BICs <- rep(NA_real_,nCovCases)
   CovConfCases <- vector("list",nCovCases)
   names(logLiks) <- names(AICs) <- names(BICs) <- names(CovConfCases) <- modnames
-  X <- cbind(Idt@MidP,Idt@LogR)
+  X <- cbind.data.frame(Idt@MidP,Idt@LogR)
 
   for (model in Config)  {  
     if (model!=2) { 
@@ -145,7 +145,7 @@ IdtNmle <- function(Idt, grouping=NULL, Type=c("SingDst","HomMxt"), CVtol=1.0e-5
     }  else if (Type=="HomMxt")  {
       Xdev <- scale(X[grouping==levels(grouping)[1],],center=mleNmuE[1,],scale=FALSE)
       for (g in 2:k)
-        Xdev <- rbind(Xdev,scale(X[grouping==levels(grouping)[g],],center=mleNmuE[g,],scale=FALSE))
+        Xdev <- rbind.data.frame(Xdev,scale(X[grouping==levels(grouping)[g],],center=mleNmuE[g,],scale=FALSE))
     }
     Conf134 <- Config[Config !=2 & Config!=5]
     if (length(Conf134)!=0)  {
@@ -179,7 +179,7 @@ IdtNmle <- function(Idt, grouping=NULL, Type=c("SingDst","HomMxt"), CVtol=1.0e-5
     }  else if (Type=="HomMxt")  {
       Xscld <- scale(X[grouping==levels(grouping)[1],],center=mleNmuE[1,],scale=Xsd)
       for (g in 2:k)
-        Xscld <- rbind(Xscld,scale(X[grouping==levels(grouping)[g],],center=mleNmuE[g,],scale=Xsd))
+        Xscld <- rbind.data.frame(Xscld,scale(X[grouping==levels(grouping)[g],],center=mleNmuE[g,],scale=Xsd))
     }
     C2res <- Cnf2MaxLik(Xscld,OptCntrl=OptCntrl)
     if ( is.element(4,Config) && C2res$lnLik < logLiks[CovCaseMap[4]] )  {
@@ -189,7 +189,6 @@ IdtNmle <- function(Idt, grouping=NULL, Type=c("SingDst","HomMxt"), CVtol=1.0e-5
       C2res <- Cnf2MaxLik(Xscld,initpar=initparconf2(CovConfCases[[CovCaseMap[3]]]$mleSigE,n,q))
     }    
     CovConfCases[[2]]$mleSigE <- C2GetCov(C2res$SigmaSr,outer(Xsd,Xsd),q)
-#    CovConfCases[[2]]$mleSigEse <- C2GetCovStderr(CovConfCases[[2]]$mleSigE,X,q,ue=colMeans(X))
     CovConfCases[[2]]$mleSigEse <- C2GetCovStderr(CovConfCases[[2]]$mleSigE,X,q,limlnk2=limlnk2,ue=colMeans(X))
     dimnames(CovConfCases[[2]]$mleSigEse) <- dimnames(CovConfCases[[2]]$mleSigE)
     logLiks[2] <- CovConfCases[[2]]$logLik <- C2res$lnLik + lglikdif 
@@ -228,7 +227,7 @@ IdtHetMxtNmle <- function( Idt,grouping, CVtol=1.0e-5, OptCntrl=OptCntrl,
   }
   mleNmuE <- matrix(nrow=k,ncol=p)
   rownames(mleNmuE) <- levels(grouping)
-  colnames(mleNmuE) <- names(cbind(Idt@MidP,Idt@LogR))
+  colnames(mleNmuE) <- c(names(Idt@MidP),names(Idt@LogR))
   mleNmuEse <- matrix(nrow=k,ncol=p)
   rownames(mleNmuEse) <- rownames(mleNmuE)
   colnames(mleNmuEse) <- colnames(mleNmuE)
@@ -267,7 +266,7 @@ IdtHetMxtNmle <- function( Idt,grouping, CVtol=1.0e-5, OptCntrl=OptCntrl,
   for (g in 1:k)
   {
     Idtg <- Idt[grouping==levels(grouping)[g],]
-    IdtgDF <- cbind(Idtg@MidP,Idtg@LogR)
+    IdtgDF <- cbind.data.frame(Idtg@MidP,Idtg@LogR)
     Xbar <- colMeans(IdtgDF)
     Xstdev <- sapply(IdtgDF,sd)
     CnstV <- which(Xstdev/abs(Xbar)<CVtol)

@@ -87,15 +87,18 @@ setClass("EMControl",
 setClass("IdtOutl",slots=c(outliers="extinteger", MD2="numeric",eta="numeric",RefDist="character",
   multiCmpCor="character",NObs="numeric",p="numeric",h="numeric",boolRewind="extlogical"))
 
+setClass("summaryIData",slots=c(MidPsumar="table", Rngsumar="table",LogRsumar="table"))
+
+
 setGeneric("nrow")
 setGeneric("ncol")
 setGeneric("rownames")
 setGeneric("colnames")
 setGeneric("names")
 setGeneric("var")
+setGeneric("sd",function(x,na.rm=FALSE) standardGeneric("sd"))                      # Check if I really need this ... !!! 
 setGeneric("cor")
 setGeneric("mean",signature="x")
-setGeneric("sd",signature="x")
 setGeneric("plot",signature=c("x","y"))
 setGeneric("summary",signature="object")
 setGeneric("head",package="utils",signature="x")
@@ -110,11 +113,9 @@ setGeneric("MidPoints",function(Idt) standardGeneric("MidPoints"))
 setGeneric("LogRanges",function(Idt) standardGeneric("LogRanges"))
 setGeneric("Ranges",function(Idt) standardGeneric("Ranges"))
 setGeneric("mle",
-#  function(Idt, Model="Normal", CovCase=1:4, SelCrit=c("BIC","AIC"), OptCntrl=list() ,... )
-  function(Idt, Model="Normal", CovCase=1:4, SelCrit=c("BIC","AIC"), k2max=1e6, OptCntrl=list() ,... )
+  function(Idt, Model=c("Normal","SKNormal","NrmandSKN"),CovCase=1:4, SelCrit=c("BIC","AIC"), k2max=1e6, OptCntrl=list(),...)
   standardGeneric("mle"))
 setGeneric("MANOVA",function(Idt, grouping, Model=c("Normal","SKNormal","NrmandSKN"), CovCase=1:4, SelCrit=c("BIC","AIC"), 
-#      Mxt=c("Hom","Het","Loc","Gen"), CVtol=1.0e-5, OptCntrl=list(), onerror=c("stop","warning","silentNull"), ...)
       Mxt=c("Hom","Het","Loc","Gen"), CVtol=1.0e-5, k2max=1e6, OptCntrl=list(), onerror=c("stop","warning","silentNull"), ...)
   standardGeneric("MANOVA"))
 setGeneric("BestModel",function(ModE,SelCrit=c("IdtCrt","BIC","AIC"))  standardGeneric("BestModel"))
@@ -125,6 +126,15 @@ setGeneric("H1res",  function(object) standardGeneric("H1res"))
 setGeneric("H0res",  function(object) standardGeneric("H0res"))
 setGeneric("snda",function(x, grouping, prior="proportions", ...) standardGeneric("snda"))
 setGeneric("ObsLogLiks",function(object,Idt,Conf=object@BestModel) standardGeneric("ObsLogLiks"))
+setGeneric("rbind",function(x, y, ...) standardGeneric("rbind"))
+setGeneric("cbind",function(x, y, ...) standardGeneric("cbind"))
+
+setClass("summaryIdtMclust",
+  slots=c(title="character",modelName="character",Hmcdt="logical",
+    NObs="numeric",NIVar="numeric",G="numeric",loglik="numeric",bic="numeric",
+    pro="numeric",mean="matrix",covariance="array",classification="extcharacter",
+    printParameters ="logical", printClassification="logical") 
+)
 
 setGeneric("fulltle",
   function(Idt, CovCase=1:4, SelCrit=c("BIC","AIC"), alpha=0.75, use.correction=TRUE, getalpha="TwoStep", 
@@ -170,12 +180,12 @@ setGeneric("RobMxtDEst",
 setGeneric("Roblda",
   function(x, grouping, prior="proportions", CVtol=1.0e-5, egvtol=1.0e-10, subset=1:nrow(x),
     CovCase=1:4, SelCrit=c("BIC","AIC"), silent=FALSE,  CovEstMet=c("Pooled","Globdev"), SngDMet=c("fasttle","fulltle"),
-    Robcontrol=RobEstControl(), ...)
+    k2max=1e6, Robcontrol=RobEstControl(), ...)
   standardGeneric("Roblda"))
 setGeneric("Robqda",
   function(x, grouping, prior="proportions", CVtol=1.0e-5, subset=1:nrow(x),
     CovCase=1:4, SelCrit=c("BIC","AIC"), silent=FALSE, SngDMet=c("fasttle","fulltle"),
-    Robcontrol=RobEstControl(), ...) 
+    k2max=1e6, Robcontrol=RobEstControl(), ...) 
   standardGeneric("Robqda"))
 
 setGeneric("Idtmclust",
@@ -193,9 +203,9 @@ setGeneric("Hmcdt",function (x) standardGeneric("Hmcdt"))
 setGeneric("BestG",function (x) standardGeneric("BestG"))
 setGeneric("BestC",function (x) standardGeneric("BestC"))
 setGeneric("PostProb",function(x) standardGeneric("PostProb"))
-setGeneric("logLik",function(x) standardGeneric("logLik"))
-setGeneric("BIC",function(x) standardGeneric("BIC"))
-setGeneric("AIC",function(x) standardGeneric("AIC"))
+setGeneric("logLik",function(object,...) standardGeneric("logLik"))                # Check if I really need this ... !!!
+setGeneric("BIC",function(object,...) standardGeneric("BIC"))                      # Check if I really need this ... !!!
+setGeneric("AIC",function(object,...,k=2) standardGeneric("AIC"))                      # Check if I really need this ... !!! 
 
 setGeneric("parameters",function(x,model="BestModel") standardGeneric("parameters"))
 setGeneric("pro",function(x,model="BestModel") standardGeneric("pro"))

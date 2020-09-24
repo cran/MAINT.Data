@@ -42,7 +42,8 @@ setMethod("RobMxtDEst",
     }
     ngrps <- length(ng)
     grpRobE <- vector("list",ngrps)
-    Xnams <- names(cbind(Idt@MidP,Idt@LogR))
+#    Xnams <- names(cbind(Idt@MidP,Idt@LogR))
+    Xnams <- c(names(Idt@MidP),names(Idt@LogR))
     anams <- list(Xnams,Xnams,grplvls)
     RobNmuE <- matrix(nrow=ngrps,ncol=p,dimnames=list(grplvls,Xnams))
 
@@ -75,7 +76,8 @@ setMethod("RobMxtDEst",
 
     if (Mxt=="Hom" && CovEstMet=="Globdev")
     {
-      X <- cbind(Idt@MidP,Idt@LogR)
+#      X <- cbind(Idt@MidP,Idt@LogR)
+      X <- cbind.data.frame(Idt@MidP,Idt@LogR)
       Xdev <- matrix(nrow=n,ncol=p) 
       Xgl1med <- matrix(nrow=ngrps,ncol=p) 
       if (!is.null(l1medpar)) {
@@ -123,7 +125,8 @@ setMethod("RobMxtDEst",
                 CovConfC[[CovC]]$RobSigE + (ng[g]/n) * grpRobE[[g]]@CovConfCases[[CovC]]$RobSigE 
             }
             regset <- ifelse(reweighted,grpRobE[[g]]@RewghtdSet,grpRobE[[g]]@rawSet)
-            X <- rbind(X,cbind(Idtg@MidP[regset,],Idtg@LogR[regset,]))
+#            X <- rbind(X,cbind(Idtg@MidP[regset,],Idtg@LogR[regset,]))
+            X <- rbind.data.frame(X,cbind.data.frame(Idtg@MidP[regset,],Idtg@LogR[regset,]))
           }
           else if (CovEstMet=="Globdev") {
             if  (getkdblstar=="Twopplusone") { 
@@ -141,7 +144,8 @@ setMethod("RobMxtDEst",
           }
           Xdev <- scale(X[grouping==levels(grouping)[1],],center=RobNmuE[1,],scale=FALSE)
           for (g in 2:ngrps)
-            Xdev <- rbind(Xdev,scale(X[grouping==levels(grouping)[g],],center=RobNmuE[g,],scale=FALSE))
+#            Xdev <- rbind(Xdev,scale(X[grouping==levels(grouping)[g],],center=RobNmuE[g,],scale=FALSE))
+            Xdev <- rbind.data.frame(Xdev,scale(X[grouping==levels(grouping)[g],],center=RobNmuE[g,],scale=FALSE))
           logdet <- pdwt.solve(CovConfC[[CovC]]$RobSigE,silent=TRUE,onlylogdet=TRUE)
           if (is.null(logdet))  {
             logLiks[CovC] <- CovConfC[[CovC]]$logLik <- -Inf
@@ -195,7 +199,8 @@ setMethod("RobMxtDEst",
 
       if(getalpha=="TwoStep" && Steps==1)
       {
-        X <- data.frame(cbind(Idt@MidP,Idt@LogR))
+#        X <- data.frame(cbind(Idt@MidP,Idt@LogR))
+        X <- data.frame(cbind.data.frame(Idt@MidP,Idt@LogR))
         nOtls <- 0.
         for (g in 1:ngrps)
         {

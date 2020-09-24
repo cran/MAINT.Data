@@ -166,7 +166,8 @@ setMethod("lda",
     if (sum(nk)!=n)  { stop("Dimensions of the x and grouping arguments do not agree with each other\n") }
  
     MxtDEst <- IdtNmle(x,grouping,Type="HomMxt",CVtol=CVtol,CovCaseArg=CovCaseArg,Config=Config,SelCrit=SelCrit,...)
-    glbmeans <- colMeans(cbind(x@MidP,x@LogR))
+#    glbmeans <- colMeans(cbind(x@MidP,x@LogR))
+    glbmeans <- colMeans(cbind.data.frame(x@MidP,x@LogR))
     grpmeans <- coef(MxtDEst)$mu
     mugdev <- scale(grpmeans,center=glbmeans,scale=FALSE)
     vnames <- unlist(dimnames(grpmeans)[2]) 
@@ -182,7 +183,8 @@ setMethod("predict",
   signature(object = "Idtlda"),
   function(object,newdata,prior=object@prior,...)
   {
-    if (is(newdata,"IData")) newdata <- as.matrix(cbind(newdata@MidP,newdata@LogR))
+#    if (is(newdata,"IData")) newdata <- as.matrix(cbind(newdata@MidP,newdata@LogR))
+    if (is(newdata,"IData")) newdata <- as.matrix(cbind.data.frame(newdata@MidP,newdata@LogR))
     if (is(newdata,"data.frame")) newdata <- as.matrix(newdata)
     n <- nrow(newdata)
     k <- length(prior) 
@@ -360,7 +362,8 @@ setMethod("predict",
   signature(object = "Idtqda"),
   function(object,newdata,prior=object@prior,...)
   {
-    if (is(newdata,"IData")) { newdata <- as.matrix(cbind(newdata@MidP,newdata@LogR)) }
+#    if (is(newdata,"IData")) { newdata <- as.matrix(cbind(newdata@MidP,newdata@LogR)) }
+    if (is(newdata,"IData")) { newdata <- as.matrix(cbind.data.frame(newdata@MidP,newdata@LogR)) }
     if (is(newdata,"data.frame")) { newdata <- as.matrix(newdata) }
     n <- nrow(newdata)
     p <- ncol(newdata)
@@ -376,7 +379,8 @@ setMethod("predict",
 #    wghtdensities <- sweep(exp(sweep(-Mahdistovertwo,1,STATS=object@ldet,FUN="-")),1,STATS=prior,FUN="*")
     minhlfMD2 <- apply(Mahdistovertwo,2,min)
     nrmhlfMD2 <- sweep(Mahdistovertwo,2,minhlfMD2)
-    wghtdensities <- sweep(exp(sweep(-nrmhlfMD2,1,object@ldet-minhlfMD2)),1,prior,"*")
+#    wghtdensities <- sweep(exp(sweep(-nrmhlfMD2,1,object@ldet-minhlfMD2)),1,prior,"*")
+    wghtdensities <- sweep(exp(sweep(-nrmhlfMD2,1,object@ldet)),1,prior,"*")
     ncnst <- apply(wghtdensities,2,sum)  			# normalizing constants
     posterior <- sweep(wghtdensities,2,STATS=ncnst,FUN="/")
     NAind <- which(apply(posterior,2,function(x) any(!is.finite(x))))

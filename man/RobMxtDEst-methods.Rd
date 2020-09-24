@@ -44,3 +44,26 @@ Todorov V. and Filzmoser P. (2009), An Object Oriented Framework for Robust Mult
 
 \seealso{ \code{\linkS4class{IdtMxNDRE}}, \code{\link{RobEstControl}}.}
 
+\examples{
+# Create an Interval-Data object containing the intervals for 899 observations 
+# on the temperatures by quarter in 60 Chinese meteorological stations.
+
+ChinaT <- IData(ChinaTemp[1:8],VarNames=c("T1","T2","T3","T4"))
+
+\dontrun{
+
+# Estimate robustly an homoscedastic mixture, with mixture components defined by regions
+
+ChinaHomMxtRobE <- RobMxtDEst(ChinaT,ChinaTemp$GeoReg)
+print(ChinaHomMxtRobE)
+
+# Estimate robustly an heteroscedastic mixture, with mixture components defined by regions
+
+ChinaHetMxtRobE <- RobMxtDEst(ChinaT,ChinaTemp$GeoReg,Mxt="Het")
+print(ChinaHetMxtRobE)
+
+
+}
+
+}
+

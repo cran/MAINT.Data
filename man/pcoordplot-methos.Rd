@@ -36,7 +36,35 @@ Seq=c("AllMidP_AllLogR","MidPLogR_VarbyVar"), model ="BestModel", \dots)
 }
 
 \seealso{
-  \linkS4class{IdtMclust}, \code{\link{Idtmclust}} 
+  \linkS4class{IdtMclust}, \code{\link{Idtmclust}},  \code{\link{plotInfCrt}}
 }
+
+\examples{
+
+\dontrun{
+
+# Create an Interval-Data object containing the intervals of loan data
+# (from the Kaggle Data Science platform) aggregated by loan purpose
+
+LbyPIdt <- IData(LoansbyPurpose_minmaxDt,
+                 VarNames=c("ln-inc","ln-revolbal","open-acc","total-acc")) 
+
+
+#Fit homoscedastic Gaussian mixtures with up to ten components
+
+mclustres <- Idtmclust(LbyPIdt,G=1:10)
+plotInfCrt(mclustres,legpos="bottomright")
+
+#Display the results of the best mixture according to the BIC
+
+pcoordplot(mclustres)
+pcoordplot(mclustres,model="HomG6C1")
+pcoordplot(mclustres,model="HomG4C1")
+
+
+}
+
+}
+
 
 

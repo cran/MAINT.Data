@@ -30,7 +30,8 @@ setMethod("mle",
       Nres <- IdtNmle(Idt,OptCntrl=OptCntrl,CovCaseArg=CovCaseArg,Config=Config,SelCrit=SelCrit)
     }
     if (Model!="Normal") { 
-      SNres <- IdtSNmle(Idt,OptCntrl=OptCntrl,limlnk2=limlnk2,CovCaseArg=CovCaseArg,Config=Config,SelCrit=SelCrit)
+#      SNres <- IdtSNmle(Idt,OptCntrl=OptCntrl,limlnk2=limlnk2,CovCaseArg=CovCaseArg,Config=Config,SelCrit=SelCrit)
+      SNres <- IdtSNmle(Idt,OptCntrl=OptCntrl,limlnk2=limlnk2,CovCaseArg=CovCaseArg,Config=Config,SelCrit=SelCrit,...)
     }
     if (Model=="Normal") { return(Nres) }
     if (Model=="SKNormal") { return(SNres) }
@@ -42,13 +43,14 @@ setMethod("mle",
         CvCase <- CovCaseMap[Conf]
         if (SNres@logLiks[CvCase] < Nres@logLiks[CvCase]) {
           if (is.null(Xscld)) {
-            Xscld <- scale(cbind(Idt@MidP,Idt@LogR))
+            Xscld <- scale(cbind.data.frame(Idt@MidP,Idt@LogR))
             Xmean <- attr(Xscld,"scaled:center")  
             Xsd <- attr(Xscld,"scaled:scale")  
             XsdOutPrd <- outer(Xsd,Xsd)
             lglikdif <- -n*sum(log(Xsd))		# difference between the log-likelihoods for the original and standardized data  
           } 
-          SNres@CovConfCases[[CvCase]] <- CorrSNSol(Nres,SNres,CvCase,Conf,Xscld,Xmean,Xsd,XsdOutPrd,lglikdif,limlnk2,OptCntrl)
+#          SNres@CovConfCases[[CvCase]] <- CorrSNSol(Nres,SNres,CvCase,Conf,Xscld,Xmean,Xsd,XsdOutPrd,lglikdif,limlnk2,OptCntrl)
+          SNres@CovConfCases[[CvCase]] <- CorrSNSol(Nres,SNres,CvCase,Conf,Xscld,Xmean,Xsd,XsdOutPrd,lglikdif,limlnk2,OptCntrl,...)
           SNres@logLiks[CvCase] <- LogLik <- SNres@CovConfCases[[CvCase]]$logLik
           nfreepar <- SKnpar(Conf,p,q)
           SNres@AICs[CvCase] <- -2*LogLik + 2*nfreepar
@@ -88,7 +90,8 @@ setMethod("MANOVA",
     Model <- match.arg(Model)
     SelCrit <- match.arg(SelCrit)
 
-    H0res <- mle(Idt,Model=Model,CovCase=CovCase,SelCrit=SelCrit,OptCntrl=OptCntrl)
+#    H0res <- mle(Idt,Model=Model,CovCase=CovCase,SelCrit=SelCrit,OptCntrl=OptCntrl)
+    H0res <- mle(Idt,Model=Model,CovCase=CovCase,SelCrit=SelCrit,OptCntrl=OptCntrl,getvcov=FALSE,...)
 
     Config <- getConfig(...)
     if (is.null(Config))  
@@ -125,38 +128,47 @@ setMethod("MANOVA",
         OptCntrl=OptCntrl,CovCaseArg=CovCaseArg,Config=Config,SelCrit=SelCrit)
     }  else if (Model=="SKNormal" && (Mxt=="Hom" || Mxt=="Loc") )  {  
       H1res <- IdtSNmle(Idt,grouping,Type="HomMxt",CVtol=CVtol,limlnk2=limlnk2,
-        OptCntrl=OptCntrl,CovCaseArg=CovCaseArg,Config=Config,SelCrit=SelCrit)
+#        OptCntrl=OptCntrl,CovCaseArg=CovCaseArg,Config=Config,SelCrit=SelCrit)
+        OptCntrl=OptCntrl,CovCaseArg=CovCaseArg,Config=Config,SelCrit=SelCrit,getvcov=FALSE,...)
     }  else if (Model=="Normal" && (Mxt=="Het" || Mxt=="Gen") ) { 
       H1res <- IdtHetMxtNmle(Idt,grouping,CVtol=CVtol,
         OptCntrl=OptCntrl,CovCaseArg=CovCaseArg,Config=Config,SelCrit=SelCrit)
     }  else if (Model=="SKNormal" && (Mxt=="Het" || Mxt=="Gen") ) { 
       H1res <- IdtFDMxtSNmle(Idt,grouping,CVtol=CVtol,limlnk2=limlnk2,
-        OptCntrl=OptCntrl,CovCaseArg=CovCaseArg,Config=Config,SelCrit=SelCrit)
+#        OptCntrl=OptCntrl,CovCaseArg=CovCaseArg,Config=Config,SelCrit=SelCrit)
+        OptCntrl=OptCntrl,CovCaseArg=CovCaseArg,Config=Config,SelCrit=SelCrit,getvcov=FALSE,...)
 
     }  else if (Model=="NrmandSKN")  {
       if (Mxt=="Hom" || Mxt=="Loc")  {
+        SNH1res <- IdtSNmle(Idt,grouping,Type="HomMxt",CVtol=CVtol,limlnk2=limlnk2,
+#          OptCntrl=OptCntrl,CovCaseArg=CovCaseArg,Config=Config,SelCrit=SelCrit)
+          OptCntrl=OptCntrl,CovCaseArg=CovCaseArg,Config=Config,SelCrit=SelCrit,getvcov=FALSE,...)
         NH1res <- IdtNmle(Idt,grouping,Type="HomMxt",CVtol=CVtol,
           OptCntrl=OptCntrl,CovCaseArg=CovCaseArg,Config=Config,SelCrit=SelCrit)
         SNH1res <- IdtSNmle(Idt,grouping,Type="HomMxt",CVtol=CVtol,limlnk2=limlnk2,
-          OptCntrl=OptCntrl,CovCaseArg=CovCaseArg,Config=Config,SelCrit=SelCrit)
+#          OptCntrl=OptCntrl,CovCaseArg=CovCaseArg,Config=Config,SelCrit=SelCrit)
+          OptCntrl=OptCntrl,CovCaseArg=CovCaseArg,Config=Config,SelCrit=SelCrit,getvcov=FALSE,...)
       } else if (Mxt=="Het" || Mxt=="Gen")  {
         NH1res <- IdtHetMxtNmle(Idt,grouping,CVtol=CVtol,
           OptCntrl=OptCntrl,CovCaseArg=CovCaseArg,Config=Config,SelCrit=SelCrit)
         SNH1res <- IdtFDMxtSNmle(Idt,grouping,CVtol=CVtol,limlnk2=limlnk2,
-          OptCntrl=OptCntrl,CovCaseArg=CovCaseArg,Config=Config,SelCrit=SelCrit)
+#          OptCntrl=OptCntrl,CovCaseArg=CovCaseArg,Config=Config,SelCrit=SelCrit)
+          OptCntrl=OptCntrl,CovCaseArg=CovCaseArg,Config=Config,SelCrit=SelCrit,getvcov=FALSE,...)
       } 
       Xscld <- NULL 
       for (Conf in Config) {
         CvCase <- CovCaseMap[Conf]
         if (SNH1res@logLiks[CvCase] < NH1res@logLiks[CvCase]) {
           if (is.null(Xscld)) {
-            Xscld <- scale(cbind(Idt@MidP,Idt@LogR))
+            Xscld <- scale(cbind.data.frame(Idt@MidP,Idt@LogR))
             Xmean <- attr(Xscld,"scaled:center")  
             Xsd <- attr(Xscld,"scaled:scale")  
             XsdOutPrd <- outer(Xsd,Xsd)
             lglikdif <- -n*sum(log(Xsd))		# difference between the log-likelihoods for the original and standardized data  
           } 
-          SNH1res@CovConfCases[[CvCase]] <- CorrHetSNSol(NH1res,SNH1res,CvCase,Conf,Xscld,Xmean,Xsd,XsdOutPrd,grouping,Mxt,lglikdif,limlnk2,OptCntrl)
+#          SNH1res@CovConfCases[[CvCase]] <- CorrHetSNSol(NH1res,SNH1res,CvCase,Conf,Xscld,Xmean,Xsd,XsdOutPrd,grouping,Mxt,lglikdif,limlnk2,OptCntrl)
+          SNH1res@CovConfCases[[CvCase]] <- 
+            CorrHetSNSol(NH1res,SNH1res,CvCase,Conf,Xscld,Xmean,Xsd,XsdOutPrd,grouping,Mxt,lglikdif,limlnk2,OptCntrl,getvcov=FALSE,...)
           SNH1res@logLiks[CvCase] <- LogLik <- SNH1res@CovConfCases[[CvCase]]$logLik
           nfreepar <- SKnpar(Conf,p,q)
           SNH1res@AICs[CvCase] <- -2*LogLik + 2*nfreepar
@@ -227,12 +239,11 @@ setMethod("MANOVA",
 
 MANOVAPermTest <- function(MANOVAres, Idt, grouping, nrep=200,
     Model=c("Normal","SKNormal","NrmandSKN"), CovCase=1:4,
-    SelCrit=c("BIC","AIC"), Mxt=c("Hom","Het","Loc","Gen"), CVtol=1.0e-5, 
+    SelCrit=c("BIC","AIC"), Mxt=c("Hom","Het","Loc","Gen"), CVtol=1.0e-5, k2max=1e6, 
     OptCntrl=list(), onerror=c("stop","warning","silentNull"), ...)
 {
    if (inherits(MANOVAres,"IdtMANOVA")==FALSE) stop("Argument MANOVAres is not of class IdtMANOVA\n")
    ChiSq <- MANOVAres@ChiSq
-#   if (class(Idt)!="IData") stop("Argument Idt is not of class IData\n")
    if (class(Idt)[1]!="IData") stop("Argument Idt is not of class IData\n")
    if (!is.factor(grouping)) stop("Argument rouping is not a factor\n")
    n <- Idt@NObs
@@ -256,7 +267,7 @@ MANOVAPermTest <- function(MANOVAres, Idt, grouping, nrep=200,
        lstind <- cumsumnk[g] 
        curgrouping[permut[frstind:lstind]] <- grplvls[g]
      }
-     empdist[rep] <- MANOVA(Idt,curgrouping,Model,CovCase,SelCrit,Mxt,CVtol,OptCntrl,onerror,...)@ChiSq
+     empdist[rep] <- MANOVA(Idt,curgrouping,Model,CovCase,SelCrit,Mxt,CVtol,k2max,OptCntrl,onerror,...)@ChiSq
    }
    pvalue <- length(which(ChiSq<empdist))/nrep
    cat("Permutation p-value of MANOVA statistic",ChiSq,":",pvalue,"\n")
@@ -543,10 +554,92 @@ setMethod("vcov",
 
 setMethod("mean", signature(x = "IdtNDE"), function(x) coef(x)$mu )
 setMethod("var", signature(x ="IdtNDE"), function(x) coef(x)$Sigma )
-setMethod("sd", signature(x ="IdtE"), function(x) sqrt(diag(var(x))) )
-setMethod("BIC", signature(x ="IdtE"), function(x) x@BICs[x@BestModel] )
-setMethod("AIC", signature(x ="IdtE"), function(x) x@AICs[x@BestModel] )
-setMethod("logLik", signature(x ="IdtE"), function(x) x@logLiks[x@BestModel] )
+setMethod("sd", signature(x ="IdtE"), function(x,na.rm=FALSE) sqrt(diag(var(x))) )
+
+setMethod("AIC", signature(object="IdtE"), 
+  function(object,...,k=2) {
+    if (missing(k)) nbarg <- 2
+    else nbarg <- 3
+    arguments <- match.call(expand.dots=TRUE)
+    if (length(arguments)==nbarg) {
+      aic <- object@AICs[object@BestModel]
+      if (k==2) return(aic)
+      else {
+        llik <- object@logLiks[object@BestModel] 
+        return(-2*llik + (k/2)*(aic+2*llik))
+      }
+    }  
+    
+    nobjs <- length(arguments)-nbarg+1
+    aics <- numeric(nobjs)
+    objl <- vector("list",nobjs-1)
+    for (i in 1:nobjs) {
+      if (i==1) {
+        aics[1] <- object@AICs[object@BestModel]     
+        names(aics)[1] <- names(object@AICs[object@BestModel])
+      }  else {
+        objl[[i-1]] <- eval(arguments[[1+i]],sys.parent())
+        aics[i] <- objl[[i-1]]@AICs[objl[[i-1]]@BestModel]
+        names(aics)[i] <- names(objl[[i-1]]@AICs[objl[[i-1]]@BestModel])
+      }
+    } 
+
+    if (k==2) return(aics)
+    else {
+      lliks <- numeric(nobjs)
+      for (i in 1:nobjs) {
+        if (i==1) lliks[1] <- object@logLiks[object@BestModel]     
+        else lliks[i] <- objl[[i-1]]@logLiks[objl[[i-1]]@BestModel]
+      } 
+    }    
+    
+    return(-2*lliks + (k/2)*(aics+2*lliks))
+  }  
+)
+
+setMethod("BIC", signature(object="IdtE"), 
+  function(object,...) {
+    arguments <- match.call(expand.dots=TRUE)
+    if (length(arguments)==2) return(object@BICs[object@BestModel])
+
+    nobjs <- length(arguments)-1
+    bics <- numeric(nobjs)
+    objl <- vector("list",nobjs-1)
+    for (i in 1:nobjs) {
+      if (i==1) {
+        bics[1] <- object@BICs[object@BestModel]     
+        names(bics)[1] <- names(object@BICs[object@BestModel])
+      }  else {
+        objl[[i-1]] <- eval(arguments[[1+i]],sys.parent())
+        bics[i] <- objl[[i-1]]@BICs[objl[[i-1]]@BestModel]
+        names(bics)[i] <- names(objl[[i-1]]@BICs[objl[[i-1]]@BestModel])
+      }
+    } 
+    return(bics)
+  }  
+)
+
+setMethod("logLik", signature(object="IdtE"), 
+  function(object,...) {
+    arguments <- match.call(expand.dots=TRUE)
+    if (length(arguments)==2) return(object@logLiks[object@BestModel])
+            
+    nobjs <- length(arguments)-1
+    logLiks <- numeric(nobjs)
+    objl <- vector("list",nobjs-1)
+    for (i in 1:nobjs) {
+      if (i==1) {
+        logLiks[1] <- object@logLiks[object@BestModel]     
+        names(logLiks)[1] <- names(object@logLiks[object@BestModel])
+      }  else {
+        objl[[i-1]] <- eval(arguments[[1+i]],sys.parent())
+        logLiks[i] <- objl[[i-1]]@logLiks[objl[[i-1]]@BestModel]
+        names(logLiks)[i] <- names(objl[[i-1]]@logLiks[objl[[i-1]]@BestModel])
+      }
+    } 
+    return(logLiks)
+  }  
+)
 
 setMethod("cor",
   signature(x ="IdtNDE"),
@@ -586,7 +679,7 @@ setMethod("ObsLogLiks",
   {
     p <- 2*Idt@NIVar
     c0 <- -0.5*(p*log(2*pi))
-    Xdev <- scale(cbind(Idt@MidP,Idt@LogR),center=object@mleNmuE,scale=FALSE)
+    Xdev <- scale(cbind.data.frame(Idt@MidP,Idt@LogR),center=object@mleNmuE,scale=FALSE)
     if (Conf!=5) {
       SigISr <- t(backsolve(chol(object@CovConfCases[[Conf]]$mleSigE),diag(p)))
       apply(Xdev,1,ILogLikNC1,SigmaSrInv=SigISr,const=c0+sum(log(diag(SigISr))))

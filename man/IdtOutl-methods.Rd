@@ -1,14 +1,14 @@
 \name{IdtOutl-methods}
 \docType{methods}
 \alias{IdtOutl-methods}
-\alias{plot,IdtOutl-method}
+\alias{plot,IdtOutl,missing-method}
 
 \title{Plot method for class IdtOutl in Package `MAINT.Data'}
 \description{Plots robust Mahalanobis distances and outlier cut-offs for an object describing potential outliers in a interval-valued data set}
 
 \usage{
-  \S4method{plot}{IdtOutl}(x, scale=c("linear","log"), RefDist=getRefDist(x),
-eta=geteta(x), multiCmpCor=multiCmpCor(x), \dots)
+  \S4method{plot}{IdtOutl,missing}(x, scale=c("linear","log"), RefDist=getRefDist(x), eta=geteta(x), 
+  multiCmpCor=getmultiCmpCor(x), \dots)
 }
 
 \arguments{

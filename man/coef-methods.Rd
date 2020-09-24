@@ -28,7 +28,7 @@
   \item{\dots}{Additional arguments for method functions.}
 }
 
-\value{ A vector of parameter estimates.}
+\value{ A list of parameter estimates. The list components depend on the model and parametriztion assumed by the model. For Gaussian models these are respectivelly mu (vector of mean estimates) and Sigma (matrix of covariance estimates). For Skew-Normal models the components are mu, Sigma and gamma1 (one vector of skewness coefficient estimates) for the centred parametrization and the vectors ksi, and alpha, and the matrix Omega for the direct parametrization. }
 
 \references{
 Arellano-Valle, R. B. and Azzalini, A. (2008): "The centred parametrization for the multivariate skew-normal distribution". Journal of Multivariate Analysis, Volume 99, Issue 7, 1362-1382.
@@ -36,5 +36,34 @@ Arellano-Valle, R. B. and Azzalini, A. (2008): "The centred parametrization for 
 
 \seealso{
   \code{\link{stdEr}}, \code{\link{vcov}} 
+}
+
+\examples{
+
+# Create an Interval-Data object containing the intervals for 899 observations 
+# on the temperatures by quarter in 60 Chinese meteorological stations.
+
+ChinaT <- IData(ChinaTemp[1:8],VarNames=c("T1","T2","T3","T4"))
+
+ChinaT_NE <- mle(ChinaT)
+
+# Display model estimates
+
+print(coef(ChinaT_NE))
+
+\dontrun{
+
+# Estimate Skew-Normal distribution  parameters by maximum likelihood  
+
+ChinaT_SNE <- mle(ChinaT,Model="SKNormal")
+
+# Display model estimates
+
+print(coef(ChinaT_SNE,ParType="Centr"))
+print(coef(ChinaT_SNE,ParType="Direct"))
+
+}
+
+ 
 }
 

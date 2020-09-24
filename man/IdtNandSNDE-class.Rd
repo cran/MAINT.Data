@@ -4,7 +4,7 @@
 \alias{IdtNandSNDE-class}
 
 \title{Class IdtNandSNDE}
-\description{IdtNandSNDE is a union of classes \code{\linkS4class{IdtSngNandSNDE}} and \code{\linkS4class{IdtMxNandSNDE}}, used for storing the estimation results of Normal and Skew-Normal modelizations for Interval Data.} 
+\description{IdtNandSNDE is a union of classes \code{\linkS4class{IdtSngNandSNDE}} and \code{\linkS4class{IdtMxNandSNDE}}, used for storing the estimation results of Normal and Skew-Normal modelisations for Interval Data.} 
 
 \references{
 Brito, P., Duarte Silva, A. P. (2012), Modelling Interval Data with Normal and Skew-Normal Distributions. \emph{Journal of Applied Statistics} \bold{39}(1), 3--20.

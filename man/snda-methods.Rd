@@ -50,7 +50,7 @@ present, the probabilities should be specified in the order of the factor levels
 
  \item{Mxt}{Indicates the type of mixing distributions to be considered. Current alternatives are \dQuote{Loc} (location model -- groups differ only on the location parameters of a Skew-Normal model) and \dQuote{Gen} (general model -- groups differ on all parameters of a Skew-Normal models).}
 
-  \item{silent}{A boolean flag indicating wether a warning message should be printed if the method fails.} 
+  \item{silent}{A boolean flag indicating whether a warning message should be printed if the method fails.} 
  
   \item{selmodel}{Selected model from a list of candidate models saved in object x.}
 
@@ -99,11 +99,6 @@ CVlocsnda <- DACrossVal(ChinaT,ChinaTemp$GeoReg,TrainAlg=snda,Mxt="Loc",
 
 summary(CVlocsnda[,,"Clerr"])
 
-glberrors <- 
-  apply(CVlocsnda[,,"Nk"]*CVlocsnda[,,"Clerr"],1,sum)/apply(CVlocsnda[,,"Nk"],1,sum)
-
-cat("Average global classification error =",mean(glberrors),"\n")
-
 # Skew-Normal based discriminant analysis, asssuming that the different regions may differ
 # in all SkewNormal parameters
 
@@ -118,11 +113,6 @@ CVgensnda <- DACrossVal(ChinaT,ChinaTemp$GeoReg,TrainAlg=snda,Mxt="Gen",
   CovCase=CovCase(ChinaT.gensnda),kfold=3,CVrep=1)
 
 summary(CVgensnda[,,"Clerr"])
-
-glberrors <- 
-  apply(CVgensnda[,,"Nk"]*CVgensnda[,,"Clerr"],1,sum)/apply(CVgensnda[,,"Nk"],1,sum)
-
-cat("Average global classification error =",mean(glberrors),"\n")
 
 }
 

@@ -19,7 +19,7 @@ the four alternative variance-covariance matrix configurations.}
         \bold{H0logLik}: Logarithm of the Likelihood function under the null hypothesis. \cr
         \bold{H1logLik}: Logarithm of the Likelihood function under the alternative hypothesis. \cr
     }
-    \item{\code{RestModels}:}{The restrited model (corresponding to the null hypothesis)}
+    \item{\code{RestModels}:}{The restricted model (corresponding to the null hypothesis)}
     \item{\code{FullModels}:}{The full model (corresponding to the alternative hypothesis)}
   }
 }

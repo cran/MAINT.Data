@@ -39,7 +39,7 @@
     \item{\code{NObs}:}{Number of entities under analysis (cases)}
     \item{\code{NIVar}:}{Number of interval variables}
     \item{\code{SelCrit}:}{The model selection criterion; currently, AIC and BIC are implemented}
-    \item{\code{Hmcdt}:}{Indicates whether the optimal model corresponds to a homocedastic (TRUE) or a hetereocedasic (FALSE) setup}
+    \item{\code{Hmcdt}:}{Indicates whether the optimal model corresponds to a homoscedastic (TRUE) or a hetereocedasic (FALSE) setup}
     \item{\code{BestG:}}{The optimal number of mixture components.}
     \item{\code{BestC:}}{The configuration case of the variance-covariance matrix in the optimal model}
     \item{\code{logLiks}:}{The logarithms of the likelihood function for the different models tried}
@@ -53,7 +53,7 @@
       \describe{
         \item{pro}{A vector whose \emph{k}th component is the mixing proportion for the \emph{k}th component of the mixture model.}
         \item{mean}{The mean for each component. If there is more than one component, this is a matrix whose kth column is the mean of the \emph{k}th component of the mixture model.}
-        \item{covariance}{A three-dimensional array with the covariance estimates. If Hmcdt is FALSE (heterocedastic setups) the third dimension levels run through the BestG mixture components, with one different covariance matrix for each level. Otherwise (homocedastic setups), there is only one covariance matrix and the size of the third dimension equals one.}
+        \item{covariance}{A three-dimensional array with the covariance estimates. If Hmcdt is FALSE (heteroscedastic setups) the third dimension levels run through the BestG mixture components, with one different covariance matrix for each level. Otherwise (homoscedastic setups), there is only one covariance matrix and the size of the third dimension equals one.}
       }
     }
     \item{\code{z:}}{A matrix whose \emph{[i,k]}th entry is the probability that observation \emph{i} in the test data belongs to the \emph{k}th class.}
@@ -94,7 +94,7 @@ Brito, P., Duarte Silva, A. P. and Dias, J. G. (2015), Probabilistic Clustering 
 }
 
 \seealso{
-  \code{\link{Idtmclust}}  
+  \code{\link{Idtmclust}}, \code{\link{plotInfCrt}},  \code{\link{pcoordplot}} 
 }
 
 \keyword{classes}

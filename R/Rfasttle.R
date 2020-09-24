@@ -27,7 +27,8 @@ refinementstep <- function(tmpsol,Idt,p,c0,k,maxnsteps,Config,SelCrit,convrg=.Ma
   Cftmpsol <- vector("list",5)
   CfSet <- matrix(nrow=5,ncol=k)
   CFCrit <- rep(NA,5)
-  X <- cbind(Idt@MidP,Idt@LogR)
+#  X <- cbind(Idt@MidP,Idt@LogR)
+  X <- cbind.data.frame(Idt@MidP,Idt@LogR)
   for (Cf in Config)  {
     Cftmpsol[[Cf]] <- tmpsol
     for (step in 1:maxnsteps) {

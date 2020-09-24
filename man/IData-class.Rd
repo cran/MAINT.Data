@@ -21,7 +21,7 @@
     \item{\code{MidP}:}{A data-frame of the midpoints of the observed intervals}
     \item{\code{LogR}:}{A data-frame of the logarithms of the ranges of the observed intervals}
     \item{\code{ObsNames}:}{An optional vector of names assigned to the individual observations.}
-    \item{\code{VarNames}:}{An optional vector of names to be assigned to the Interval-Valued Variables.}
+    \item{\code{VarNames}:}{An optional vector of names to be assigned to the Interval-valued Variables.}
     \item{\code{NObs}:}{Number of entities under analysis (cases)}
     \item{\code{NIVar}:}{Number of interval variables}
     \item{\code{NbMicroUnits}:}{An integer vector with the number of micro data units by interval-valued observation (or an empty vector, if not applicable)}
@@ -31,8 +31,9 @@
 \section{Methods}{
   \describe{
     \item{show}{\code{signature(object = "IData")}: show S4 method for the IData-class.}
-    \item{nrow}{\code{signature(x = "IData")}: returns the number of entities (observations).}
-    \item{ncol}{\code{signature(x = "IData")}: returns the number of Interval Variables.}
+    \item{nrow}{\code{signature(x = "IData")}: returns the number of statistical units (observations).}
+    \item{ncol}{\code{signature(x = "IData")}: returns the number of of Interval-valued variables.}
+    \item{dim}{\code{signature(x = "IData")}: returns a vector with the of number statistical units as first element, and the number of Interval-valued variables as second element.}
     \item{rownames}{\code{signature(x = "IData")}: returns the row (entity) names for an object of class IData.}
     \item{colnames}{\code{signature(x = "IData")}: returns column (variable) names for an object of class IData.}
     \item{names}{\code{signature(x = "IData")}: returns column (variable) names for an object of class IData.}
