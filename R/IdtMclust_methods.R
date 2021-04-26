@@ -31,8 +31,7 @@ setMethod("pcoordplot",
     }  else if (Seq == "MidPLogR_VarbyVar")  {
       DF <- as.data.frame(t(x_mean[rep(1:q,each=2)+rep(c(0,q),q),]))
     }
-#    DF <- cbind(DF,Component=paste("CP",1:G,sep=""))
-    DF <- cbind.data.frame(DF,Component=paste("CP",1:G,sep=""))
+    DF <- cbind(DF,Component=paste("CP",1:G,sep=""))
     plt <- ggparcoord(DF, columns = 1:p, groupColumn = 'Component') + ggtitle(title) +
       theme_minimal() + theme(plot.title=element_text(hjust=0.5)) + theme(axis.text.x=element_text(angle=90,hjust=1)) 
        
@@ -346,15 +345,12 @@ setMethod("var",signature(x = "IdtMclust"),
 setMethod("classification",signature(x = "IdtMclust"),
   function(x,model="BestModel") 
   { 
-#    if (model=="BestModel") return(factor(x@parameters$classification)) 
     if (model=="BestModel") return(factor(x@classification)) 
     nomodmsg <- paste("There is no model named",model,"in these Idtmclust results\n") 
     if (substr(model,1,3)=="Hom") {
       if (!is.element(model,names(x@allres$RepresHom))) stop(nomodmsg) 
-#      return(factor(x@allres$RepresHom[[model]]@parameters$classification))
       return(factor(x@allres$RepresHom[[model]]@classification))
     } else if (substr(model,1,3)=="Het") {
-#      return(factor(x@allres$RepresHet[[model]]@parameters$classification))
       return(factor(x@allres$RepresHet[[model]]@lassification))
     } else stop(nomodmsg) 
   }

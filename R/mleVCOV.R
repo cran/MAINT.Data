@@ -63,17 +63,16 @@ NmleVCov <- function(nk,p,SigmaE,k=1,grpnames=NULL)  # Gets the Var-Cov of maxim
 
      # Var-Covariance of sample covariance matrix
 
-  for (i in 1:p)
-    parnames <- c(parnames,paste("Sigma_",vnames[i],"_",vnames[i:p],sep=""))
-  ncnst <- (n-k)/n^2                    
+  for (i in 1:p)  parnames <- c(parnames,paste("Sigma_",vnames[i],"_",vnames[i:p],sep=""))
   ind1 <- k*p
+  ncnst <- 1./(n-k)                  
   for(i1 in 1:p) for(j1 in i1:p)  {
     ind1 <- ind1 + 1  
     ind2 <- k*p
     for(i2 in 1:p) for(j2 in i2:p)  {
       ind2 <- ind2 + 1
       if (ind2<=ind1)  {
-        mlevcov[ind1,ind2] <- ncnst * ( SigmaE[i1,i2]*SigmaE[j1,j2] + SigmaE[i1,j2]*SigmaE[i2,j1] )
+        mlevcov[ind1,ind2] <- ncnst * ( SigmaE[i1,i2]*SigmaE[j1,j2] + SigmaE[i1,j1]*SigmaE[i2,j2] )
         if (ind2<ind1) mlevcov[ind2,ind1] <- mlevcov[ind1,ind2]
       }
     }

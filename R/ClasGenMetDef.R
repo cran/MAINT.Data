@@ -93,9 +93,14 @@ setClass("summaryIData",slots=c(MidPsumar="table", Rngsumar="table",LogRsumar="t
 setGeneric("nrow")
 setGeneric("ncol")
 setGeneric("rownames")
+setGeneric("row.names")
 setGeneric("colnames")
 setGeneric("names")
 setGeneric("var")
+getGeneric("rbind")
+setGeneric("rbind", signature="...")
+getGeneric("cbind")
+setGeneric("cbind", signature="...")
 setGeneric("sd",function(x,na.rm=FALSE) standardGeneric("sd"))                      # Check if I really need this ... !!! 
 setGeneric("cor")
 setGeneric("mean",signature="x")
@@ -126,8 +131,9 @@ setGeneric("H1res",  function(object) standardGeneric("H1res"))
 setGeneric("H0res",  function(object) standardGeneric("H0res"))
 setGeneric("snda",function(x, grouping, prior="proportions", ...) standardGeneric("snda"))
 setGeneric("ObsLogLiks",function(object,Idt,Conf=object@BestModel) standardGeneric("ObsLogLiks"))
-setGeneric("rbind",function(x, y, ...) standardGeneric("rbind"))
-setGeneric("cbind",function(x, y, ...) standardGeneric("cbind"))
+#setGeneric("rbind",function(x, y, ...) standardGeneric("rbind"))
+#setGeneric("cbind",function(x, y, ...) standardGeneric("cbind"))
+setGeneric("NbMicroUnits<-",function(x, value) standardGeneric("NbMicroUnits<-"))
 
 setClass("summaryIdtMclust",
   slots=c(title="character",modelName="character",Hmcdt="logical",

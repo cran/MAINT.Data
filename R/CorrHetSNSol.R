@@ -1,4 +1,3 @@
-#CorrHetSNSol <- function(Nres,SNres,CvCase,Conf,Xscld,Xmean,Xsd,XsdOutPrd,grouping,Mxt,lglikdif,limlnk2,OptCntrl,bordertol=1e-2,maxsk=0.99527)
 CorrHetSNSol <- function(Nres,SNres,CvCase,Conf,Xscld,Xmean,Xsd,XsdOutPrd,grouping,Mxt,lglikdif,limlnk2,OptCntrl,getvcov=TRUE,bordertol=1e-2,maxsk=0.99527)
 {
 
@@ -11,7 +10,7 @@ CorrHetSNSol <- function(Nres,SNres,CvCase,Conf,Xscld,Xmean,Xsd,XsdOutPrd,groupi
     npar <- SKnpar(Conf,p,p/2,Ngrps=k)
     grpModMat <- model.matrix(~ grouping)
     Gmat <- model.matrix(~ grplvls)
-    InFData <- try( sn.infoMv( dp=list(beta=as.matrix(rbind.data.frame(Res$ksi[1,],Res$beta2k)),Omega=Res$Omega,alpha=Res$alpha), y=Xscld, x=grpModMat ) )
+    InFData <- try( sn.infoMv( dp=list(beta=as.matrix(rbind(Res$ksi[1,],Res$beta2k)),Omega=Res$Omega,alpha=Res$alpha), y=Xscld, x=grpModMat ) )
     if ( is.null(InFData) || class(InFData)[1] == "try-error" || is.null(InFData$asyvar.cp) )  {
       return( list(mleCPvcov=NULL,muEse=NULL,SigmaEse=NULL,gamma1Ese=NULL,status="Invalid") )
     }

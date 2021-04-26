@@ -118,7 +118,7 @@ setMethod("vcov",
     } else {
       if (is.null(group))
       {
-        warning(paste("vcov returned as three-dimensional array with a different var-cov matrix for each group,\n",
+        warning(paste("vcov returned a three-dimensional array with a different var-cov matrix for each group,\n",
           "which was identified by the level of the third array dimension\n")) 
         object@CovConfCases[[selmodel]]$mleCPvcov
       } else {

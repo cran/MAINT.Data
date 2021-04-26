@@ -45,7 +45,7 @@ IdtNmle <- function(Idt, grouping=NULL, Type=c("SingDst","HomMxt"), CVtol=1.0e-5
   logLiks <- AICs <- BICs <- rep(NA_real_,nCovCases)
   CovConfCases <- vector("list",nCovCases)
   names(logLiks) <- names(AICs) <- names(BICs) <- names(CovConfCases) <- modnames
-  X <- cbind.data.frame(Idt@MidP,Idt@LogR)
+  X <- cbind(Idt@MidP,Idt@LogR)
 
   for (model in Config)  {  
     if (model!=2) { 
@@ -57,7 +57,7 @@ IdtNmle <- function(Idt, grouping=NULL, Type=c("SingDst","HomMxt"), CVtol=1.0e-5
   if (Type=="SingDst")
   {
     mleNmuE <- colMeans(X)
-    mleNsdE <- sapply(X,sd)
+    mleNsdE <- sapply(X,sd) * sqrt((n-1)/n)
     mleNmuEse <- mleNsdE/sqrt(n)
     if (is.element(1,Config))
     {
@@ -70,7 +70,8 @@ IdtNmle <- function(Idt, grouping=NULL, Type=c("SingDst","HomMxt"), CVtol=1.0e-5
         error( onerror,paste("Variables",paste(names(CnstV),collapse=" "),"appear to be constant\n") )
       }
       CovConfCases[[1]]$mlevcov <- NmleVCov(n,p,CovConfCases[[1]]$mleSigE)
-      CovConfCases[[1]]$mleSigEse  <- sqrt((CovConfCases[[1]]$mleSigE^2+outer(XVar,XVar))/n)
+#      CovConfCases[[1]]$mleSigEse  <- sqrt((CovConfCases[[1]]$mleSigE^2+outer(XVar,XVar))/n)
+      CovConfCases[[1]]$mleSigEse  <- sqrt((CovConfCases[[1]]$mleSigE^2+outer(XVar,XVar))/(n-1))
       dimnames(CovConfCases[[1]]$mleSigEse) <- dimnames(CovConfCases[[1]]$mleSigE)
     }  else {
       SigNEC1 <- var(X) * (n-1)/n
@@ -82,15 +83,16 @@ IdtNmle <- function(Idt, grouping=NULL, Type=c("SingDst","HomMxt"), CVtol=1.0e-5
         error(onerror,paste("Variables",paste(names(CnstV),collapse=" "),"appear to be constant\n"))
       }
       vcovNEC1 <- NmleVCov(n,p,SigNEC1)
-      SigNEseC1 <- sqrt((SigNEC1^2+outer(XVar,XVar))/n)
+#      SigNEseC1 <- sqrt((SigNEC1^2+outer(XVar,XVar))/n)
+      SigNEseC1 <- sqrt((SigNEC1^2+outer(XVar,XVar))/(n-1))
       dimnames(SigNEseC1) <- dimnames(SigNEC1)
     }
   }
   else if (Type=="HomMxt")
   {
     mleNmuE <- apply(X,2,function(x) tapply(x,grouping,mean))
-    mleNmuEse <- apply(X,2,function(x) tapply(x,grouping,sd))/sqrt(nk)
-    rownames(mleNmuE) <- rownames(mleNmuEse) <- levels(grouping)
+#    mleNmuEse <- apply(X,2,function(x) tapply(x,grouping,sd))/sqrt(nk)
+#    mleNmuEse <- apply(X,2,function(x) tapply(x,grouping,sd)) * ((nk-1)/nk) /sqrt(nk)
     if (is.element(1,Config))
     {
       CovConfCases[[1]]$mleSigE <- var(X[grouping==levels(grouping)[1],]) * (nk[1]-1)/n
@@ -104,7 +106,8 @@ IdtNmle <- function(Idt, grouping=NULL, Type=c("SingDst","HomMxt"), CVtol=1.0e-5
         error(onerror,paste("Variables",paste(names(CnstV),collapse=" "),"appear to be constant within groups\n"))
       }
       CovConfCases[[1]]$mlevcov <- NmleVCov(nk,p,CovConfCases[[1]]$mleSigE,k,grpnames=levels(grouping))
-      CovConfCases[[1]]$mleSigEse  <- sqrt((CovConfCases[[1]]$mleSigE^2+outer(XVar,XVar))/n)
+#      CovConfCases[[1]]$mleSigEse  <- sqrt((CovConfCases[[1]]$mleSigE^2+outer(XVar,XVar))/n)
+      CovConfCases[[1]]$mleSigEse  <- sqrt((CovConfCases[[1]]$mleSigE^2+outer(XVar,XVar))/(n-k))
       dimnames(CovConfCases[[1]]$mleSigEse) <- dimnames(CovConfCases[[1]]$mleSigE)
     }  else  {
       SigNEC1 <- var(X[grouping==levels(grouping)[1],]) * (nk[1]-1)/n
@@ -117,9 +120,13 @@ IdtNmle <- function(Idt, grouping=NULL, Type=c("SingDst","HomMxt"), CVtol=1.0e-5
         error(onerror,paste("Variables",paste(names(CnstV),collapse=" "),"appear to be constant within groups\n"))
       }
       vcovNEC1 <- NmleVCov(nk,p,SigNEC1,k,grpnames=levels(grouping))
-      SigNEseC1  <- sqrt((SigNEC1^2+outer(XVar,XVar))/n)
+#      SigNEseC1  <- sqrt((SigNEC1^2+outer(XVar,XVar))/n)
+      SigNEseC1  <- sqrt((SigNEC1^2+outer(XVar,XVar))/(n-k))
       dimnames(SigNEseC1) <- dimnames(SigNEC1)
     }
+    mleNmuEse <- matrix(sqrt(rep(XVar,each=k)/rep(nk,p)),nrow=k,ncol=p)
+    rownames(mleNmuE) <- rownames(mleNmuEse) <- levels(grouping)
+    colnames(mleNmuEse) <- colnames(mleNmuE)
   }
   if (any(Config!=2))
   {
@@ -145,7 +152,7 @@ IdtNmle <- function(Idt, grouping=NULL, Type=c("SingDst","HomMxt"), CVtol=1.0e-5
     }  else if (Type=="HomMxt")  {
       Xdev <- scale(X[grouping==levels(grouping)[1],],center=mleNmuE[1,],scale=FALSE)
       for (g in 2:k)
-        Xdev <- rbind.data.frame(Xdev,scale(X[grouping==levels(grouping)[g],],center=mleNmuE[g,],scale=FALSE))
+        Xdev <- rbind(Xdev,scale(X[grouping==levels(grouping)[g],],center=mleNmuE[g,],scale=FALSE))
     }
     Conf134 <- Config[Config !=2 & Config!=5]
     if (length(Conf134)!=0)  {
@@ -179,7 +186,7 @@ IdtNmle <- function(Idt, grouping=NULL, Type=c("SingDst","HomMxt"), CVtol=1.0e-5
     }  else if (Type=="HomMxt")  {
       Xscld <- scale(X[grouping==levels(grouping)[1],],center=mleNmuE[1,],scale=Xsd)
       for (g in 2:k)
-        Xscld <- rbind.data.frame(Xscld,scale(X[grouping==levels(grouping)[g],],center=mleNmuE[g,],scale=Xsd))
+        Xscld <- rbind(Xscld,scale(X[grouping==levels(grouping)[g],],center=mleNmuE[g,],scale=Xsd))
     }
     C2res <- Cnf2MaxLik(Xscld,OptCntrl=OptCntrl)
     if ( is.element(4,Config) && C2res$lnLik < logLiks[CovCaseMap[4]] )  {
@@ -266,7 +273,7 @@ IdtHetMxtNmle <- function( Idt,grouping, CVtol=1.0e-5, OptCntrl=OptCntrl,
   for (g in 1:k)
   {
     Idtg <- Idt[grouping==levels(grouping)[g],]
-    IdtgDF <- cbind.data.frame(Idtg@MidP,Idtg@LogR)
+    IdtgDF <- cbind(Idtg@MidP,Idtg@LogR)
     Xbar <- colMeans(IdtgDF)
     Xstdev <- sapply(IdtgDF,sd)
     CnstV <- which(Xstdev/abs(Xbar)<CVtol)

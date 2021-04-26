@@ -61,7 +61,7 @@ Duarte Silva, A.P. and Brito, P. (2015), Discriminant analysis of interval data:
 }
 
 \seealso{ \code{\link{qda}}, \code{\link{snda}}, \code{\link{Roblda}}, \code{\link{Robqda}}, \code{\linkS4class{IData}}, \code{\linkS4class{IdtMxtNDE}}, \code{\linkS4class{IdtClMANOVA}}, 
- \code{\linkS4class{IdtLocNSNMANOVA}} }
+ \code{\linkS4class{IdtLocNSNMANOVA}}, \code{\link{qda}}, \code{\link{ConfMat}} }
 
 \keyword{methods}
 \keyword{Interval Data}
@@ -79,8 +79,11 @@ ChinaT <- IData(ChinaTemp[1:8],VarNames=c("T1","T2","T3","T4"))
 ChinaT.lda <- lda(ChinaT,ChinaTemp$GeoReg)
 cat("Temperatures of China -- linear discriminant analysis results:\n")
 print(ChinaT.lda)
+ldapred <- predict(ChinaT.lda,ChinaT)$class
 cat("lda Prediction results:\n")
-print(predict(ChinaT.lda,ChinaT)$class)
+print(ldapred )
+cat("Resubstition confusion matrix:\n")
+ConfMat(ChinaTemp$GeoReg,ldapred)
 
 \dontrun{
 #Estimate error rates by ten-fold cross-validation replicated 20 times  

@@ -131,7 +131,7 @@ setMethod("predict",
   signature(object = "IdtSNlocda"),
   function(object,newdata,prior=object@prior,...)
   {
-    if (is(newdata,"IData")) { newdata <- as.matrix(cbind.data.frame(newdata@MidP,newdata@LogR)) }
+    if (is(newdata,"IData")) { newdata <- as.matrix(cbind(newdata@MidP,newdata@LogR)) }
     if (is(newdata,"data.frame")) { newdata <- as.matrix(newdata) }
     n <- nrow(newdata)
     k <- length(prior) 
@@ -245,7 +245,7 @@ setMethod("predict",
   signature(object = "IdtSNgenda"),
   function(object,newdata,prior=object@prior,...)
   {
-    if (is(newdata,"IData")) { newdata <- as.matrix(cbind.data.frame(newdata@MidP,newdata@LogR)) }
+    if (is(newdata,"IData")) { newdata <- as.matrix(cbind(newdata@MidP,newdata@LogR)) }
     if (is(newdata,"data.frame")) { newdata <- as.matrix(newdata) }
     n <- nrow(newdata)
     k <- length(prior)

@@ -43,7 +43,7 @@ setMethod("mle",
         CvCase <- CovCaseMap[Conf]
         if (SNres@logLiks[CvCase] < Nres@logLiks[CvCase]) {
           if (is.null(Xscld)) {
-            Xscld <- scale(cbind.data.frame(Idt@MidP,Idt@LogR))
+            Xscld <- scale(cbind(Idt@MidP,Idt@LogR))
             Xmean <- attr(Xscld,"scaled:center")  
             Xsd <- attr(Xscld,"scaled:scale")  
             XsdOutPrd <- outer(Xsd,Xsd)
@@ -92,7 +92,7 @@ setMethod("MANOVA",
 
 #    H0res <- mle(Idt,Model=Model,CovCase=CovCase,SelCrit=SelCrit,OptCntrl=OptCntrl)
     H0res <- mle(Idt,Model=Model,CovCase=CovCase,SelCrit=SelCrit,OptCntrl=OptCntrl,getvcov=FALSE,...)
-
+    
     Config <- getConfig(...)
     if (is.null(Config))  
     {
@@ -160,7 +160,7 @@ setMethod("MANOVA",
         CvCase <- CovCaseMap[Conf]
         if (SNH1res@logLiks[CvCase] < NH1res@logLiks[CvCase]) {
           if (is.null(Xscld)) {
-            Xscld <- scale(cbind.data.frame(Idt@MidP,Idt@LogR))
+            Xscld <- scale(cbind(Idt@MidP,Idt@LogR))
             Xmean <- attr(Xscld,"scaled:center")  
             Xsd <- attr(Xscld,"scaled:scale")  
             XsdOutPrd <- outer(Xsd,Xsd)
@@ -214,6 +214,7 @@ setMethod("MANOVA",
         df <- SKnpar(BestConf,p,q,Ngrps=k,Mxt="GenMod") - SKnpar(BestConf,p,q,Ngrps=1)
       }
     } 
+        
     pvalue <- pchisq(ChiSq,df,lower.tail=FALSE)
     if (Model=="Normal" && (Mxt=="Hom" || Mxt=="Loc") )  { 
       return( new("IdtClMANOVA",NIVar=Idt@NIVar,grouping=grouping,H0res=H0res,H1res=H1res,
@@ -663,7 +664,7 @@ setMethod("vcov",
     } else {
       if (is.null(group))
       {
-        warning(paste("vcov returned as three-dimensional array with a different var-cov matrix for each group,\n",
+        warning(paste("vcov returned a three-dimensional array with a different var-cov matrix for each group,\n",
           "which was identified by the level of the third array dimension\n")) 
         object@CovConfCases[[selmodel]]$mlevcov
       } else {
@@ -679,7 +680,7 @@ setMethod("ObsLogLiks",
   {
     p <- 2*Idt@NIVar
     c0 <- -0.5*(p*log(2*pi))
-    Xdev <- scale(cbind.data.frame(Idt@MidP,Idt@LogR),center=object@mleNmuE,scale=FALSE)
+    Xdev <- scale(cbind(Idt@MidP,Idt@LogR),center=object@mleNmuE,scale=FALSE)
     if (Conf!=5) {
       SigISr <- t(backsolve(chol(object@CovConfCases[[Conf]]$mleSigE),diag(p)))
       apply(Xdev,1,ILogLikNC1,SigmaSrInv=SigISr,const=c0+sum(log(diag(SigISr))))

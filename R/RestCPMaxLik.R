@@ -146,12 +146,11 @@ GetCovPar <- function(S,Config=1,test=TRUE)
   if (Config==1 || Config==2) S1 <- S
   if (Config==3 || Config==5) S1 <- diag(diag(S))
   if (Config==3) for (v in 1:q) S1[v,q+v] <- S1[q+v,v] <- S[q+v,v]
-#  if (Config==4) S1 <- rbind(cbind(S[1:q,1:q],matrix(0.,q,q)),cbind(matrix(0.,q,q),S[(q+1):p,(q+1):p]))
   if (Config==4) {
-    S1 <- rbind.data.frame(
-      cbind.data.frame(S[1:q,1:q],matrix(0.,q,q,dimnames=list(rownames(S)[1:q],colnames(S)[(q+1):p]))),
-      cbind.data.frame(matrix(0.,q,q,dimnames=list(rownames(S)[(q+1):p],colnames(S)[1:q])),S[(q+1):p,(q+1):p])
-    )
+    S1 <- as.matrix(rbind(
+      cbind(S[1:q,1:q],matrix(0.,q,q,dimnames=list(rownames(S)[1:q],colnames(S)[(q+1):p]))),
+      cbind(matrix(0.,q,q,dimnames=list(rownames(S)[(q+1):p],colnames(S)[1:q])),S[(q+1):p,(q+1):p])
+    ))
   }
     
   if (test) {
@@ -191,9 +190,9 @@ GetSigmaPar <- function(S,Config=1)
   if (Config==3 || Config==5) S1 <- diag(diag(S))
   if (Config==3) for (v in 1:q) S1[v,q+v] <- S1[q+v,v] <- S[q+v,v]
   if (Config==4) {
-    S1 <- rbind.data.frame(
-      cbind.data.frame(S[1:q,1:q],matrix(0.,q,q,dimnames=list(rownames(S)[1:q],colnames(S)[(q+1):p]))),
-      cbind.data.frame(matrix(0.,q,q,dimnames=list(rownames(S)[(q+1):p],colnames(S)[1:q])),S[(q+1):p,(q+1):p])
+    S1 <- rbind(
+      cbind(S[1:q,1:q],matrix(0.,q,q,dimnames=list(rownames(S)[1:q],colnames(S)[(q+1):p]))),
+      cbind(matrix(0.,q,q,dimnames=list(rownames(S)[(q+1):p],colnames(S)[1:q])),S[(q+1):p,(q+1):p])
     )
   }
     

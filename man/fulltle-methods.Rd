@@ -18,7 +18,7 @@
 }
 
 \arguments{
-    \item{Idt}{An IData object representing interval-valued entities.}
+    \item{Idt}{An IData object representing interval-valued units.}
 
     \item{CovCase}{Configuration of the variance-covariance matrix: a set of integers between 1 and 4.}
 
@@ -28,11 +28,11 @@
 
     \item{use.correction}{whether to use finite sample correction factors; defaults to \code{TRUE}.}
 
-    \item{getalpha}{Argument specifying if the \sQuote{alpha} parameter (roughly the percentage of the sample used for computing the trimmed likelihood) should be estimated from the data, or if the value of the argument \sQuote{alpha} should be used instead. When set to \dQuote{TwoStep}, \sQuote{alpha} is estimated by a two-step procedure with the value of argument \sQuote{alpha} specifying the size of the samples used in the first step. Otherwise, with the value of argument \sQuote{alpha} is used directly.}   
+    \item{getalpha}{Argument specifying if the \sQuote{alpha} parameter (roughly the percentage of the sample used for computing the trimmed likelihood) should be estimated from the data, or if the value of the argument \sQuote{alpha} should be used instead. When set to \dQuote{TwoStep}, \sQuote{alpha} is estimated by a two-step procedure with the value of argument \sQuote{alpha} specifying the size of the samples used in the first step. Otherwise, the value of argument \sQuote{alpha} is used directly.}   
 
-    \item{rawMD2Dist}{The assumed reference distribution of the raw MCD squared distances, which is used to find to cutoffs defining the observations kept in one-step reweighted MCD estimates. Alternatives are \sQuote{ChiSq}, \sQuote{HardRockeAsF} and \sQuote{HardRockeAdjF}, respectivelly for the usual Chi-squared, and the asymptotic and adjusted scaled F distributions proposed by Hardin and Rocke (2005).}    
+    \item{rawMD2Dist}{The assumed reference distribution of the raw MCD squared distances, which is used to find to cutoffs defining the observations kept in one-step reweighted MCD estimates. Alternatives are \sQuote{ChiSq}, \sQuote{HardRockeAsF} and \sQuote{HardRockeAdjF}, respectivelly for the usual Chi-square, and the asymptotic and adjusted scaled F distributions proposed by Hardin and Rocke (2005).}    
 
-    \item{MD2Dist}{The assumed reference distributions used to find cutoffs defining the observations assumed as outliers. Alternatives are \dQuote{ChiSq} and \dQuote{CerioliBetaF} respectivelly for the usual Chi-squared, and the Beta and F distributions proposed by Cerioli (2010).}    
+    \item{MD2Dist}{The assumed reference distributions used to find cutoffs defining the observations assumed as outliers. Alternatives are \dQuote{ChiSq} and \dQuote{CerioliBetaF} respectivelly for the usual Chi-square, and the Beta and F distributions proposed by Cerioli (2010).}    
 
     \item{eta}{Nominal size of the null hypothesis that a given observation is not an outlier. Defines the raw MCD Mahalanobis distances cutoff used to choose the observations kept in the reweightening step.}
 
@@ -44,7 +44,7 @@
 
   \item{k2max}{Maximal allowed l2-norm condition number for correlation matrices. Correlation matrices with condition number above k2max are considered to be numerically singular, leading to degenerate results.}
 
-   \item{force}{A boolean flag indicating whether, for moderate or large data sets the algorithm should proceed anyway, regardless of an expected long excution time, due to exponential explosions in the number of different subsets that need to be avaluated by fulltle}
+   \item{force}{A boolean flag indicating whether, for moderate or large data sets the algorithm should proceed anyway, regardless of an expected long excution time, due to exponential explosions in the number of different subsets that need to be avaluated by fulltle.}
 
     \item{\dots}{Further arguments to be passed to internal functions of \sQuote{fulltle}.} 
 }
@@ -85,7 +85,7 @@ CarsIdt <- IData(Cars[1:8],VarNames=c("Price","EngineCapacity","TopSpeed","Accel
 
 # Estimate parameters by the full trimmed maximum likelihood estimator, 
 # using a two-step procedure to select the trimming parameter, a reweighed 
-# MCD estimate, and the classical 97.5\% chi-squared quantile cut-offs.
+# MCD estimate, and the classical 97.5\% chi-square quantile cut-offs.
 
 CarsTE1 <- fulltle(CarsIdt)
 cat("Cars data -- normal maximum trimmed likelihood estimation results:\n")

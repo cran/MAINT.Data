@@ -66,7 +66,7 @@ Duarte Silva, A.P. and Brito, P. (2015), Discriminant analysis of interval data:
 Duarte Silva, A.P., Filzmoser, P. and Brito, P. (2017), Outlier detection in interval data. \emph{Advances in Data Analysis and Classification}, 1--38.\cr
 }
 
-\seealso{\code{\link{lda}}, \code{\link{qda}}, \code{\link{snda}}, \code{\linkS4class{IData}}, \code{\linkS4class{RobEstControl}}}
+\seealso{\code{\link{lda}}, \code{\link{qda}}, \code{\link{snda}}, \code{\linkS4class{IData}}, \code{\linkS4class{RobEstControl}},code{\link{ConfMat}} }
 
 \keyword{methods}
 \keyword{Interval Data}
@@ -85,6 +85,8 @@ ChinaT <- IData(ChinaTemp[1:8],VarNames=c("T1","T2","T3","T4"))
 ChinaT.rlda <- Roblda(ChinaT,ChinaTemp$GeoReg)
 cat("Temperatures of China -- robust lda discriminant analysis results:\n")
 print(ChinaT.rlda)
+cat("Resubstition confusion matrix:\n")
+ConfMat(ChinaTemp$GeoReg,predict(ChinaT.rlda,ChinaT)$class)
 
 #Estimate error rates by ten-fold cross-validation with 5 replications 
 
@@ -97,6 +99,8 @@ summary(CVrlda[,,"Clerr"])
 ChinaT.rqda <- Robqda(ChinaT,ChinaTemp$GeoReg)
 cat("Temperatures of China -- robust qda discriminant analysis results:\n")
 print(ChinaT.rqda)
+cat("Resubstition confusion matrix:\n")
+ConfMat(ChinaTemp$GeoReg,predict(ChinaT.rqda,ChinaT)$class)
 
 #Estimate error rates by ten-fold cross-validation with 5 replications 
 

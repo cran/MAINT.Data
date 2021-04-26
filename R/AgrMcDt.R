@@ -28,7 +28,7 @@ AgrMcDt <- function(MicDtDF,agrby,agrcrt="minmax")
   if (length(unique(agrby))!=length(levels(agrby)))  agrby <- factor(agrby)
   grplvls <- levels(agrby)
   lbDF <- ubDF <- data.frame(MicDtDF[1,])
-  bndsDF <- cbind.data.frame(lbDF,ubDF)
+  bndsDF <- cbind(lbDF,ubDF)
 
   ngrps <- length(grplvls)
   nvar <- ncol(MicDtDF)

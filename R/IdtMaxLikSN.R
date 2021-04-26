@@ -286,7 +286,7 @@ IdtSNmle <- function(Idt, grouping=NULL, Type=c("SingDst","HomMxt"), getvcov=TRU
       npar <- SKnpar(Conf,p,p/2,Ngrps=k)
       if (Conf==1)  {
         InFData <- try( 
-          sn.infoMv( dp=list(beta=as.matrix(rbind.data.frame(Res$ksi[1,],Res$beta2k)),Omega=Res$Omega,alpha=Res$alpha), 
+          sn.infoMv( dp=list(beta=as.matrix(rbind(Res$ksi[1,],Res$beta2k)),Omega=Res$Omega,alpha=Res$alpha), 
                    y=Xscld, x=model.matrix(~ grouping), at.MLE=TRUE )  
         ) 
         if ( is.null(InFData) || class(InFData)[1] == "try-error" || is.null(InFData$asyvar.cp) )  {
@@ -398,7 +398,7 @@ IdtSNmle <- function(Idt, grouping=NULL, Type=c("SingDst","HomMxt"), getvcov=TRU
   }
   Config <- sort(Config)  
 
-  X <- cbind.data.frame(Idt@MidP,Idt@LogR)
+  X <- cbind(Idt@MidP,Idt@LogR)
   Xnames <- names(X)
   if (CovCaseArg)  {
     nCovCases <- 4 
@@ -657,7 +657,7 @@ IdtFDMxtSNmle <- function(Idt, grouping, getvcov, CVtol=1.0e-5, OptCntrl=list(),
   }
   for (g in 1:k) {
     Idtg <- Idt[grouping==lev[g],]
-    IdtgDF <- cbind.data.frame(Idtg@MidP,Idtg@LogR)
+    IdtgDF <- cbind(Idtg@MidP,Idtg@LogR)
     Xbar <- colMeans(IdtgDF)
     Xstdev <- sapply(IdtgDF,sd)
     CnstV <- which(Xstdev/abs(Xbar)<CVtol)

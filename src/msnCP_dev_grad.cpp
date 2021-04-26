@@ -300,7 +300,6 @@ void msnCP_ll_grad(const NumericVector& mu1, const NumericMatrix& beta2k, const 
 NumericVector msnCP_dev_grad1(NumericVector& param, const NumericMatrix& y, const IntegerVector& grpind,
   const int Config, const int n, const int p, const int k, const double limlnk2,
   const bool trace, const double c2tol, const double ldRtol, const double beta0tol, 
-//  const double PenF, const double MachineEPS, const bool FixedArrays)
   const double PenF, const double MachineEPS, const bool FixedArrays, const bool Srpar)
 {
   int q(p/2), nvcovpar(p*(p+1)/2), nvcovsrpar(ncovp(Config,q,p));
@@ -330,10 +329,6 @@ NumericVector msnCP_dev_grad1(NumericVector& param, const NumericMatrix& y, cons
 
   static NumericVector paramgrad;
   if (paramgrad.size()!=gradl) paramgrad = clone(param); 
-/*
-for (int i=0;i<gradl;i++) paramgrad(i) = 0.;
-return paramgrad;
-*/
 
   SetZero(DSigSigSr,nvcovpar,nvcovsrpar,true); 
   if (SigmaSrgrad.size()!=nvcovsrpar)  SigmaSrgrad.set_size(nvcovsrpar);

@@ -69,7 +69,7 @@ Brito, P., Duarte Silva, A. P. (2012), Modelling Interval Data with Normal and S
 Duarte Silva, A.P. and Brito, P. (2015), Discriminant analysis of interval data: An assessment of parametric and distance-based   approaches. \emph{Journal of Classification} \bold{39}(3), 516--541.\cr
 }
 
-\seealso{\code{\link{lda}}, \code{\link{qda}}, \code{\link{Roblda}}, \code{\link{Robqda}}, \code{\linkS4class{IData}}, \code{\linkS4class{IdtLocSNMANOVA}}, \code{\linkS4class{IdtLocNSNMANOVA}}, \code{\linkS4class{IdtGenSNMANOVA}},\code{\linkS4class{IdtGenSNMANOVA}} }
+\seealso{\code{\link{lda}}, \code{\link{qda}}, \code{\link{Roblda}}, \code{\link{Robqda}}, \code{\linkS4class{IData}}, \code{\linkS4class{IdtLocSNMANOVA}}, \code{\linkS4class{IdtLocNSNMANOVA}}, \code{\linkS4class{IdtGenSNMANOVA}},\code{\linkS4class{IdtGenSNMANOVA}}, \code{\link{ConfMat}}, \code{\link{ConfMat}} }
 
 \keyword{methods}
 \keyword{Interval Data}
@@ -91,6 +91,8 @@ ChinaT.locsnda <- snda(ChinaT,ChinaTemp$GeoReg,Mxt="Loc")
 
 cat("Temperatures of China -- SkewNormal location model discriminant analysis results:\n")
 print(ChinaT.locsnda)
+cat("Resubstition confusion matrix:\n")
+ConfMat(ChinaTemp$GeoReg,predict(ChinaT.locsnda,ChinaT)$class)
 
 #Estimate error rates by three-fold cross-validation without replication  
 
@@ -106,6 +108,8 @@ ChinaT.gensnda <- snda(ChinaT,ChinaTemp$GeoReg,Mxt="Gen")
 
 cat("Temperatures of China -- SkewNormal general model discriminant analysis results:\n")
 print(ChinaT.gensnda)
+cat("Resubstition confusion matrix:\n")
+ConfMat(ChinaTemp$GeoReg,predict(ChinaT.gensnda,ChinaT)$class)
 
 #Estimate error rates by three-fold cross-validation without replication  
 

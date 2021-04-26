@@ -124,7 +124,6 @@ setMethod("lda",
 setMethod("lda",
   signature(x = "IData"),
   function(x, grouping, prior="proportions", CVtol=1.0e-5, egvtol=1.0e-10, subset=1:nrow(x), CovCase=1:4,
-#    SelCrit=c("BIC","AIC"), silent=FALSE, ...)
     SelCrit=c("BIC","AIC"), silent=FALSE, k2max=1e6, ...)
   {
     limlnk2 <- log(k2max)
@@ -166,8 +165,7 @@ setMethod("lda",
     if (sum(nk)!=n)  { stop("Dimensions of the x and grouping arguments do not agree with each other\n") }
  
     MxtDEst <- IdtNmle(x,grouping,Type="HomMxt",CVtol=CVtol,CovCaseArg=CovCaseArg,Config=Config,SelCrit=SelCrit,...)
-#    glbmeans <- colMeans(cbind(x@MidP,x@LogR))
-    glbmeans <- colMeans(cbind.data.frame(x@MidP,x@LogR))
+    glbmeans <- colMeans(cbind(x@MidP,x@LogR))
     grpmeans <- coef(MxtDEst)$mu
     mugdev <- scale(grpmeans,center=glbmeans,scale=FALSE)
     vnames <- unlist(dimnames(grpmeans)[2]) 
@@ -183,8 +181,7 @@ setMethod("predict",
   signature(object = "Idtlda"),
   function(object,newdata,prior=object@prior,...)
   {
-#    if (is(newdata,"IData")) newdata <- as.matrix(cbind(newdata@MidP,newdata@LogR))
-    if (is(newdata,"IData")) newdata <- as.matrix(cbind.data.frame(newdata@MidP,newdata@LogR))
+    if (is(newdata,"IData")) newdata <- as.matrix(cbind(newdata@MidP,newdata@LogR))
     if (is(newdata,"data.frame")) newdata <- as.matrix(newdata)
     n <- nrow(newdata)
     k <- length(prior) 
@@ -195,7 +192,6 @@ setMethod("predict",
     sphdata <- newdata %*% object@scaling 
     sphmeans <- object@means %*% object@scaling 
     Mahdistovertwo <- apply(sphdata, 1, function(x) apply(sphmeans, 1, function(mu) (sum((mu-x)^2)/2)))
-#    wghtdensities <- sweep(exp(-Mahdistovertwo),1,STATS=prior,FUN="*")
     minhlfMD2 <- apply(Mahdistovertwo,2,min)
     wghtdensities <- sweep(exp(sweep(-Mahdistovertwo,2,minhlfMD2,"+")),1,prior,"*")
     ncnst <- apply(wghtdensities,2,sum)  			# normalizing constants
@@ -363,7 +359,7 @@ setMethod("predict",
   function(object,newdata,prior=object@prior,...)
   {
 #    if (is(newdata,"IData")) { newdata <- as.matrix(cbind(newdata@MidP,newdata@LogR)) }
-    if (is(newdata,"IData")) { newdata <- as.matrix(cbind.data.frame(newdata@MidP,newdata@LogR)) }
+    if (is(newdata,"IData")) { newdata <- as.matrix(cbind(newdata@MidP,newdata@LogR)) }
     if (is(newdata,"data.frame")) { newdata <- as.matrix(newdata) }
     n <- nrow(newdata)
     p <- ncol(newdata)

@@ -10,7 +10,7 @@ Cross-Validation.
 }
 
 \usage{DACrossVal(data, grouping, TrainAlg, EvalAlg=EvalClrule, 
-Strfolds=TRUE, kfold=10, CVrep=20, prior="proportions", loo=FALSE, \dots)}
+Strfolds=TRUE, kfold=10, CVrep=20, prior="proportions", loo=FALSE, dec=3, \dots)}
 
 \arguments{
 
@@ -33,6 +33,8 @@ proportions (default), or randomly generated from the whole training sample, ign
   \item{prior}{The prior probabilities of class membership.  If unspecified, the class proportions for the training set are used.  If present, the probabilities should be specified in the order of the factor levels.}
 
   \item{loo}{A boolean flag indicating if a leave-one-out strategy should be employed. When set to \dQuote{TRUE} overrides the kfold and CVrep arguments.}
+
+  \item{dec}{The number of decimal digits to display in confusion matrices of relative frequencies.} 
 
   \item{\dots}{Further arguments to be passed to \sQuote{TrainAlg} and \sQuote{EvalAlg}.} 
 }

@@ -138,12 +138,6 @@ RepLOptim <- function(start, parsd, fr, gr=NULL, inphess=NULL, ..., method="nlmi
       { 
         hlfrng <- sqrt(3)*parsd  #  generate new parameters from an uniform distribution
         initpar <- runif(npar,min=pmax(lower,bestpar-hlfrng),max=pmin(upper,bestpar+hlfrng))
-      #  u <- runif(n=npar)     # generate npar uniform random numbers
-      #  initpar <- qnorm(u,mean=bestpar,sd=parsd) #  generate new parameters from a normal distribution
-      #  lbndind <- which(initpar<lower)   #  identify indices of parameters that fell below their lower bounds
-      #  ubndind <- which(initpar>upper)   #  identify indices of parameters that fell above their upper bounds
-      #  initpar[lbndind] <- lower[lbndind] + u[lbndind] * (bestpar[lbndind]-lower[lbndind]) # and correct them
-      #  initpar[ubndind] <- upper[ubndind] - u[ubndind] * (upper[ubndind]-bestpar[ubndind])
       }
     } 
   }

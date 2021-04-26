@@ -19,7 +19,7 @@ Idtmclust(Idt, G = 1:9, CovCase=1:4, SelCrit=c("BIC","AIC"),
   \item{CovCase}{Configuration of the variance-covariance matrix: a set of integers between 1 and 4.}
    \item{SelCrit}{The model selection criterion.}
   \item{control}{A list of control parameters for EM. The defaults are set by the call \code{EMControl()}.}
-  \item{Mxt}{The type of Gaussian mixuture assumed by Idtmclust. Alternatives are \dQuote{Hom} (default) for homoscedastic mixtures,
+  \item{Mxt}{The type of Gaussian mixture assumed by Idtmclust. Alternatives are \dQuote{Hom} (default) for homoscedastic mixtures,
     \dQuote{Het} for heteroscedastic mixtures, and \dQuote{HomandHet} for both homoscedastic and heteroscedastic mixtures.
   }
 }

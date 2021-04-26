@@ -1,7 +1,7 @@
 DACrossVal <- function(data,grouping,TrainAlg,EvalAlg=EvalClrule,Strfolds=TRUE,kfold=10,CVrep=20,
-  prior="proportions",loo=FALSE,...)
+  prior="proportions",loo=FALSE,dec=3,...)
 {
-  fold <- function(n,kfold,fi) {
+   fold <- function(n,kfold,fi) {
     lb <- floor((fi-1)*n/kfold) + 1
     ub <- floor(fi*n/kfold)
     if (lb>ub) return(NULL)
@@ -25,6 +25,8 @@ DACrossVal <- function(data,grouping,TrainAlg,EvalAlg=EvalClrule,Strfolds=TRUE,k
   trep <- kfold*CVrep
   EvalRes <- array(dim=c(trep,k,2),dimnames=list(NULL,codes,c("Nk","Clerr")))
   if (prior[1]=="proportions") { prior <- nk/n }
+  if (k>2)   Cmat <- matrix(0,nrow=k,ncol=k,dimnames=list(codes,codes))
+  else Cmat <- NULL
   for (i in 1:CVrep)
   {
     if (!loo) {
@@ -53,10 +55,11 @@ DACrossVal <- function(data,grouping,TrainAlg,EvalAlg=EvalClrule,Strfolds=TRUE,k
         EvalResij <- list(err=NA,Nk=as.numeric(table(grouping[-out])))
         warning("Non valid classification rule in fold ",j," of replication ",i,"\n")
       }  else {
-        EvalResij <- EvalAlg(tres,data[out,],grouping[out],k=k)
+        EvalResij <- EvalAlg(tres,data[out,,drop=FALSE],grouping[out],k=k)
         rep <- (i-1)*kfold+j
         EvalRes[rep,,"Clerr"] <- ifelse(EvalResij$Nk>0.,EvalResij$err,NA)
         EvalRes[rep,,"Nk"] <- EvalResij$Nk
+        if (k>2) Cmat <- Cmat + EvalResij$Cmat
       }
     }
   }
@@ -78,6 +81,16 @@ DACrossVal <- function(data,grouping,TrainAlg,EvalAlg=EvalClrule,Strfolds=TRUE,k
   cat(msg,"\n")
   print(errestimates)
   attr(EvalRes,"errestimates") <- errestimates
+  
+  if (k>2) {
+    cat("\nConfusion matrix (original classes in rows, predicted in columns)\n\n")
+    if (loo) {   
+      cat("Absolute frequencies\n\n")
+      print(Cmat)
+      cat("\nRelative frequencies\n\n")
+    }  
+    print(round(Cmat/rowSums(Cmat),dec))
+  }
   invisible(EvalRes)  # returns EvalRes silently
 }
 
@@ -87,9 +100,11 @@ EvalClrule <- function(darule,VData,Vgrp,k)
   errates <- array(dim=k)
   Nk <- array(dim=k)
   clres <- predict(darule,VData)$class
+  if (k>2)   Cmat <- matrix(nrow=k,ncol=k,dimnames=list(grpcodes,grpcodes))
+  else Cmat <- NULL
   for (grpInd in 1:k)
   {
-    Nk[grpInd] <- length(Vgrp[Vgrp==grpcodes[grpInd]])
+    Nk[grpInd] <- length(which(Vgrp==grpcodes[grpInd]))
     thisgrpclres <- clres[Vgrp==grpcodes[grpInd]]
     levels(thisgrpclres) <- grpcodes
     thisgrperr <- thisgrpclres[grpcodes[grpInd]!=thisgrpclres]
@@ -98,7 +113,8 @@ EvalClrule <- function(darule,VData,Vgrp,k)
     } else {
       errates[grpInd] <- 0
     }
+    for (grpInd2 in 1:k) Cmat[grpInd,grpInd2] <- length(which(thisgrpclres==grpcodes[grpInd2]))
   }
-  list(err=errates,Nk=Nk)  #  return(list(err=errates,Nk=Nk))
+  list(err=errates,Nk=Nk,Cmat=Cmat)  #  return(list(err=errates,Nk=Nk,Cmat=Cmat))
 }
 

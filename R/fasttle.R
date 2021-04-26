@@ -47,8 +47,7 @@ setMethod("fasttle",
     }
     if (getalpha=="TwoStep")
     {
-#      X <- cbind(Idt@MidP,Idt@LogR)
-      X <- cbind.data.frame(Idt@MidP,Idt@LogR)
+      X <- cbind(Idt@MidP,Idt@LogR)
       if (MD2Dist=="ChiSq") {
         fstsol <- fasttle1(Idt,CovCase,SelCrit,alpha,nsamp,ncsteps,trace,use.correction,
           rawMD2Dist,eta,multiCmpCor,kdblstar,outlin,trialmethod,m,reweighted,limlnk2,otpType="OnlyEst")
@@ -170,7 +169,7 @@ fasttle1 <- function(data,CovCase,SelCrit,alpha,nsamp,ncsteps,trace,use.correcti
     n <- data@NObs  
     if (outlin=="MidPandLogR")  {
 #      X <- as.matrix(cbind(data@MidP,data@LogR))
-      X <- as.matrix(cbind.data.frame(data@MidP,data@LogR))
+      X <- as.matrix(cbind(data@MidP,data@LogR))
       p <- 2*data@NIVar
     }  else {
       p <- data@NIVar
@@ -482,7 +481,7 @@ getIdtOutl <- function(Idt,IdtE=NULL,muE=NULL,SigE=NULL,
   }
 
 #  X <- data.frame(cbind(Idt@MidP,Idt@LogR),row.names=Idt@ObsNames)
-  X <- data.frame(cbind.data.frame(Idt@MidP,Idt@LogR),row.names=Idt@ObsNames)
+  X <- data.frame(cbind(Idt@MidP,Idt@LogR),row.names=Idt@ObsNames)
   if (outlin=="MidPandLogR") vind <- 1:(2*Idt@NIVar)
   else if (outlin=="MidP") vind <- 1:Idt@NIVar
   else if (outlin=="LogR") vind <- (Idt@NIVar+1):(2*Idt@NIVar)

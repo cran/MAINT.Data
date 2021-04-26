@@ -15,9 +15,9 @@
 }
 
 \arguments{
-  \item{Idt}{An IData object representing interval-valued entities.}
+  \item{Idt}{An IData object representing interval-valued units.}
 
-  \item{Model}{The joint distribution assumed for the MidPoint and LogRanges. Current alternatives are \dQuote{Normal} for Gaussian,
+  \item{Model}{The joint distribution assumed for the MidPoint and LogRanges. Current alternatives are \dQuote{Normal} for Gaussian
 distributions, \dQuote{SNNormal} for Skew-Normal and \dQuote{NrmandSKN} for both Gaussian and Skew-Normal distributions.}
 
   \item{CovCase}{Configuration of the variance-covariance matrix: a set of integers between 1 and 4.}
@@ -26,7 +26,7 @@ distributions, \dQuote{SNNormal} for Skew-Normal and \dQuote{NrmandSKN} for both
 
    \item{k2max}{Maximal allowed l2-norm condition number for correlation matrices. Correlation matrices with condition number above k2max are considered to be numerically singular, leading to degenerate results.}
 
-   \item{OptCntrl}{List of optional control parameters to passed to the optimization routine. See the documentation of RepLOptim for a description of the available options.}
+   \item{OptCntrl}{List of optional control parameters to be passed to the optimization routine. See the documentation of RepLOptim for a description of the available options.}
 
   \item{\dots}{Other named arguments.}
 }

@@ -21,8 +21,7 @@ setMethod("fulltle",
 
     if (getalpha=="TwoStep")
     {
-#      X <- cbind(Idt@MidP,Idt@LogR)
-      X <- cbind.data.frame(Idt@MidP,Idt@LogR)
+      X <- cbind(Idt@MidP,Idt@LogR)
       if (MD2Dist=="ChiSq") {
         fstsol <- fulltle1(Idt,CovCase,SelCrit,alpha,use.correction,rawMD2Dist,eta,multiCmpCor,outlin,reweighted,limlnk2,force)
         nOtls <- MDOtlDet(X,coef(fstsol)$mu,coef(fstsol)$Sigma,eta=eta,RefDist="ChiSq",multiCmpCor=multiCmpCor,otp="onlycnt")
@@ -92,7 +91,7 @@ fulltle1 <-  function(Idt,CovCase,SelCrit,alpha,use.correction,rawMD2Dist,eta,mu
   n <- Idt@NObs    
   if (outlin=="MidPandLogR")  {
 #    X <- as.matrix(cbind(Idt@MidP,Idt@LogR))
-    X <- as.matrix(cbind.data.frame(Idt@MidP,Idt@LogR))
+    X <- as.matrix(cbind(Idt@MidP,Idt@LogR))
     p <- 2*Idt@NIVar
   }
   else {

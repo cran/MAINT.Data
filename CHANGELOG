@@ -1,3 +1,27 @@
+########## Version 2.6.0 (April 2021) ###################
+
+Version 2.6.0 implements the following changes:
+
+1)  A set of automated tests (using the facilities of the testthat package) is added to the MAINT.Data directory 
+
+2)  The function IData is modifed in order to also accept:
+
+      2.1) A vector with the number of Micro Units by each interval-valued observation (when known) 
+      2.2) Matrices without row names in its first argument 
+      
+3)  The DACrossVal function now displays also confusion matrices in addition to group specif and global
+    estimates of classification errors. Furthermore, a new function, called ConfMat, displays and returns
+    confusion matrices directly from factor vectors of original and prediction classes.        
+      
+4)  Anohter accessor method for the IData NbMicroUnits slot was added, allowing filling in 
+    (and not just reading, as in previus version) with new values
+    
+5)  Methods cbind and rbind for IData objects are now defined as generic S4 methods that inherit from
+    methods derived from the corresponding base S3 methods. This allows for the traditional base rbind 
+    and cbind methods to remain available after calling MAINT.Data, what was not guaranteed in previous
+    versions.        
+      
+
 ########## Version 2.5.0 (September 2020) ###################
 
 Version 2.5.0 implements the following changes:

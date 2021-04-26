@@ -9,6 +9,8 @@
 \alias{!=,IData,IData-method}
 \alias{[,IData-method}
 \alias{[<-,IData-method}
+\alias{rbind}
+\alias{cbind}
 \alias{rbind,IData-method}
 \alias{cbind,IData-method}
 
@@ -17,6 +19,7 @@
 \alias{ncol,IData-method}
 \alias{dim,IData-method}
 \alias{rownames,IData-method}
+\alias{row.names,IData-method}
 \alias{colnames,IData-method}
 \alias{names,IData-method}
 
@@ -27,6 +30,8 @@
 \alias{LogRanges}
 \alias{Ranges}
 \alias{NbMicroUnits}
+\alias{NbMicroUnits<-}
+\alias{NbMicroUnits<-,IData-method}
 
 \alias{CovCase-methods}
 \alias{CovCase}

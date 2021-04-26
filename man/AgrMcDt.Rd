@@ -40,6 +40,8 @@ tail(Flightsminmax)
 
 summary(Flightsminmax)
 
+\dontrun{
+
 # Repeat this procedure using now the 10th and 90th percentiles.
 
 Flights1090prcnt <- AgrMcDt(FlightsDF,FlightsUnits,agrcrt=c(0.1,0.9))
@@ -50,6 +52,8 @@ head(Flights1090prcnt)
 tail(Flights1090prcnt)
 
 summary(Flights1090prcnt)
+
+}
 
 }
 
