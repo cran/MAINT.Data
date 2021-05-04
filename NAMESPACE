@@ -10,6 +10,8 @@ importFrom(robustbase,h.alpha.n,.MCDcons,.MCDcnp2)
 importFrom(pcaPP,l1median)
 importFrom(sn,msn.mle,sn.infoMv,zeta,duplicationMatrix)
 importFrom(mclust,hclass,Mclust,mclustBIC)
+importFrom(graphics,par)
+importFrom(withr,with_par)
 
 importClassesFrom(rrcov,CovControlMcd)
 

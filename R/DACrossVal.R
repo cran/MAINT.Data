@@ -100,7 +100,7 @@ EvalClrule <- function(darule,VData,Vgrp,k)
   errates <- array(dim=k)
   Nk <- array(dim=k)
   clres <- predict(darule,VData)$class
-  if (k>2)   Cmat <- matrix(nrow=k,ncol=k,dimnames=list(grpcodes,grpcodes))
+  if (k>2)  Cmat <- matrix(nrow=k,ncol=k,dimnames=list(grpcodes,grpcodes))
   else Cmat <- NULL
   for (grpInd in 1:k)
   {
@@ -113,7 +113,8 @@ EvalClrule <- function(darule,VData,Vgrp,k)
     } else {
       errates[grpInd] <- 0
     }
-    for (grpInd2 in 1:k) Cmat[grpInd,grpInd2] <- length(which(thisgrpclres==grpcodes[grpInd2]))
+    if (k>2) for (grpInd2 in 1:k) 
+      Cmat[grpInd,grpInd2] <- length(which(thisgrpclres==grpcodes[grpInd2]))
   }
   list(err=errates,Nk=Nk,Cmat=Cmat)  #  return(list(err=errates,Nk=Nk,Cmat=Cmat))
 }

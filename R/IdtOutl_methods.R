@@ -36,10 +36,8 @@ setMethod("plot",
 
    if (RefDist!="CerioliBetaF")  {
      if (scale=="linear") {
-#       plot(MD2,main="Robust Mahalanobis Distances",xlab="",xaxt="n",...)
        plot.default(MD2,main="Robust Mahalanobis Distances",xlab="",xaxt="n",...)
      } else if (scale=="log") {
-#       plot(MD2,main="Robust Mahalanobis Distances (log scale)",xlab="",xaxt="n",log="y",...)
        plot.default(MD2,main="Robust Mahalanobis Distances (log scale)",xlab="",xaxt="n",log="y",...)
      }
      axis(1,1:n,labels=names(MD2),las=2,...)
@@ -47,10 +45,8 @@ setMethod("plot",
    } else {
       RewSet <- x@boolRewind
       if (scale=="linear") {
-#        plot(MD2,main="Robust Mahalanobis Distances",xlab="",xaxt="n",type="n",...)
         plot.default(MD2,main="Robust Mahalanobis Distances",xlab="",xaxt="n",type="n",...)
       } else if (scale=="log") {
-#        plot(MD2,main="Robust Mahalanobis Distances (log scale)",xlab="",xaxt="n",type="n",log="y",...)
         plot.default(MD2,main="Robust Mahalanobis Distances (log scale)",xlab="",xaxt="n",type="n",log="y",...)
         axis(1,1:n,labels=names(MD2),las=2,...)
       }

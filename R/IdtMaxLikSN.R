@@ -209,7 +209,7 @@ SNVCovscaling <- function(Conf,p,stdv,k=1)  # Creates a scaling matrix in order 
 }
 
 IdtSNmle <- function(Idt, grouping=NULL, Type=c("SingDst","HomMxt"), getvcov=TRUE, CVtol=1.0e-5, bordertol=1e-2, 
-#IdtSNmle <- function(Idt, grouping=NULL, Type=c("SingDst","HomMxt"), getvcov, CVtol=1.0e-5, bordertol=1e-2, 
+#IdtSNmle <- function(Idt, grouping=NULL, Type=c("SingDst","HomMxt"), getvcov=FALSE, CVtol=1.0e-5, bordertol=1e-2, 
   OptCntrl=list(), onerror=c("stop","warning","silentNull"), limlnk2, CovCaseArg, Config, SelCrit, EPS=1E-6)
 {
 

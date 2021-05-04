@@ -1,6 +1,7 @@
 setMethod("pcoordplot",
   signature(x = "IdtMclust"),
-  function(x, title="Parallel Coordinate Plot", Seq=c("AllMidP_AllLogR","MidPLogR_VarbyVar"), model="BestModel", ...)
+  function(x, title="Parallel Coordinate Plot", Seq=c("AllMidP_AllLogR","MidPLogR_VarbyVar"), model="BestModel", 
+           legendpar=list(), ...)
   {
     if (requireNamespace("GGally",quietly=TRUE)==FALSE) {
       stop("Required package GGally is not installed\n")
@@ -32,11 +33,26 @@ setMethod("pcoordplot",
       DF <- as.data.frame(t(x_mean[rep(1:q,each=2)+rep(c(0,q),q),]))
     }
     DF <- cbind(DF,Component=paste("CP",1:G,sep=""))
+    
+    dotarguments <- match.call(expand.dots=FALSE)$...
+    
     plt <- ggparcoord(DF, columns = 1:p, groupColumn = 'Component') + ggtitle(title) +
       theme_minimal() + theme(plot.title=element_text(hjust=0.5)) + theme(axis.text.x=element_text(angle=90,hjust=1)) 
-       
+    
     plt <- plt + theme(axis.title = element_blank())
 
+    if (!is.null(dotarguments$cex.main))
+      plt <- plt + theme(plot.title = element_text(size=12*dotarguments$cex.main))
+
+    if (!is.null(dotarguments$cex.lab))
+      plt <- plt + theme(axis.text.x = element_text(size=8*dotarguments$cex.lab))
+
+    if (!is.null(legendpar$cex.main))
+      plt <- plt + theme(legend.title = element_text(size=8*legendpar$cex.main))
+    
+    if (!is.null(legendpar$cex.lab))
+      plt <- plt + theme(legend.text = element_text(size=8*legendpar$cex.lab))
+        
     plt <- plt + theme(axis.text.y = element_blank())
     plt <- plt + theme(panel.grid.major.y = element_blank())
 
@@ -81,8 +97,33 @@ setMethod("pcoordplot",
 
 setMethod("plotInfCrt",
   signature(object = "IdtMclust"),
-  function(object, crt=object@SelCrit,legpos="bottomleft", nprnt=5, ...)
-  {
+  function(object, crt=object@SelCrit, legpos="right", nprnt=5, 
+    legendout=TRUE, outlegsize="adjstoscreen", outlegdisp="adjstoscreen", legendpar=list(), ...)
+{
+  if (legendout) {
+    if (outlegdisp!="adjstoscreen" && (!is.finite(outlegdisp) || outlegdisp<0. || outlegdisp>1.) )
+        stop("Argument outlegdisp (=",outlegdisp,") needs to be equal to a number betweeen 0. and 1., or the string 'adjstoscreen'\n")
+    if (!is.null(legendpar$cex)) outlegsize <- outlegsize * legendpar$cex
+    graphpar <- par()
+    linesize <- graphpar$mar[1] / graphpar$mai[1]
+    plotlength <- linesize * graphpar$pin[1]
+    margins <- graphpar$mar
+    if (legpos=="bottomright" || legpos=="topright" || legpos=="right" ) {  
+      if (outlegsize=="adjstoscreen") outlegsize <- 6
+      margins[4] <- margins[4] + outlegsize
+      if (outlegdisp=="adjstoscreen")  marggap <- c(-( outlegsize/(plotlength-outlegsize) + 0.05) ,0)
+      else marggap <- c(-outlegdisp,0)
+    }  else if (legpos=="bottomleft" || legpos=="topleft" || legpos=="left" ) {
+      if (outlegsize=="adjstoscreen") outlegsize <- 7
+#      addleftspc <- 3.6
+      addleftspc <- 2.5
+      margins[2] <- margins[2] + outlegsize + 0.5
+      if (outlegdisp=="adjstoscreen")  marggap <- c(-( (outlegsize+addleftspc)/(plotlength-outlegsize) + 0.05) ,0)
+      else marggap <- c(-outlegdisp,0)
+    }  else legendout <- FALSE
+  }      
+    
+    
     if (crt=="BIC") {
       IC_values <- object@BICs
     } else if (crt=="AIC") {
@@ -91,7 +132,7 @@ setMethod("plotInfCrt",
       stop("Wrong crt argument (it should equal either the string 'BIC' or the string 'AIC'.\n")
     }   
     if (length(IC_values)<2) stop("the argument to plotInfCrt does not include several (more than one) models to compare.\n")
-    
+ 
     nn <- length(IC_values)
     modnames <- names(IC_values)
     Mxt <- substr(modnames,1,3)
@@ -115,16 +156,29 @@ setMethod("plotInfCrt",
     ICmat <- matrix(NA,nGs,nMxbyCovC,dimnames = list(Gs,MxbyCovC))
     linetype <- ifelse(substr(MxbyCovC,1,3)=="Hom",1,9)
     for (m in 1:nMxts) for (c in 1:nCovCases) 
-#      ICmat[,(m-1)*nCovCases+c] <- IC_values[Mxt==Mxts[m] & CovCase==CovCases[c]] 
       ICmat[,(m-1)*nCovCases+c] <- -IC_values[Mxt==Mxts[m] & CovCase==CovCases[c]] 
 
-#    matplot(as.integer(substr(Gs,2,1+unique(nGdigts))),ICmat,type="b",lty=1,ylab=crt,xlab="Number of Components",
-    matplot(as.integer(substr(Gs,2,1+unique(nGdigts))),ICmat,type="b",lty=linetype,ylab=paste("minus",crt),xlab="Number of Components",
-            pch=substr(MxbyCovC,5,5),col=1:nMxbyCovC,...)
-#    if (max(ICmat[,1]) < max(ICmat[,nMxbyCovC])) legpos <- "topleft"
-#    else  legpos <- "topright"
-    legend(legpos,legend=MxbyCovC,lty=linetype,col=1:nMxbyCovC)
 
+    if (legendout) {
+      withr::with_par( list(mar=margins, xpd=TRUE), 
+        { 
+          matplot(as.integer(substr(Gs,2,1+unique(nGdigts))),ICmat,type="b",lty=linetype,
+                ylab=paste("minus",crt),xlab="Number of Components",
+                pch=substr(MxbyCovC,5,5),col=1:nMxbyCovC, ... )  
+          if (length(legendpar)==0) 
+            legend(legpos, inset=marggap, legend=MxbyCovC, lty=linetype, col=1:nMxbyCovC)
+          else
+            do.call("legend",c(list(x=legpos, inset=marggap, legend=MxbyCovC, lty=linetype, col=1:nMxbyCovC), legendpar) )
+        }
+      )  
+    } else {
+      matplot(as.integer(substr(Gs,2,1+unique(nGdigts))),ICmat,type="b",lty=linetype,
+              ylab=paste("minus",crt),xlab="Number of Components",
+              pch=substr(MxbyCovC,5,5),col=1:nMxbyCovC,...)
+      if (length(legendpar)==0) legend(legpos,legend=MxbyCovC,lty=linetype,col=1:nMxbyCovC)
+      else do.call("legend",c(list(x=legpos, legend=MxbyCovC, lty=linetype, col=1:nMxbyCovC), legendpar ))
+    }          
+      
     bestcrt <- sort(IC_values,index.return=TRUE)
     cat("Best",crt,"values:\n")
     cat("          ",names(IC_values)[bestcrt$ix[1:nprnt]],"\n",sep="   ")
@@ -181,69 +235,12 @@ setMethod("summary",
     }
     modelName <- paste(str1, " C",C,sep="") 
 
-#    obj <- list(
-#      title = title, modelName =modelName,  Hmcdt = mod@Hmcdt,     
-#      NObs = mod@NObs, NIVar = mod@NIVar, G = G,  
-#      loglik = mod@logLik, bic = mod@bic,
-#      pro = pro, mean = mean, covariance = covariance,
-#      classification = mod@classification,
-#      printParameters = parameters, printClassification = classification
-#    )
-#    class(obj) <- "summaryIdtMclust"
-#    return(obj)
-
    new("summaryIdtMclust",title=title,modelName=modelName,Hmcdt=mod@Hmcdt,     
       NObs=mod@NObs,NIVar=mod@NIVar,G=G,loglik=mod@logLik,bic=mod@bic,
       pro=pro,mean=mean,covariance=covariance,classification=mod@classification,
       printParameters=parameters,printClassification=classification)
   }
-) 
- 
-#print.summaryIdtMclust <- function(x, ...)
-#{
-#   n <- x$NObs
-#   p <- 2*x$NIVar
-#   cat(rep("-", nchar(x$title)),"\n",sep="")
-#   cat(x$title, "\n")
-#   cat(rep("-", nchar(x$title)),"\n",sep="")
-#   cat(x$modelName," model with ", x$G, ifelse(x$G > 1, " components\n", " component\n"),sep = "") 
-#   tab <- data.frame("log-likelihood" = x$loglik, "NObs" = n, "BIC" = x$bic, row.names = "")
-#   print(tab)
-#   cat("\nClustering table:")
-#   if (x$G==1) {
-#     cat("\nCP1\n",n,"\n")
-#   } else {
-#     print(table(factor(x$classification, levels = paste("CP",seq_len(x$G),sep=""))))
-#   }
-#   if(x$printParameters) {
-#     cat("\nMixing probabilities:\n")
-#     print(x$pro)
-#     cat("\nMeans:\n")
-#     print(x$mean)
-#     cat("\nStandard deviations:\n")
-#     if (x$Hmcdt) {
-#       print(sqrt(diag(x$covariance[,,1])))
-#     } else {
-#       stdv <- matrix(nrow=p,ncol=x$G,dimnames=list(rownames(x$mean),colnames(x$mean)))
-#       for(g in 1:x$G) stdv[,g] <- sqrt(diag(x$covariance[,,g]))
-#       print(stdv)
-#     }
-#     cat("\nCorrelations:\n")
-#     if (x$Hmcdt) {
-#       print(cov2cor(x$covariance[,,1]))
-#     } else { 
-#       for(g in 1:x$G) { 
-#         cat("[,,CP", g, "]\n", sep = "")
-#         print(cov2cor(x$covariance[,,g])) 
-#       }
-#     }
-#   }
-#   if(x$printClassification) {
-#     cat("\nClassification:\n")
-#     print(x$classification)
-#   }
-#   invisible(x)
-#}
+)  
 
 setMethod("show",
   signature(object = "summaryIdtMclust"),

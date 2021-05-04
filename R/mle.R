@@ -3,7 +3,7 @@ getConfig <- function(Config=NULL,...) Config
 setMethod("mle",
   signature(Idt = "IData"),
   function(Idt,Model=c("Normal","SKNormal","NrmandSKN"),CovCase=1:4,
-  SelCrit=c("BIC","AIC"), k2max=1e6, OptCntrl=list(),...)
+  SelCrit=c("BIC","AIC"), k2max=1e6, OptCntrl=list(), ...)
   {
     Model <- match.arg(Model)
     SelCrit <- match.arg(SelCrit)

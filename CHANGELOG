@@ -1,6 +1,11 @@
+########## Version 2.6.1 (May 2021) ###################
+
+Version 2.6.1 adds aditional  arguments to the plotInfCrt and pcoordplot methods in order to give the
+user some control over the placement and apparence of the respective legends.
+
 ########## Version 2.6.0 (April 2021) ###################
 
-Version 2.6.0 implements the following changes:
+Versions 2.6.0 implements the following changes:
 
 1)  A set of automated tests (using the facilities of the testthat package) is added to the MAINT.Data directory 
 

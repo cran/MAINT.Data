@@ -15,7 +15,7 @@
 \usage{
 
 \S4method{pcoordplot}{IdtMclust}(x,title="Parallel Coordinate Plot",
-Seq=c("AllMidP_AllLogR","MidPLogR_VarbyVar"), model ="BestModel", \dots)
+Seq=c("AllMidP_AllLogR","MidPLogR_VarbyVar"), model ="BestModel", legendpar=list(), \dots)
 
 }
 
@@ -30,6 +30,9 @@ Seq=c("AllMidP_AllLogR","MidPLogR_VarbyVar"), model ="BestModel", \dots)
 }
 
   \item{model}{A character vector specifying the the model whose solution is to be displayed.}
+
+  \item{legendpar}{A named list with graphical parameters for the plot legend. Currently only the
+   base R \sQuote{cex.main} and \sQuote{cex.lab} parameters are implemented.}
 
   \item{\dots}{ Graphical arguments to be passed to methods}
 

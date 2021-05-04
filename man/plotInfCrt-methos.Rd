@@ -15,7 +15,9 @@
 
 \usage{
 
-\S4method{plotInfCrt}{IdtMclust}(object,crt=object@SelCrit,legpos="bottomleft",nprnt=5, \dots)
+\S4method{plotInfCrt}{IdtMclust}(object, crt=object@SelCrit, legpos="right", nprnt=5,
+  legendout=TRUE, outlegsize="adjstoscreen", outlegdisp="adjstoscreen", 
+  legendpar=list(), \dots)
 
 }
 
@@ -24,9 +26,17 @@
 
   \item{crt}{The information criteria whose values are to be displayed.}
 
-  \item{legpos}{Legend position. Alternatives are \dQuote{bottomleft} (default), \dQuote{bottomright}, \dQuote{topleft} and \dQuote{bottomright}.} 
+  \item{legpos}{Legend position. Alternatives are \dQuote{right} (default), \dQuote{left}, \dQuote{bottomright}, \dQuote{bottomleft}, \dQuote{topright} and \dQuote{topleft} .} 
 
   \item{nprnt}{Number of solutions for which the value of the information criterio should be printed in an suplmentary short output message.}
+
+  \item{legendout}{A boolean flag indicating if the legend should be placed outside (default) or inside the main plot.}
+
+  \item{outlegsize}{The size (in inches) to be reserved for a legend placed outside the main plot, or the string \dQuote{adjstoscreen} (default) for an automatic adjustment of the plot and legend sizes.}
+      
+  \item{outlegdisp}{The displacement (as a percentage of the main plot size) of the outer margin for a legend placed outside the main plot, or the string \dQuote{adjstoscreen} (default) for an automatic adjustment of the legend position.}
+ 
+  \item{legendpar}{A named list with graphical parameters for the plot legend.}
 
   \item{\dots}{ Graphical arguments to be passed to methods.}
 

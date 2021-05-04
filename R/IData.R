@@ -146,7 +146,8 @@ setMethod("plot",
       do.call("segments",c(list(x0=Lbx,y0=y@MidP[,1],x1=Ubx,y1=y@MidP[,1]),dotarguments))
       do.call("segments",c(list(x0=x@MidP[,1],y0=Lby,x1=x@MidP[,1],y1=Uby),dotarguments))
     } else if (type=="rectangles") {
-      for (i in 1:x@NObs) rect(Lbx[i],Lby[i],Ubx[i],Uby[i],lty=1)
+#      for (i in 1:x@NObs) rect(Lbx[i],Lby[i],Ubx[i],Uby[i],lty=1)
+        for (i in 1:x@NObs) do.call("rect",c(Lbx[i],Lby[i],Ubx[i],Uby[i], dotarguments))
     }
   }
 )
