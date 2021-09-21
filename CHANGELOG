@@ -1,3 +1,8 @@
+########## Version 2.6.2 (September 2021) ###################
+
+Version 2.6.2 ensures compatibility with the upcoming CRAN enforcement of STRICT_R_HEADERS 
+by changing the constant PI to M_I in the source code.
+
 ########## Version 2.6.1 (May 2021) ###################
 
 Version 2.6.1 adds aditional  arguments to the plotInfCrt and pcoordplot methods in order to give the

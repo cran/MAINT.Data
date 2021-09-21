@@ -5,7 +5,7 @@
 #include "msnCP_dev.h"
 #include "msnCP_dev_grad.h"
 
-const double b0 = 2./(4.-PI);
+const double b0 = 2./(4.-M_PI);
 const double cubrootb0 = pow(b0,(1./3));
 
 void msnCP_ll_grad(const NumericVector& mu1, const NumericMatrix& beta2k, const mat& Sigma, 

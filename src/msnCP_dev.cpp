@@ -5,7 +5,7 @@
 #include "AdMatAlgFoo.h"
 #include "AuxFoo.h"
 
-const double ln2pi = log(2.*PI);
+const double ln2pi = log(2.*M_PI);
 
 void cov2cor(const int p,const mat& S,mat& R)
 {
@@ -37,7 +37,7 @@ void cnvCPtoDP(const int p,const NumericVector mu,const mat& Sigma,const Numeric
     if (mu0OtP.n_rows!=p || mu0OtP.n_cols!=p)  mu0OtP.set_size(p,p);
   }
   for (int i=0;i<p;i++) { 
-    c(i) = pow(2*fabs(gamma1(i))/(4.-PI),1./3);
+    c(i) = pow(2*fabs(gamma1(i))/(4.-M_PI),1./3);
     if (gamma1(i)<0) c(i) *= -1;
     muz(i) = c(i)/sqrt(1.+c(i)*c(i));
     sigmaz(i) = sqrt(1.-muz(i)*muz(i));

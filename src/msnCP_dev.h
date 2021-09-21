@@ -6,7 +6,7 @@
 using namespace Rcpp ;
 using namespace arma ;
 
-const double b = sqrt(2./PI);
+const double b = sqrt(2./M_PI);
 
 void Rprintivctzzz(const int p,const IntegerVector& v);
 

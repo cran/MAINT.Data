@@ -1,5 +1,5 @@
-9e1f08d481ba5babe657a820548c87d3 *CHANGELOG
-166894c5a52f9679e549b9bd526cc10c *DESCRIPTION
+52e1008e9516aeedb7318a764db1345e *CHANGELOG
+46f1d3e74ec292fe87eddad1b66f7cff *DESCRIPTION
 d0a302983d1db2f134ded345eaeaf9ac *NAMESPACE
 d491e2aff0f700f0456350fb15b4f434 *R/AgrMcDt.R
 58626bbc5a23bbff62d4d331a93e47b0 *R/CPLogLik.grads.R
@@ -90,7 +90,7 @@ e9c0985b8a951a3b688c0829169a8836 *man/Idtlda-class.Rd
 504dc3b9209665c32c3493a6499e8ad5 *man/LoansbyRskLvs_minmaxDt.Rd
 8fba1fb23080c8a71253e9d08dd5f0bf *man/LoansbyRskLvs_qntlDt.Rd
 8053bccb69f9b11e2ce763f19d5e2bb2 *man/MAINT.Data-internal.Rd
-b248b44b253c031f6d478b2165f64850 *man/MAINT.Data-package.Rd
+91774447ae8a0a401a7dc323f47e9191 *man/MAINT.Data-package.Rd
 a4fd6242b51c0c729fb129996687a58d *man/MANOVA-methods.Rd
 7d7225adef351d225bcf6dd7e742d695 *man/MANOVAPermTest.Rd
 4eefa57019b36a57e5e402a60980dd4f *man/RepLOptim.Rd
@@ -126,7 +126,7 @@ b55a3ff3186dbb0852cb7d670e3c7a69 *man/vcov-methods.Rd
 beeae2894857d417a3a7db8ca55da498 *src/CEMGauss.cpp
 239a03b34e5be866ebc9a7921e3a69c1 *src/CEMGauss.h
 3973dc7e1aeb5ed095378bf29fae1291 *src/MDataGaussLogLik.cpp
-2ee4f5d85873f367291320258dc668b6 *src/MDataGaussLogLik.h
+df8fe9a60a4f26c56e8f58f97989cc44 *src/MDataGaussLogLik.h
 9bc5aa7d4334d43640f515c9a1fd70bd *src/Makevars
 ee03cff16b26889c9c08cde5740d7b8b *src/MinMaxEgval.cpp
 f1179ba3103e7d7f299faf1d96eb05a1 *src/MinMaxEgval.h
@@ -135,10 +135,10 @@ f1179ba3103e7d7f299faf1d96eb05a1 *src/MinMaxEgval.h
 b3b7fc833014d962b2e03b1b18553611 *src/fulltle.cpp
 30373f732a318e83dae751b948fd95bd *src/msnCP_Aux.cpp
 48ed8ba98a0a4ceff63e5662d4fdea58 *src/msnCP_Aux.h
-2e249981f63fe66c41cd873ecc8b4c4c *src/msnCP_dev.cpp
-25cc0b0822a85f5b634b98b569f7d40b *src/msnCP_dev.h
+71c6c3bc9c201e5656ebf4524ca32c57 *src/msnCP_dev.cpp
+43e1fac3fbeda28e71ac4fc136e0dede *src/msnCP_dev.h
 def10a91996eea33986f34d74e874721 *src/msnCP_dev_RIntf.cpp
-5aecab2e9d5f4eb145d14d411314ce0d *src/msnCP_dev_grad.cpp
+767ac1e72206a15228e79fc2f36d052d *src/msnCP_dev_grad.cpp
 93330a0941464360cad4622b1eac8e21 *src/msnCP_dev_grad.h
 16057cb882b27e43baf2141b2f7898ed *src/registerDynamicSimbol.cpp
 6cd8c3010b48590a8996391bcd9aeb8e *src/sampleint.cpp
