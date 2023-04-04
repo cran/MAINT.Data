@@ -47,9 +47,9 @@ setMethod("rownames",signature(x = "IData"),function(x) x@ObsNames)
 setMethod("row.names",signature(x = "IData"),function(x) x@ObsNames)
 setMethod("colnames",signature(x = "IData"),function(x) x@VarNames)
 setMethod("names",signature(x = "IData"),function(x) x@VarNames)
-setMethod("MidPoints",signature(Idt = "IData"),function(Idt) Idt@MidP)
-setMethod("LogRanges",signature(Idt = "IData"),function(Idt) Idt@LogR)
-setMethod("Ranges",signature(Idt = "IData"),function(Idt) exp(Idt@LogR))
+setMethod("MidPoints",signature(Sdt = "IData"),function(Sdt) Sdt@MidP)
+setMethod("LogRanges",signature(Sdt = "IData"),function(Sdt) Sdt@LogR)
+setMethod("Ranges",signature(Sdt = "IData"),function(Sdt) exp(Sdt@LogR))
 
 setMethod("NbMicroUnits",
   signature(x = "IData"),
@@ -278,8 +278,8 @@ setMethod("[",
   {
     if (missing(i)) i <- 1:nrow(x)  
     if (missing(j)) j <- 1:ncol(x)  
-    if (class(i)[1]=="character") i <- sapply(i,function(ri) which(ri==x@ObsNames))
-    if (class(j)[1]=="character") j <- sapply(j,function(ci) which(ci==x@VarNames))
+    if (is.character(i)) i <- sapply(i,function(ri) which(ri==x@ObsNames))
+    if (is.character(j)) j <- sapply(j,function(ci) which(ci==x@VarNames))
     IData(cbind(x@MidP[i,j,drop=FALSE],x@LogR[i,j,drop=FALSE]),
       Seq="AllMidP_AllLogR",VarNames=x@VarNames[j],ObsNames=x@ObsNames[i])
   }
@@ -292,8 +292,8 @@ setMethod("[<-",
     if (!is(value,"IData")) stop("Argument value is not an IData object\n")
     if (missing(i)) i <- 1:nrow(x)  
     if (missing(j)) j <- 1:ncol(x)  
-    if (class(i)[1]=="character") i <- sapply(i,function(ri) which(ri==x@ObsNames))
-    if (class(j)[1]=="character") j <- sapply(j,function(ci) which(ci==x@VarNames))
+    if (is.character(i))  i <- sapply(i,function(ri) which(ri==x@ObsNames))
+    if (is.character(j)) j <- sapply(j,function(ci) which(ci==x@VarNames))
     x@MidP[i,j] <- value@MidP
     x@LogR[i,j] <- value@LogR
     x
@@ -342,7 +342,8 @@ setMethod(rbind,
     x <- eval(dotarguments[[1]])
     for (nextarg in 2:length(dotarguments)) {
       y <- eval(dotarguments[[nextarg]])
-      if (class(y)[1]!="IData") stop("Argument y is not an object of class IData\n")
+#      if (class(y)[1]!="IData") stop("Argument y is not an object of class IData\n")
+      if (!inherits(y,"IData")) stop("Argument y is not an object of class IData\n")
       if (x@NIVar != y@NIVar) stop("Arguments x and y have a different number of interval-valued variables\n")
       dataDF <- rbind(cbind(x@MidP,x@LogR),cbind(y@MidP,y@LogR))
       if (x@NIVar==1) {
@@ -364,7 +365,8 @@ setMethod(cbind,
     x <- eval(dotarguments[[1]])
     for (nextarg in 2:length(dotarguments)) {
       y <- eval(dotarguments[[nextarg]])
-      if (class(y)[1]!="IData") stop("Argument y is not an object of class IData\n")
+#      if (class(y)[1]!="IData") stop("Argument y is not an object of class IData\n")
+      if (!inherits(y,"IData"))  stop("Argument y is not an object of class IData\n")
       if (x@NObs != y@NObs) stop("Arguments x and y have a different number of rows\n")
       dataDF <- cbind(x@MidP,y@MidP,x@LogR,y@LogR)
       if (x@NIVar==1 && y@NIVar==1) rownames(dataDF) <- x@ObsNames
@@ -375,7 +377,8 @@ setMethod(cbind,
       # if (lpar>4) for (i in 3:(lpar-2))  {
       #   newIDtObj <- eval(par[[i]])
       #   if (i==3) auxtxt <- "rd " else auxtxt <- "-th "
-      #   if (class(newIDtObj)[1]!="IData") stop("The ",i,auxtxt,"argument is not an object of class IData\n")
+#     #   if (class(newIDtObj)[1]!="IData") stop("The ",i,auxtxt,"argument is not an object of class IData\n")
+      #   if (!inherits(newIDtObj,"IData")) stop("The ",i,auxtxt,"argument is not an object of class IData\n")
       #   if (x@NObs != newIDtObj@NObs) stop("First and ",i,auxtxt,"argument have a different number of rows\n")
       #   dataDF <- cbind(dataDF[,1:curnIvar],newIDtObj@MidP,dataDF[,(curnIvar+1):(2*curnIvar)],newIDtObj@LogR)
       #   VNames <- c(VNames,newIDtObj@VarNames)

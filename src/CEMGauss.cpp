@@ -148,12 +148,12 @@ SEXP CEMGauss(SEXP X_s, SEXP k_s, SEXP Cf_s, SEXP Homoc_s, SEXP maxiter_s, SEXP 
     else {
       LnLik1 = 0.;
       double maxSctlnMidPEgvl(0.),minSctlnMidPEgvl(INF),maxSctlnLogREgvl(0.),minSctlnLogREgvl(INF);
-      double minmpegval,maxmpegval,minlregval,maxlregval,singviol;
+      double minmpegval(0.),maxmpegval(INF),minlregval(0.),maxlregval(INF),singviol;
       
       if (Homoc) {
         validsol = safepdsolve(*Sigmapout,SigmaInv,SiglnDet,viol,mincorregv,maxcorregv,MINLNDET,maxlnk2,true); 
         if (SctEgvCnstr) {
-          bool PDCovar = MinMaxEgval(*Sigmapout,Cf,singviol,minmpegval,maxmpegval,minmpegval,maxmpegval,EPSILON,MINLNDET,maxlnk2);
+          bool PDCovar = MinMaxEgval(*Sigmapout,Cf,singviol,minmpegval,maxmpegval,minlregval,maxlregval,EPSILON,MINLNDET,maxlnk2);
           if (!PDCovar) validsol = false;
           minSctlnMidPEgvl = fmin(minSctlnMidPEgvl,minmpegval);
           maxSctlnMidPEgvl = fmax(maxSctlnMidPEgvl,maxmpegval);
@@ -168,7 +168,7 @@ SEXP CEMGauss(SEXP X_s, SEXP k_s, SEXP Cf_s, SEXP Homoc_s, SEXP maxiter_s, SEXP 
         } else {
           mat Sigmakg = Sigmakpout->slice(g);           
           if (SctEgvCnstr) {
-            bool PDCovar = MinMaxEgval(Sigmakg,Cf,singviol,minmpegval,maxmpegval,minmpegval,maxmpegval,EPSILON,MINLNDET,maxlnk2);
+            bool PDCovar = MinMaxEgval(Sigmakg,Cf,singviol,minmpegval,maxmpegval,minlregval,maxlregval,EPSILON,MINLNDET,maxlnk2);
             if (!PDCovar) {
               validsol = false;
               break;

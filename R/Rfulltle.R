@@ -88,18 +88,18 @@ Subsmplmle <- function(SmplInd,FullData,Config,SelCrit,...)
   list(CmpCrt=Res@logLiks[Res@BestModel])
 }
 
-Rfulltle <- function(Idt,k=ceiling((Idt@NObs+2*Idt@NIVar+1)/2),Config=2,SelCrit=c("BIC","AIC"),force=FALSE,...)
+Rfulltle <- function(Sdt,k=ceiling((Sdt@NObs+2*Sdt@NIVar+1)/2),Config=2,SelCrit=c("BIC","AIC"),force=FALSE,...)
 {
   if (!force)
   {
     maxnCk <- 10000
-    nCk <- choose(Idt@NObs,k) 
+    nCk <- choose(Sdt@NObs,k) 
     if (nCk> maxnCk)  {
       stop( paste("fulltle might take too long since",nCk,"different subsets need to be evaluated.\n",
         "To proceed anyway set the 'force' argument to TRUE, otherwise try the fasttle method instead.\n") )
     }
   }					
-  bestsol <- RunfooforallComb(Idt@NObs,k,Subsmplmle,ResType="none",FullData=Idt,Config=Config,SelCrit=match.arg(SelCrit),...)
+  bestsol <- RunfooforallComb(Sdt@NObs,k,Subsmplmle,ResType="none",FullData=Sdt,Config=Config,SelCrit=match.arg(SelCrit),...)
   list(LogLik=bestsol$bstcrt,Set=bestsol$bestSet)
 }
 

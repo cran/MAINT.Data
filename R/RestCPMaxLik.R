@@ -155,7 +155,8 @@ GetCovPar <- function(S,Config=1,test=TRUE)
     
   if (test) {
     Sr <- try(chol(S1, pivot = FALSE), silent = TRUE)
-    if(class(Sr)[1] == "try-error") return(NULL)
+#    if(class(Sr)[1] == "try-error") return(NULL)
+    if (inherits(Sr,"try-error")) return(NULL)
   } else {
     Sr <- chol(S)
   }

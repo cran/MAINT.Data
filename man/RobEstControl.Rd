@@ -17,7 +17,7 @@ RobEstControl(alpha=0.75, nsamp=500,  seed=NULL, trace=FALSE, use.correction=TRU
 
 \arguments{
 
-  \item{alpha}{Numeric parameter controlling the size of the subsets over which the trimmed likelihood is maximized; roughly alpha*nrow(Idt) observations are used for computing the trimmed likelihood. Allowed values are between 0.5 and 1.
+  \item{alpha}{Numeric parameter controlling the size of the subsets over which the trimmed likelihood is maximized; roughly alpha*nrow(Sdt) observations are used for computing the trimmed likelihood. Allowed values are between 0.5 and 1.
 Note that when argument \sQuote{getalpha} is set to \dQuote{TwoStep} the final value of \sQuote{alpha} is estimated by a two-step procedure and the value of argument \sQuote{alpha} is only used to specify the size of the samples used in the first step.}
   \item{nsamp}{Number of subsets used for initial estimates.}
   \item{seed}{Starting value for random generator.}

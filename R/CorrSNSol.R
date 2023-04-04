@@ -8,7 +8,8 @@ CorrSNSol <- function(Nres,SNres,CvCase,Conf,Xscld,Xmean,Xsd,XsdOutPrd,lglikdif,
     SngDparnam <- c(SngDparnam,paste("gamma1_",Xnames,sep=""))
     npar <- SKnpar(Conf,p,p/2)
     InFData <- try( sn.infoMv( dp=list(xi=Res$ksi,Omega=Res$Omega,alpha=Res$alpha), y=Xscld, x=matrix(1,nrow=n,ncol=1) ) )
-    if ( is.null(InFData) || class(InFData)[1] == "try-error" || is.null(InFData$asyvar.cp) )  {
+#    if ( is.null(InFData) || class(InFData)[1] == "try-error" || is.null(InFData$asyvar.cp) )  {
+    if ( is.null(InFData) || inherits(InFData,"try-error") || is.null(InFData$asyvar.cp) )  {
       return( list(mleCPvcov=NULL,muEse=NULL,SigmaEse=NULL,gamma1Ese=NULL,status="Invalid") )
     }
     if (Conf==1)  {

@@ -22,7 +22,8 @@ devbymsn.mle <- function(
 
 #  res <- msn.mle(x,y,start=list(beta=beta,Omega=Omega,alpha=alpha),w,trace,opt.method,control)
    try( res <- msn.mle(x,y,start=list(beta=beta,Omega=Omega,alpha=alpha),w,trace,opt.method,control) )
-   if ( is.null(res) || class(res)[1] == "try-error" || !is.finite(res$logL) )  {
+#   if ( is.null(res) || class(res)[1] == "try-error" || !is.finite(res$logL) )  {
+   if ( is.null(res) || inherits(res,"try-error") || !is.finite(res$logL) )  {
      return( list(par=c(as.numeric(beta),eta),value=.Machine$double.xmax) )
    }
    list(par=c(as.numeric(res$dp$beta),res$dp$alpha/sqrt(diag(res$dp$Omega))),value=-2*res$logL)
@@ -56,7 +57,8 @@ SNCnf1MaxLik <- function(Data,grouping=NULL,initpar=NULL,EPS=1E-6,limlnk2,OptCnt
     parsd <- sd0*c(rep(1./sqrt(n),p),rep(0.1,p))   # standard deviation hyper-parameters
     if (is.null(initpar))  { 
       msnmlesol <- try(msn.mle(x=matrix(1,nrow=n,ncol=1),y=Data))
-      if (class(msnmlesol)[1] == "try-error")  { 
+#      if (class(msnmlesol)[1] == "try-error")  { 
+      if (inherits(msnmlesol,"try-error"))  { 
         return(list(lnLik=-Inf,ksi=NULL,beta2k=NULL,Omega=NULL,Omega.cor=NULL,alpha=NULL,
                delta=NULL,mu=NULL,Sigma=NULL,gamma1=NULL,admissible=NULL,c2=NULL,optres=NULL))
       }
@@ -74,7 +76,8 @@ SNCnf1MaxLik <- function(Data,grouping=NULL,initpar=NULL,EPS=1E-6,limlnk2,OptCnt
     X <- model.matrix(~ grouping)
     if (is.null(initpar))  { 
       msnmlesol <- try(msn.mle(x=X,y=Data))
-      if (class(msnmlesol)[1] == "try-error")  { 
+#      if (class(msnmlesol)[1] == "try-error")  { 
+      if (inherits(msnmlesol,"try-error"))  { 
         return(list(lnLik=-Inf,ksi=NULL,beta2k=NULL,Omega=NULL,Omega.cor=NULL,alpha=NULL,
              delta=NULL,mu=NULL,Sigma=NULL,gamma1=NULL,admissible=NULL,c2=NULL,optres=NULL))
       }
@@ -204,12 +207,11 @@ SNVCovscaling <- function(Conf,p,stdv,k=1)  # Creates a scaling matrix in order 
     ind <- ind + 1  
     sclvct[ind] <- stdv[i]*stdv[j]
   }
-  if (Conf!=1) { sclvct <- sclvct[c(1:nlocpar,nlocpar+vcovCind(Conf,p),gamma1ind)] } 
+  if (Conf!=1) { sclvct <- sclvct[c(1:nlocpar,nlocpar+SigCind(Conf,p/2),gamma1ind)] } 
   outer(sclvct,sclvct)  
 }
 
-IdtSNmle <- function(Idt, grouping=NULL, Type=c("SingDst","HomMxt"), getvcov=TRUE, CVtol=1.0e-5, bordertol=1e-2, 
-#IdtSNmle <- function(Idt, grouping=NULL, Type=c("SingDst","HomMxt"), getvcov=FALSE, CVtol=1.0e-5, bordertol=1e-2, 
+IdtSNmle <- function(Sdt, grouping=NULL, Type=c("SingDst","HomMxt"), getvcov=TRUE, CVtol=1.0e-5, bordertol=1e-2, 
   OptCntrl=list(), onerror=c("stop","warning","silentNull"), limlnk2, CovCaseArg, Config, SelCrit, EPS=1E-6)
 {
 
@@ -258,7 +260,8 @@ IdtSNmle <- function(Idt, grouping=NULL, Type=c("SingDst","HomMxt"), getvcov=TRU
          InFData <- try( 
            sn.infoMv( dp=list(xi=Res$ksi,Omega=Res$Omega,alpha=Res$alpha), y=Xscld, x=matrix(1,nrow=n,ncol=1), at.MLE=TRUE ) 
          )
-         if ( is.null(InFData) || class(InFData)[1] == "try-error" || (is.null(InFData$asyvar.cp)) )  {
+#         if ( is.null(InFData) || class(InFData)[1] == "try-error" || (is.null(InFData$asyvar.cp)) )  {
+         if ( is.null(InFData) || inherits(InFData,"try-error") || (is.null(InFData$asyvar.cp)) )  {
            return( list(mleCPvcov=NULL,muEse=NULL,SigmaEse=NULL,gamma1Ese=NULL,status="Invalid") )
          }
          mleCPvcov <- InFData$asyvar.cp
@@ -289,7 +292,8 @@ IdtSNmle <- function(Idt, grouping=NULL, Type=c("SingDst","HomMxt"), getvcov=TRU
           sn.infoMv( dp=list(beta=as.matrix(rbind(Res$ksi[1,],Res$beta2k)),Omega=Res$Omega,alpha=Res$alpha), 
                    y=Xscld, x=model.matrix(~ grouping), at.MLE=TRUE )  
         ) 
-        if ( is.null(InFData) || class(InFData)[1] == "try-error" || is.null(InFData$asyvar.cp) )  {
+#        if ( is.null(InFData) || class(InFData)[1] == "try-error" || is.null(InFData$asyvar.cp) )  {
+        if ( is.null(InFData) || inherits(InFData,"try-error") || is.null(InFData$asyvar.cp) )  {
           return( list(mleCPvcov=NULL,muEse=NULL,SigmaEse=NULL,gamma1Ese=NULL,status="Invalid") )
         }
         betavcov <- InFData$asyvar.cp
@@ -371,10 +375,10 @@ IdtSNmle <- function(Idt, grouping=NULL, Type=c("SingDst","HomMxt"), getvcov=TRU
   Type <- match.arg(Type)
   onerror <- match.arg(onerror)
 
-  q <- Idt@NIVar
+  q <- Sdt@NIVar
   p <- 2*q
   nvcovpar <- p*(p+1)/2
-  n <- Idt@NObs
+  n <- Sdt@NObs
   n1scvct <- rep(1,n)
   maxsk <- 0.99527
   if (q==1) Config <- q1Config(Config)
@@ -398,7 +402,7 @@ IdtSNmle <- function(Idt, grouping=NULL, Type=c("SingDst","HomMxt"), getvcov=TRU
   }
   Config <- sort(Config)  
 
-  X <- cbind(Idt@MidP,Idt@LogR)
+  X <- cbind(Sdt@MidP,Sdt@LogR)
   Xnames <- names(X)
   if (CovCaseArg)  {
     nCovCases <- 4 
@@ -611,11 +615,10 @@ IdtSNmle <- function(Idt, grouping=NULL, Type=c("SingDst","HomMxt"), getvcov=TRU
   }
 }
 
-#IdtFDMxtSNmle <- function(Idt, grouping, getvcov=TRUE, CVtol=1.0e-5, OptCntrl=list(), limlnk2, CovCaseArg, Config, SelCrit)
-IdtFDMxtSNmle <- function(Idt, grouping, getvcov, CVtol=1.0e-5, OptCntrl=list(), limlnk2, CovCaseArg, Config, SelCrit)
+IdtFDMxtSNmle <- function(Sdt, grouping, getvcov, CVtol=1.0e-5, OptCntrl=list(), limlnk2, CovCaseArg, Config, SelCrit)
 {
-  n <- Idt@NObs
-  q <- Idt@NIVar
+  n <- Sdt@NObs
+  q <- Sdt@NIVar
   p <- 2*q
   if (q==1) Config <- q1Config(Config)
   nk <- as.numeric(table(grouping))
@@ -623,7 +626,7 @@ IdtFDMxtSNmle <- function(Idt, grouping, getvcov, CVtol=1.0e-5, OptCntrl=list(),
   if (k==1)  {
     stop("The data belongs to one single group. A partition into at least two different groups is required\n")
   }
-  Xnams <- c(names(Idt@MidP),names(Idt@LogR))
+  Xnams <- c(names(Sdt@MidP),names(Sdt@LogR))
   lev <- levels(grouping)
   anams <- list(Xnams,Xnams,lev)
   mnams <- list(lev,Xnams)
@@ -656,7 +659,7 @@ IdtFDMxtSNmle <- function(Idt, grouping, getvcov, CVtol=1.0e-5, OptCntrl=list(),
     names(CovConfCases[[CvCase]]$optres) <- lev
   }
   for (g in 1:k) {
-    Idtg <- Idt[grouping==lev[g],]
+    Idtg <- Sdt[grouping==lev[g],]
     IdtgDF <- cbind(Idtg@MidP,Idtg@LogR)
     Xbar <- colMeans(IdtgDF)
     Xstdev <- sapply(IdtgDF,sd)
@@ -666,8 +669,6 @@ IdtFDMxtSNmle <- function(Idt, grouping, getvcov, CVtol=1.0e-5, OptCntrl=list(),
     }  else if (length(CnstV)>1)  {
       stop("Variables ",paste(names(CnstV),collapse=" ")," appear to be constant in group ",lev[g],"\n")
     }
-#    pres <- IdtSNmle(Idtg,Type="SingDst",CVtol=CVtol,OptCntrl=OptCntrl, limlnk2=limlnk2,
-#      CovCaseArg=CovCaseArg,Config=Config,SelCrit=SelCrit)
     pres <- IdtSNmle(Idtg,Type="SingDst",getvcov=getvcov,CVtol=CVtol,OptCntrl=OptCntrl, limlnk2=limlnk2,
       CovCaseArg=CovCaseArg,Config=Config,SelCrit=SelCrit)
     for (model in Config)

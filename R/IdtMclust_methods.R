@@ -204,7 +204,8 @@ setMethod("show",
 
 setMethod("summary",
   signature(object = "IdtMclust"),
-  function(object, parameters = FALSE, classification = FALSE, model="BestModel", ...)
+#  function(object, parameters = FALSE, classification = FALSE, model="BestModel", ...)
+  function(object, parameters = FALSE, classification = FALSE, model="BestModel", ShowClassbyOBs=FALSE, ...)
   {
     if (model=="BestModel") {
       G  <- object@BestG
@@ -238,7 +239,8 @@ setMethod("summary",
    new("summaryIdtMclust",title=title,modelName=modelName,Hmcdt=mod@Hmcdt,     
       NObs=mod@NObs,NIVar=mod@NIVar,G=G,loglik=mod@logLik,bic=mod@bic,
       pro=pro,mean=mean,covariance=covariance,classification=mod@classification,
-      printParameters=parameters,printClassification=classification)
+#      printParameters=parameters,printClassification=classification)
+      printParameters=parameters,printClassification=classification,ShowClassbyOBs=ShowClassbyOBs)
   }
 )  
 
@@ -285,7 +287,13 @@ setMethod("show",
    }
    if(object@printClassification) {
      cat("\nClassification:\n")
-     print(object@classification)
+#     print(object@classification)
+     if (object@ShowClassbyOBs)  print(object@classification)
+     else for(g in 1:object@G) {
+       Cmpg <- paste("CP",g,sep="") 
+       cat(paste("Component",Cmpg,"\n"))
+       print(names(object@classification[object@classification==Cmpg]))
+     }   
    }
    invisible(object)
   }

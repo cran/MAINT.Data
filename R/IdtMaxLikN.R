@@ -10,14 +10,14 @@ error <- function(onerror,msg)     # Things to do: replace this by an exception-
   }
 } 
 
-IdtNmle <- function(Idt, grouping=NULL, Type=c("SingDst","HomMxt"), CVtol=1.0e-5, limlnk2=log(1e8),
+IdtNmle <- function(Sdt, grouping=NULL, Type=c("SingDst","HomMxt"), CVtol=1.0e-5, limlnk2=log(1e8),
   OptCntrl=list(), onerror=c("stop","warning","silentNull"), CovCaseArg, Config, SelCrit)
 {                                   
   onerror <- match.arg(onerror)
   Type <- match.arg(Type)
-  q <- Idt@NIVar
+  q <- Sdt@NIVar
   p <- 2*q
-  n <- Idt@NObs
+  n <- Sdt@NObs
   if (Type=="SingDst")  { 
     k <- 1
   }  else if (Type=="HomMxt")  {
@@ -45,7 +45,7 @@ IdtNmle <- function(Idt, grouping=NULL, Type=c("SingDst","HomMxt"), CVtol=1.0e-5
   logLiks <- AICs <- BICs <- rep(NA_real_,nCovCases)
   CovConfCases <- vector("list",nCovCases)
   names(logLiks) <- names(AICs) <- names(BICs) <- names(CovConfCases) <- modnames
-  X <- cbind(Idt@MidP,Idt@LogR)
+  X <- cbind(Sdt@MidP,Sdt@LogR)
 
   for (model in Config)  {  
     if (model!=2) { 
@@ -90,6 +90,16 @@ IdtNmle <- function(Idt, grouping=NULL, Type=c("SingDst","HomMxt"), CVtol=1.0e-5
   }
   else if (Type=="HomMxt")
   {
+    smallg <- which((nk<2))
+    if (length(smallg)>0) {
+      grpnames <- levels(grouping)
+      if (length(smallg)==1) {
+        if (nk[smallg]==0) stop(paste("Group",grpnames[smallg],"has no observations in the current data set\n")) 
+        else stop(paste("Group",grpnames[smallg],"is too small (only one observation) to estimate mixture models\n"))
+      } else stop(
+        paste("Groups",paste(grpnames[smallg],collapse=", "),"are too small (only",paste(nk[smallg],collapse=", "),"observations) to estimate mixture models\n")) 
+    }
+    
     mleNmuE <- apply(X,2,function(x) tapply(x,grouping,mean))
 #    mleNmuEse <- apply(X,2,function(x) tapply(x,grouping,sd))/sqrt(nk)
 #    mleNmuEse <- apply(X,2,function(x) tapply(x,grouping,sd)) * ((nk-1)/nk) /sqrt(nk)
@@ -220,12 +230,12 @@ IdtNmle <- function(Idt, grouping=NULL, Type=c("SingDst","HomMxt"), CVtol=1.0e-5
   }
 }
 
-IdtHetMxtNmle <- function( Idt,grouping, CVtol=1.0e-5, OptCntrl=OptCntrl,
+IdtHetMxtNmle <- function( Sdt,grouping, CVtol=1.0e-5, OptCntrl=OptCntrl,
 	onerror=c("stop","warning","silentNull"), CovCaseArg, Config, SelCrit )
 {
   onerror <- match.arg(onerror)
-  n <- Idt@NObs
-  q <- Idt@NIVar
+  n <- Sdt@NObs
+  q <- Sdt@NIVar
   p <- 2*q
   nk <- as.numeric(table(grouping))
   k <- length(nk) 
@@ -234,7 +244,7 @@ IdtHetMxtNmle <- function( Idt,grouping, CVtol=1.0e-5, OptCntrl=OptCntrl,
   }
   mleNmuE <- matrix(nrow=k,ncol=p)
   rownames(mleNmuE) <- levels(grouping)
-  colnames(mleNmuE) <- c(names(Idt@MidP),names(Idt@LogR))
+  colnames(mleNmuE) <- c(names(Sdt@MidP),names(Sdt@LogR))
   mleNmuEse <- matrix(nrow=k,ncol=p)
   rownames(mleNmuEse) <- rownames(mleNmuE)
   colnames(mleNmuEse) <- colnames(mleNmuE)
@@ -272,7 +282,7 @@ IdtHetMxtNmle <- function( Idt,grouping, CVtol=1.0e-5, OptCntrl=OptCntrl,
   if (is.element(2,Config)) { names(CovConfCases[[2]]$optres) <- levels(grouping) }
   for (g in 1:k)
   {
-    Idtg <- Idt[grouping==levels(grouping)[g],]
+    Idtg <- Sdt[grouping==levels(grouping)[g],]
     IdtgDF <- cbind(Idtg@MidP,Idtg@LogR)
     Xbar <- colMeans(IdtgDF)
     Xstdev <- sapply(IdtgDF,sd)
@@ -337,7 +347,7 @@ mleNSigC35 <- function(Conf,mat,q,p,defval)
 mleNvcovC35 <- function(Conf,mat,p,k)
 {
   kp <- k*p
-  mind <- c(1:kp,kp+vcovCind(Conf,p))
+  mind <- c(1:kp,kp+SigCind(Conf,p/2))
   mat[mind,mind]  #  return(mat[mind,mind])
 }
 

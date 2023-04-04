@@ -13,7 +13,7 @@ or by calling the constructor-function \code{RobEstControl}.
 }
 \section{Slots}{
   \describe{
-    \item{\code{alpha}:}{Inherited from class \code{"CovControlMcd"}. Numeric parameter controlling the size of the subsets over which the trimmed likelihood is maximized; roughly alpha*nrow(Idt) observations are used for computing the trimmed likelihood. Allowed values are between 0.5 and 1.
+    \item{\code{alpha}:}{Inherited from class \code{"CovControlMcd"}. Numeric parameter controlling the size of the subsets over which the trimmed likelihood is maximized; roughly alpha*nrow(Sdt) observations are used for computing the trimmed likelihood. Allowed values are between 0.5 and 1.
 Note that when argument \sQuote{getalpha} is set to \dQuote{TwoStep} the final value of \sQuote{alpha} is estimated by a two-step procedure and the value of argument \sQuote{alpha} is only used to specify the size of the samples used in the first step.}
     \item{\code{nsamp}:}{Inherited from class \code{"CovControlMcd"}. Number of subsets used for initial estimates.}
     \item{\code{scalefn}:}{Inherited from class \code{"CovControlMcd"} and not used in the package \sQuote{Maint.Data.}}

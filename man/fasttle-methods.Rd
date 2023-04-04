@@ -7,7 +7,7 @@
 
 \description{Performs maximum trimmed likelihood estimation by the fasttle algorithm}
 
-\usage{fasttle(Idt,
+\usage{fasttle(Sdt,
     CovCase=1:4,
     SelCrit=c("BIC","AIC"),
     alpha=control@alpha,
@@ -32,13 +32,13 @@
 }
 
 \arguments{
-    \item{Idt}{An IData object representing interval-valued units.}
+    \item{Sdt}{An IData object representing interval-valued units.}
 
     \item{CovCase}{Configuration of the variance-covariance matrix: a set of integers between 1 and 4.}
 
     \item{SelCrit}{The model selection criterion.}
 
-    \item{alpha}{Numeric parameter controlling the size of the subsets over which the trimmed likelihood is maximized; roughly alpha*nrow(Idt) observations are used for computing the trimmed likelihood.  Note that when argument \sQuote{getalpha} is set to \dQuote{TwoStep} the final value of \sQuote{alpha} is estimated by a two-step procedure and the value of argument \sQuote{alpha} is only used to specify the size of the samples used in the first step. Allowed values are between 0.5 and 1.}
+    \item{alpha}{Numeric parameter controlling the size of the subsets over which the trimmed likelihood is maximized; roughly alpha*nrow(Sdt) observations are used for computing the trimmed likelihood.  Note that when argument \sQuote{getalpha} is set to \dQuote{TwoStep} the final value of \sQuote{alpha} is estimated by a two-step procedure and the value of argument \sQuote{alpha} is only used to specify the size of the samples used in the first step. Allowed values are between 0.5 and 1.}
 
     \item{nsamp}{Number of subsets used for initial estimates.}  
 

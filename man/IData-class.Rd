@@ -37,10 +37,10 @@
     \item{rownames}{\code{signature(x = "IData")}: returns the row (entity) names for an object of class IData.}
     \item{colnames}{\code{signature(x = "IData")}: returns column (variable) names for an object of class IData.}
     \item{names}{\code{signature(x = "IData")}: returns column (variable) names for an object of class IData.}
-    \item{MidPoints}{\code{signature(Idt = "IData")}: returns a data frame with MidPoints for an object of class IData.}
-    \item{LogRanges}{\code{signature(Idt = "IData")}: returns a data frame with LogRanges for an object of class IData.}
-    \item{Ranges}{\code{signature(Idt = "IData")}: returns an data frame with Ranges for an object of class IData.}
-    \item{NbMicroUnits}{\code{signature(Idt = "IData")}: returns an integer vector with the number of micro data units by interval-valued observation for an object of class IData.}
+    \item{MidPoints}{\code{signature(Sdt = "IData")}: returns a data frame with MidPoints for an object of class IData.}
+    \item{LogRanges}{\code{signature(Sdt = "IData")}: returns a data frame with LogRanges for an object of class IData.}
+    \item{Ranges}{\code{signature(Sdt = "IData")}: returns an data frame with Ranges for an object of class IData.}
+    \item{NbMicroUnits}{\code{signature(Sdt = "IData")}: returns an integer vector with the number of micro data units by interval-valued observation for an object of class IData.}
     \item{head}{\code{signature(x = "IData")}: head S4 method for the IData-class.}
     \item{tail}{\code{signature(x = "IData")}: tail S4 method for the IData-class.}
     \item{plot}{\code{signature(x = "IData")}: plot S4 methods for the IData-class.}

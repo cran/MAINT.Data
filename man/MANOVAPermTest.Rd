@@ -6,7 +6,7 @@
 
 \usage{
 
-MANOVAPermTest(MANOVAres, Idt, grouping, nrep=200,
+MANOVAPermTest(MANOVAres, Sdt, grouping, nrep=200,
     Model=c("Normal","SKNormal","NrmandSKN"), CovCase=1:4,
     SelCrit=c("BIC","AIC"), Mxt=c("Hom","Het","Loc","Gen"), CVtol=1.0e-5, k2max=1e6,
     OptCntrl=list(), onerror=c("stop","warning","silentNull"), \dots)
@@ -19,7 +19,7 @@ MANOVAPermTest(MANOVAres, Idt, grouping, nrep=200,
 \arguments{
   \item{MANOVAres}{An object representing a MANOVA analysis on interval-valued entities.}
 
-  \item{Idt}{An IData object representing interval-valued entities.}
+  \item{Sdt}{An IData object representing interval-valued entities.}
 
   \item{grouping}{Factor indicating the group to which each observation belongs to.}
 

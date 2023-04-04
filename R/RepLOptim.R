@@ -23,7 +23,7 @@ RepLOptim <- function(start, parsd, fr, gr=NULL, inphess=NULL, ..., method="nlmi
   if (!is.null(control$maxnoimprov)) maxnoimprov <- control$maxnoimprov else maxnoimprov <- maxnoimprov_default
   if (!is.null(control$maxreplic)) maxreplic <- control$maxreplic else maxreplic <- maxreplic_default
   if (!is.null(control$maxiter)) maxiter <- control$maxiter 
-  else if (class(method)[1]!="character") maxiter <- maxiter_default
+  else if (!is.character(method)) maxiter <- maxiter_default
     else if (method!="SANN") maxiter <- maxiter_default
       else maxiter <-  maxSANNiter_default
   if (!is.null(control$maxeval)) maxeval <- control$maxeval else maxeval <- maxeval_default

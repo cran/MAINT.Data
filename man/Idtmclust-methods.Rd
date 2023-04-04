@@ -8,13 +8,13 @@
 \description{Performs Gaussian model based clustering for interval data}
 
 \usage{
-Idtmclust(Idt, G = 1:9, CovCase=1:4, SelCrit=c("BIC","AIC"),
+Idtmclust(Sdt, G = 1:9, CovCase=1:4, SelCrit=c("BIC","AIC"),
   Mxt=c("Hom","Het","HomandHet"), control=EMControl()) 
 }
 
 \arguments{
 
-  \item{Idt}{An IData object representing interval-valued entities.}
+  \item{Sdt}{An IData object representing interval-valued entities.}
   \item{G}{An integer vector specifying the numbers of mixture components (clusters) for which the BIC is to be calculated.}
   \item{CovCase}{Configuration of the variance-covariance matrix: a set of integers between 1 and 4.}
    \item{SelCrit}{The model selection criterion.}

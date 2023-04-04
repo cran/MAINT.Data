@@ -1,6 +1,6 @@
 setMethod("fasttle",
-  signature(Idt = "IData"),
-  function(Idt,
+  signature(Sdt = "IData"),
+  function(Sdt,
     CovCase=1:4,
     SelCrit=c("BIC","AIC"),
     alpha=control@alpha,
@@ -25,10 +25,10 @@ setMethod("fasttle",
   {
     limlnk2 <- log(k2max)
 
-    q <- Idt@NIVar
+    q <- Sdt@NIVar
     if (q==1) CovCase <- q1CovCase(CovCase) 
     p <- 2*q 
-    n <- Idt@NObs
+    n <- Sdt@NObs
 
 #    if (alpha*n <= 2*q) {
 #      stop("The number of observations is too small and would lead to singular covariance estimates.\n")
@@ -47,14 +47,14 @@ setMethod("fasttle",
     }
     if (getalpha=="TwoStep")
     {
-      X <- cbind(Idt@MidP,Idt@LogR)
+      X <- cbind(Sdt@MidP,Sdt@LogR)
       if (MD2Dist=="ChiSq") {
-        fstsol <- fasttle1(Idt,CovCase,SelCrit,alpha,nsamp,ncsteps,trace,use.correction,
+        fstsol <- fasttle1(Sdt,CovCase,SelCrit,alpha,nsamp,ncsteps,trace,use.correction,
           rawMD2Dist,eta,multiCmpCor,kdblstar,outlin,trialmethod,m,reweighted,limlnk2,otpType="OnlyEst")
         if (is.null(fstsol)) return(NULL)
         nOtls <- MDOtlDet(X,coef(fstsol)$mu,coef(fstsol)$Sigma,eta=eta,RefDist="ChiSq",multiCmpCor=multiCmpCor,otp="onlycnt")
       }  else if (MD2Dist=="CerioliBetaF") {
-        fstsol <- fasttle1(Idt,CovCase,SelCrit,alpha,nsamp,ncsteps,trace,use.correction,
+        fstsol <- fasttle1(Sdt,CovCase,SelCrit,alpha,nsamp,ncsteps,trace,use.correction,
           rawMD2Dist,eta,multiCmpCor,kdblstar,outlin,trialmethod,m,reweighted,limlnk2,otpType="SetMD2andEst")
         if (is.null(fstsol)) return(NULL)
         nOtls <- MDOtlDet(X,coef(fstsol)$mu,coef(fstsol)$Sigma,eta=eta,RefDist="CerioliBetaF",
@@ -69,14 +69,14 @@ setMethod("fasttle",
         } else {  
           CovCaseArg <- FALSE
         }	
-        finalsol <- IdtNmle(Idt,CovCaseArg=CovCaseArg,Config=Config,SelCrit=SelCrit)
+        finalsol <- IdtNmle(Sdt,CovCaseArg=CovCaseArg,Config=Config,SelCrit=SelCrit)
         warning(paste("fasttle returned the classical maximum likelihood estimates because the data does not appear to include any outlier.\n",
           "If you want to force a trimmed likelihood estimator run fasttle with the argument getalpha=FALSE.\n"))
         if (otpType=="OnlyEst") {
            stop("otpType argument 'OnlyEst' has beed decrepated\n")
         }  else {
           rawSet <- RewghtdSet <- 1:n
-          names(rawSet) <- names(RewghtdSet) <- Idt@ObsNames
+          names(rawSet) <- names(RewghtdSet) <- Sdt@ObsNames
           if (outlin=="MidPandLogR") {
             RobMD2 <- GetMD2(X,coef(finalsol)$mu,coef(finalsol)$Sigma)
           } else if (outlin=="MidP") {
@@ -109,10 +109,10 @@ setMethod("fasttle",
         }
       }  
       newalpha <- 1. - nOtls/n
-      return( fasttle1(Idt,CovCase,SelCrit,newalpha,nsamp,ncsteps,trace,use.correction,
+      return( fasttle1(Sdt,CovCase,SelCrit,newalpha,nsamp,ncsteps,trace,use.correction,
         rawMD2Dist,eta,multiCmpCor,kdblstar,outlin,trialmethod,m,reweighted,limlnk2,otpType) )
     }  else {
-      return( fasttle1(Idt,CovCase,SelCrit,alpha,nsamp,ncsteps,trace,use.correction,
+      return( fasttle1(Sdt,CovCase,SelCrit,alpha,nsamp,ncsteps,trace,use.correction,
         rawMD2Dist,eta,multiCmpCor,kdblstar,outlin,trialmethod,m,reweighted,limlnk2,otpType) )
     } 
   }
@@ -447,7 +447,7 @@ RobEstControl <- function (alpha=0.75,
                          otpType="SetMD2andEst" )
 }
 
-getIdtOutl <- function(Idt,IdtE=NULL,muE=NULL,SigE=NULL,
+getIdtOutl <- function(Sdt,IdtE=NULL,muE=NULL,SigE=NULL,
   eta=0.025,Rewind=NULL,m=length(Rewind),
   RefDist=c("ChiSq","HardRockeAdjF","HardRockeAsF","CerioliBetaF"),
   multiCmpCor=c("never","always","iterstep"),outlin=c("MidPandLogR","MidP","LogR"))
@@ -465,7 +465,7 @@ getIdtOutl <- function(Idt,IdtE=NULL,muE=NULL,SigE=NULL,
     Rewind <- IdtE@RewghtdSet
   } 
   if (!is.null(Rewind)) {  
-    boolRewind <- sapply(1:nrow(Idt),function(x) is.element(x,Rewind))
+    boolRewind <- sapply(1:nrow(Sdt),function(x) is.element(x,Rewind))
   } else {
     boolRewind <- NULL
   }
@@ -480,14 +480,13 @@ getIdtOutl <- function(Idt,IdtE=NULL,muE=NULL,SigE=NULL,
      if (is.null(SigE)) SigE <- coef(IdtE)$Sigma
   }
 
-#  X <- data.frame(cbind(Idt@MidP,Idt@LogR),row.names=Idt@ObsNames)
-  X <- data.frame(cbind(Idt@MidP,Idt@LogR),row.names=Idt@ObsNames)
-  if (outlin=="MidPandLogR") vind <- 1:(2*Idt@NIVar)
-  else if (outlin=="MidP") vind <- 1:Idt@NIVar
-  else if (outlin=="LogR") vind <- (Idt@NIVar+1):(2*Idt@NIVar)
+  X <- data.frame(cbind(Sdt@MidP,Sdt@LogR),row.names=Sdt@ObsNames)
+  if (outlin=="MidPandLogR") vind <- 1:(2*Sdt@NIVar)
+  else if (outlin=="MidP") vind <- 1:Sdt@NIVar
+  else if (outlin=="LogR") vind <- (Sdt@NIVar+1):(2*Sdt@NIVar)
 
   otl <- MDOtlDet(X[vind],muE[vind],SigE[vind,vind],eta,m,ret="Outliers",RefDist=RefDist,Rewind=Rewind,multiCmpCor=multiCmpCor,otp="indandMD2")
-  new("IdtOutl",outliers=otl$outliers,MD2=otl$MD2,eta=eta,RefDist=RefDist,multiCmpCor=multiCmpCor,NObs=Idt@NObs,p=length(vind),h=m,boolRewind=boolRewind)
+  new("IdtOutl",outliers=otl$outliers,MD2=otl$MD2,eta=eta,RefDist=RefDist,multiCmpCor=multiCmpCor,NObs=Sdt@NObs,p=length(vind),h=m,boolRewind=boolRewind)
 }
 
 GetMD2 <- function(Data,muE,SigE)

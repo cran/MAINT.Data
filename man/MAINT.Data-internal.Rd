@@ -171,7 +171,6 @@
 \alias{SNVCovscaling}
 \alias{SigCind}
 \alias{mleNvcovC35}
-\alias{vcovCind}
 \alias{resdlmfit}
 
 \alias{delta.etc} 

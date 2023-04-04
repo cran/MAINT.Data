@@ -14,7 +14,7 @@
 
 \usage{
 
-MANOVA(Idt, grouping, Model=c("Normal","SKNormal","NrmandSKN"), CovCase=1:4, 
+MANOVA(Sdt, grouping, Model=c("Normal","SKNormal","NrmandSKN"), CovCase=1:4, 
 		SelCrit=c("BIC","AIC"), Mxt=c("Hom","Het","Loc","Gen"), 
                 CVtol=1.0e-5, k2max=1e6,
 		OptCntrl=list(), onerror=c("stop","warning","silentNull"), \dots)
@@ -28,7 +28,7 @@ MANOVA(Idt, grouping, Model=c("Normal","SKNormal","NrmandSKN"), CovCase=1:4,
 \arguments{
   \item{object}{An object representing a MANOVA analysis on interval-valued units.}
 
-  \item{Idt}{An IData object representing interval-valued units.}
+  \item{Sdt}{An IData object representing interval-valued units.}
 
   \item{grouping}{Factor indicating the group to which each observation belongs to.}
 

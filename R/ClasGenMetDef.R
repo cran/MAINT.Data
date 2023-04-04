@@ -114,13 +114,14 @@ setGeneric("vcov",package="stats",signature="object")
 setGeneric("predict",package="stats",signature="object")
 setGeneric("lda",package="MASS",signature="x")
 setGeneric("qda",package="MASS",signature="x")
-setGeneric("MidPoints",function(Idt) standardGeneric("MidPoints"))
-setGeneric("LogRanges",function(Idt) standardGeneric("LogRanges"))
-setGeneric("Ranges",function(Idt) standardGeneric("Ranges"))
+setGeneric("MidPoints",function(Sdt) standardGeneric("MidPoints"))
+setGeneric("LogRanges",function(Sdt) standardGeneric("LogRanges"))
+setGeneric("Ranges",function(Sdt) standardGeneric("Ranges"))
 setGeneric("mle",
-  function(Idt, Model=c("Normal","SKNormal","NrmandSKN"),CovCase=1:4, SelCrit=c("BIC","AIC"), k2max=1e6, OptCntrl=list(),...)
-  standardGeneric("mle"))
-setGeneric("MANOVA",function(Idt, grouping, Model=c("Normal","SKNormal","NrmandSKN"), CovCase=1:4, SelCrit=c("BIC","AIC"), 
+#  function(Sdt, Model=c("Normal","SKNormal","NrmandSKN"),CovCase=1:4, SelCrit=c("BIC","AIC"), k2max=1e6, OptCntrl=list(),...)
+  function(Sdt, Model="Normal", CovCase="AllC", SelCrit=c("BIC","AIC"), k2max=1e6, OptCntrl=list(), ...)
+    standardGeneric("mle"))
+setGeneric("MANOVA",function(Sdt, grouping, Model=c("Normal","SKNormal","NrmandSKN"), CovCase=1:4, SelCrit=c("BIC","AIC"), 
       Mxt=c("Hom","Het","Loc","Gen"), CVtol=1.0e-5, k2max=1e6, OptCntrl=list(), onerror=c("stop","warning","silentNull"), ...)
   standardGeneric("MANOVA"))
 setGeneric("BestModel",function(ModE,SelCrit=c("IdtCrt","BIC","AIC"))  standardGeneric("BestModel"))
@@ -130,7 +131,7 @@ setGeneric("testMod", function(ModE, RestMod=ModE@ModelConfig[2]:length(ModE@Mod
 setGeneric("H1res",  function(object) standardGeneric("H1res"))
 setGeneric("H0res",  function(object) standardGeneric("H0res"))
 setGeneric("snda",function(x, grouping, prior="proportions", ...) standardGeneric("snda"))
-setGeneric("ObsLogLiks",function(object,Idt,Conf=object@BestModel) standardGeneric("ObsLogLiks"))
+setGeneric("ObsLogLiks",function(object,Sdt,Conf=object@BestModel) standardGeneric("ObsLogLiks"))
 #setGeneric("rbind",function(x, y, ...) standardGeneric("rbind"))
 #setGeneric("cbind",function(x, y, ...) standardGeneric("cbind"))
 setGeneric("NbMicroUnits<-",function(x, value) standardGeneric("NbMicroUnits<-"))
@@ -139,18 +140,19 @@ setClass("summaryIdtMclust",
   slots=c(title="character",modelName="character",Hmcdt="logical",
     NObs="numeric",NIVar="numeric",G="numeric",loglik="numeric",bic="numeric",
     pro="numeric",mean="matrix",covariance="array",classification="extcharacter",
-    printParameters ="logical", printClassification="logical") 
+#    printParameters ="logical", printClassification="logical") 
+    printParameters ="logical", printClassification="logical", ShowClassbyOBs="logical") 
 )
 
 setGeneric("fulltle",
-  function(Idt, CovCase=1:4, SelCrit=c("BIC","AIC"), alpha=0.75, use.correction=TRUE, getalpha="TwoStep", 
+  function(Sdt, CovCase=1:4, SelCrit=c("BIC","AIC"), alpha=0.75, use.correction=TRUE, getalpha="TwoStep", 
     rawMD2Dist=c("ChiSq","HardRockeAsF","HardRockeAdjF"), MD2Dist=c("ChiSq","CerioliBetaF"),
     eta=0.025,multiCmpCor=c("never","always","iterstep"), outlin=c("MidPandLogR","MidP","LogR"), reweighted=TRUE, k2max=1e6,
     force=FALSE, ...)
   standardGeneric("fulltle"))
 
 setGeneric("fasttle",
-  function(Idt,
+  function(Sdt,
     CovCase=1:4,
     SelCrit=c("BIC","AIC"),
     alpha=control@alpha,
@@ -180,7 +182,7 @@ setGeneric("getRefDist",function(IdtOtl) standardGeneric("getRefDist"))
 setGeneric("getmultiCmpCor",function(IdtOtl) standardGeneric("getmultiCmpCor")) 
 
 setGeneric("RobMxtDEst",
-  function(Idt,grouping,Mxt=c("Hom","Het"),CovEstMet=c("Pooled","Globdev"),
+  function(Sdt,grouping,Mxt=c("Hom","Het"),CovEstMet=c("Pooled","Globdev"),
     CovCase=1:4,SelCrit=c("BIC","AIC"),Robcontrol=RobEstControl(), l1medpar=NULL, ...)
   standardGeneric("RobMxtDEst"))
 setGeneric("Roblda",
@@ -195,7 +197,7 @@ setGeneric("Robqda",
   standardGeneric("Robqda"))
 
 setGeneric("Idtmclust",
-  function(Idt, G=1:9, CovCase=1:4, SelCrit=c("BIC","AIC"), Mxt=c("Hom","Het","HomandHet"), control=EMControl())
+  function(Sdt, G=1:9, CovCase=1:4, SelCrit=c("BIC","AIC"), Mxt=c("Hom","Het","HomandHet"), control=EMControl())
   standardGeneric("Idtmclust"))
 
 setGeneric("pcoordplot",

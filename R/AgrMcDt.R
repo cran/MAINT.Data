@@ -3,7 +3,8 @@ AgrMcDt <- function(MicDtDF,agrby,agrcrt="minmax")
   mcall <- match.call()$MicDtDF
   if (length(mcall) > 1) mcall <- "microdata"
   if (!(is.data.frame(MicDtDF))) stop("First argument of AgMicroData must be a data frame.\n")
-  if (class(MicDtDF)[1]!="data.frame") MicDtDF <- as.data.frame(MicDtDF)
+#  if (class(MicDtDF)[1]!="data.frame") MicDtDF <- as.data.frame(MicDtDF)
+  if (!is.data.frame(MicDtDF)) MicDtDF <- as.data.frame(MicDtDF)
   if (any(!sapply(1:ncol(MicDtDF),function(ind) is.numeric(MicDtDF[,ind])))) {  
     stop(paste("Some of the columns of the",mcall,"data frame have non-numeric variables.\n"))
   }
@@ -21,7 +22,8 @@ AgrMcDt <- function(MicDtDF,agrby,agrcrt="minmax")
   if (!is.factor(agrby)) stop("Argument agrby is not a factor\n")
   globaln <- nrow(MicDtDF)
   if (length(agrby)!=globaln) stop("Size of the agrby argument does not agree with the number of rows in the MicDtDF data frame.\n") 
-  if ( agrcrt[1]!="minmax" && (class(agrcrt)[1]!="numeric" || length(agrcrt)!=2 || agrcrt[1]>=agrcrt[2] || agrcrt[1]<0. || agrcrt[2]>1.) )
+#  if ( agrcrt[1]!="minmax" && (class(agrcrt)[1]!="numeric" || length(agrcrt)!=2 || agrcrt[1]>=agrcrt[2] || agrcrt[1]<0. || agrcrt[2]>1.) )
+  if ( agrcrt[1]!="minmax" && (!is.numeric(agrcrt) || length(agrcrt)!=2 || agrcrt[1]>=agrcrt[2] || agrcrt[1]<0. || agrcrt[2]>1.) )
     stop(paste("Wrong value for the agrcrt argument\n( it should be either the string minmax or a two-dim vector",
                "\nof a prob. value for the lower percentile, followed by the prob. value for the upper percentile - \nex:c(0.05,0.95) ).\n")) 
    

@@ -1,6 +1,6 @@
 setMethod("Idtmclust",
-  signature(Idt = "IData"),
-  function(Idt, G=1:9, CovCase=1:4, SelCrit=c("BIC","AIC"), Mxt=c("Hom","Het","HomandHet"), control=EMControl())   
+  signature(Sdt = "IData"),
+  function(Sdt, G=1:9, CovCase=1:4, SelCrit=c("BIC","AIC"), Mxt=c("Hom","Het","HomandHet"), control=EMControl())   
   {
     pertubzVct <- function(z,maxprt) {
       maxzind <- which.max(z)
@@ -27,10 +27,10 @@ setMethod("Idtmclust",
     if (!is.finite(MaxSctEgvlRt)) SctEgvCnstr <- FALSE 
     else SctEgvCnstr <- TRUE 
 
-    if (class(G)!="integer") G <- as.integer(G)
-    if (class(CovCase)!="integer") CovCase <- as.integer(CovCase)
+    if (!is.integer(G)) G <- as.integer(G)
+    if (!is.integer(CovCase)) CovCase <- as.integer(CovCase)
 
-    X <- data.frame(c(Idt@MidP,Idt@LogR),row.names=rownames(Idt))
+    X <- data.frame(c(Sdt@MidP,Sdt@LogR),row.names=rownames(Sdt))
     n <- nrow(X)
     p <- ncol(X)
     q <- p/2
@@ -67,7 +67,7 @@ setMethod("Idtmclust",
         for (Cfi in nCases:1) {
           ind <- ind0+Cfi
           Cf <- CovCase[Cfi]
-          mleEst <- mle(Idt,CovCase=Cf)
+          mleEst <- mle(Sdt,CovCase=Cf)
           muSig <- coef(mleEst)
           if ( CheckSigmaSing(Cf,muSig$Sigma,limlnk2=log(k2max),scale=TRUE) == TRUE ) {
             warning(paste("No one group solution was produced for configuration case",Cf,
@@ -87,9 +87,9 @@ setMethod("Idtmclust",
           else if (Cf==3) Sigmapar <- p*(p/2+1)/2   
           else if (Cf==4) Sigmapar <- p
           if (Mxt=="HomandHet" || Mxt=="Hom") {
-            clusters <- rep("CP1",Idt@NObs)
-            names(clusters) <- Idt@ObsNames
-            RepresHom[[ind]] <- new("IdtMclustEl",NObs=Idt@NObs,NIVar=Idt@NIVar,SelCrit=SelCrit,Hmcdt=TRUE,Conf=Cf,nG=k,
+            clusters <- rep("CP1",Sdt@NObs)
+            names(clusters) <- Sdt@ObsNames
+            RepresHom[[ind]] <- new("IdtMclustEl",NObs=Sdt@NObs,NIVar=Sdt@NIVar,SelCrit=SelCrit,Hmcdt=TRUE,Conf=Cf,nG=k,
               logLik=Lik,alllnLik=Lik,bic=BIC,aic=AIC,z=matrix(1.,nrow=n,ncol=1,dimnames=list(Onames,"CP1")),classification=clusters,
               parameters=list(pro=NULL,mean=matrix(muSig$mu,ncol=1,dimnames=list(Vnames,"CP1")),
                 covariance=array(muSig$Sigma,dim=c(p,p,1),dimnames=list(Vnames,Vnames,NULL)))
@@ -99,9 +99,9 @@ setMethod("Idtmclust",
             HomAICs[ind] <- AIC
           }
           if (Mxt=="HomandHet" || Mxt=="Het") {
-            clusters <- rep("CP1",Idt@NObs)
-            names(clusters) <- Idt@ObsNames
-            RepresHet[[ind]] <- new("IdtMclustEl",NObs=Idt@NObs,NIVar=Idt@NIVar,SelCrit=SelCrit,Hmcdt=FALSE,Conf=Cf,nG=k,
+            clusters <- rep("CP1",Sdt@NObs)
+            names(clusters) <- Sdt@ObsNames
+            RepresHet[[ind]] <- new("IdtMclustEl",NObs=Sdt@NObs,NIVar=Sdt@NIVar,SelCrit=SelCrit,Hmcdt=FALSE,Conf=Cf,nG=k,
               logLik=Lik,alllnLik=Lik,bic=BIC,aic=AIC,z=matrix(1.,nrow=n,ncol=1,dimnames=list(Onames,"CP1")),classification=clusters,
               parameters=list(pro=NULL,mean=matrix(muSig$mu,ncol=1,dimnames=list(Vnames,"CP1")),
                 covariance=array(muSig$Sigma,dim=c(p,p,1),dimnames=list(Vnames,Vnames,"CP1")))
@@ -270,7 +270,7 @@ setMethod("Idtmclust",
                 nrep=nrep,Cf=Cf,Homoc=TRUE,maxiter=maxiter,protol=protol,k2max=k2max,
                 MaxSctEgvlRt=MaxSctEgvlRt,SctEgvCnstr=SctEgvCnstr,MaxVarGRt=MaxVarGRt,convtol=convtol)
 
-              RepresHom[[ind]] <- new("IdtMclustEl",NObs=Idt@NObs,NIVar=Idt@NIVar,SelCrit=SelCrit,Hmcdt=TRUE,Conf=Cf,nG=k,
+              RepresHom[[ind]] <- new("IdtMclustEl",NObs=Sdt@NObs,NIVar=Sdt@NIVar,SelCrit=SelCrit,Hmcdt=TRUE,Conf=Cf,nG=k,
                 logLik=FSol$BestSol$LnLik,alllnLik=FSol$alllnLik,bic=FSol$BestSol$BIC,aic=FSol$BestSol$AIC,
                 parameters=list(
                   pro=FSol$BestSol$tau,mean=FSol$BestSol$muk,covariance=array(FSol$BestSol$Sigma,dim=c(p,p,1),dimnames=list(Vnames,Vnames,NULL))
@@ -283,7 +283,7 @@ setMethod("Idtmclust",
 
             } else {
 
-              RepresHom[[ind]] <- new("IdtMclustEl",NObs=Idt@NObs,NIVar=Idt@NIVar,SelCrit=SelCrit,Hmcdt=TRUE,Conf=Cf,nG=k,
+              RepresHom[[ind]] <- new("IdtMclustEl",NObs=Sdt@NObs,NIVar=Sdt@NIVar,SelCrit=SelCrit,Hmcdt=TRUE,Conf=Cf,nG=k,
                 logLik=ISol$LnLik,alllnLik=ISol$LnLik,bic=ISol$BIC,aic=ISol$AIC,
                 parameters=list(
                   pro=ISol$tau,mean=ISol$muk,covariance=array(ISol$Sigma,dim=c(p,p,1),dimnames=list(Vnames,Vnames,NULL))
@@ -405,7 +405,7 @@ setMethod("Idtmclust",
                 nrep=nrep,Cf=Cf,Homoc=FALSE,maxiter=maxiter,protol=protol,k2max=k2max,
                 MaxSctEgvlRt=MaxSctEgvlRt,SctEgvCnstr=SctEgvCnstr,MaxVarGRt=MaxVarGRt,convtol=convtol)
             
-              RepresHet[[ind]] <- new("IdtMclustEl",NObs=Idt@NObs,NIVar=Idt@NIVar,SelCrit=SelCrit,Hmcdt=FALSE,Conf=Cf,nG=k,
+              RepresHet[[ind]] <- new("IdtMclustEl",NObs=Sdt@NObs,NIVar=Sdt@NIVar,SelCrit=SelCrit,Hmcdt=FALSE,Conf=Cf,nG=k,
                 logLik=FSol$BestSol$LnLik,alllnLik=FSol$alllnLik,bic=FSol$BestSol$BIC,aic=FSol$BestSol$AIC,
                 parameters=list(pro=FSol$BestSol$tau,mean=FSol$BestSol$muk,covariance=FSol$BestSol$Sigmak),
                 z=FSol$BestSol$z,classification=FSol$BestSol$clusters
@@ -416,7 +416,7 @@ setMethod("Idtmclust",
              
             } else {  
 
-              RepresHet[[ind]] <- new("IdtMclustEl",NObs=Idt@NObs,NIVar=Idt@NIVar,SelCrit=SelCrit,Hmcdt=FALSE,Conf=Cf,nG=k,
+              RepresHet[[ind]] <- new("IdtMclustEl",NObs=Sdt@NObs,NIVar=Sdt@NIVar,SelCrit=SelCrit,Hmcdt=FALSE,Conf=Cf,nG=k,
                 logLik=ISol$LnLik,alllnLik=ISol$LnLik,bic=ISol$BIC,aic=ISol$AIC,
                 parameters=list(pro=ISol$tau,mean=ISol$muk,covariance=ISol$Sigmak),
                 z=ISol$z,classification=ISol$clusters
@@ -461,7 +461,7 @@ setMethod("Idtmclust",
     }
      if (BestMxt=="Hom") {
        return (
-         new("IdtMclust",call=call,data=Idt,NObs=Idt@NObs,NIVar=Idt@NIVar,SelCrit=SelCrit,Hmcdt=TRUE,
+         new("IdtMclust",call=call,data=Sdt,NObs=Sdt@NObs,NIVar=Sdt@NIVar,SelCrit=SelCrit,Hmcdt=TRUE,
            BestC=RepresHom[[bestHomMod]]@Conf,BestG=RepresHom[[bestHomMod]]@nG,
            logLiks=c(HomlogLiks,HetlogLiks),BICs=c(HomBICs,HetBICs),AICs=c(HomAICs,HetAICs),
            logLik=RepresHom[[bestHomMod]]@logLik,bic=RepresHom[[bestHomMod]]@bic,aic=RepresHom[[bestHomMod]]@aic,
@@ -470,7 +470,7 @@ setMethod("Idtmclust",
          )
      }  else if (BestMxt=="Het") {  
        return (
-         new("IdtMclust",call=call,data=Idt,NObs=Idt@NObs,NIVar=Idt@NIVar,SelCrit=SelCrit,Hmcdt=FALSE,
+         new("IdtMclust",call=call,data=Sdt,NObs=Sdt@NObs,NIVar=Sdt@NIVar,SelCrit=SelCrit,Hmcdt=FALSE,
            BestC=RepresHet[[bestHetMod]]@Conf,BestG=RepresHet[[bestHetMod]]@nG,
            logLiks=c(HomlogLiks,HetlogLiks),BICs=c(HomBICs,HetBICs),AICs=c(HomAICs,HetAICs),
            logLik=RepresHet[[bestHetMod]]@logLik,bic=RepresHet[[bestHetMod]]@bic,aic=RepresHet[[bestHetMod]]@aic,

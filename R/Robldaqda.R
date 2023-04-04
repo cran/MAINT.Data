@@ -35,7 +35,6 @@ setMethod("Roblda",
     MxtDEst <- RobMxtDEst(x,grouping,Mxt="Hom",CovCase=CovCase,SelCrit=SelCrit,CovEstMet=CovEstMet,...)
     nk <- as.numeric(table(grouping))
     if (sum(nk)!=n)  { stop("Dimensions of the x and grouping arguments do not agree with each other\n") }
-#    glbmeans <- colMeans(cbind(x@MidP,x@LogR))
     glbmeans <- c(colMeans(x@MidP),colMeans(x@LogR))
     mugdev <- scale(MxtDEst@RobNmuE,center=glbmeans,scale=FALSE)
     vnames <- unlist(dimnames(MxtDEst@RobNmuE)[2]) 
@@ -43,15 +42,14 @@ setMethod("Roblda",
     for (g in 1:k) B <- B + (nk[g]/n) * outer(mugdev[g,],mugdev[g,]) 
     selmodel <- BestModel(MxtDEst)
 
-#    Ilda(Conf=selmodel,p=p,nk=nk,prior=prior,means=MxtDEst@RobNmuE,W=MxtDEst@CovConfCases[[selmodel]]$RobSigE,B=B,egvtol=egvtol,...)
-    Ilda(Conf=selmodel,p=p,nk=nk,prior=prior,means=MxtDEst@RobNmuE,W=MxtDEst@CovConfCases[[selmodel]]$RobSigE,B=B,egvtol=egvtol,limlnk2=limlnk2)
+#    Ilda(Conf=selmodel,p=p,nk=nk,prior=prior,means=MxtDEst@RobNmuE,W=MxtDEst@CovConfCases[[selmodel]]$RobSigE,B=B,egvtol=egvtol,limlnk2=limlnk2)
+    Slda(Conf=selmodel,p=p,nk=nk,prior=prior,means=MxtDEst@RobNmuE,W=MxtDEst@CovConfCases[[selmodel]]$RobSigE,B=B,egvtol=egvtol,limlnk2=limlnk2)
   }
 )
 
 setMethod("Robqda",
   signature(x = "IData"),
   function(x, grouping, prior="proportions", CVtol=1.0e-5, subset=1:nrow(x),
-#    CovCase=1:4, SelCrit=c("BIC","AIC"), silent=FALSE, SngDMet=c("fasttle","fulltle"),
     CovCase=1:4, SelCrit=c("BIC","AIC"), silent=FALSE, SngDMet=c("fasttle","fulltle"), k2max=1e6,
       Robcontrol=RobEstControl(), ...) 
   {
@@ -81,7 +79,7 @@ setMethod("Robqda",
     selmodel <- BestModel(MxtDEst)
 
 #    Iqda(Conf=selmodel,p=2*x@NIVar,nk=as.numeric(table(grouping)),lev=grplvls,
-    Iqda(Conf=selmodel,p=2*x@NIVar,nk=as.numeric(table(grouping)),lev=grplvls,limlnk2=limlnk2,
+    Sqda(Conf=selmodel,p=2*x@NIVar,nk=as.numeric(table(grouping)),lev=grplvls,limlnk2=limlnk2,
       prior=prior,means=MxtDEst@RobNmuE,Wg=coef(MxtDEst,selmodel)$Sigma)
   }
 )

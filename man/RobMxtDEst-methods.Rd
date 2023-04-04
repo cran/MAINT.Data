@@ -9,13 +9,13 @@
 
 \usage{
 
-\S4method{RobMxtDEst}{IData}(Idt, grouping, Mxt=c("Hom","Het"), CovEstMet=c("Pooled","Globdev"),
+\S4method{RobMxtDEst}{IData}(Sdt, grouping, Mxt=c("Hom","Het"), CovEstMet=c("Pooled","Globdev"),
     CovCase=1:4, SelCrit=c("BIC","AIC"), Robcontrol=RobEstControl(),
     l1medpar=NULL, \dots)
 }
 
 \arguments{
-  \item{Idt}{An IData object representing interval-valued entities.}
+  \item{Sdt}{An IData object representing interval-valued entities.}
   \item{grouping}{Factor indicating the group to which each observation belongs to.}
   \item{Mxt}{Indicates the type of mixing distributions to be considered. Current alternatives are \dQuote{Hom} (homocedastic) and \dQuote{Het} (hetereocedasic).}
   \item{CovEstMet}{Method used to estimate the common covariance matrix. Alternatives are \dQuote{Pooled} (default) for a pooled average of the the robust within-groups covariance estimates, and \dQuote{Globdev} for a global estimate based on all deviations from the groups multivariate l_1 medians. \cr

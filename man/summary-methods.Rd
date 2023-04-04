@@ -6,7 +6,8 @@
 \description{summary methods for the classe IdtMclust defined in Package `MAINT.Data'.}
 
 \usage{
- \S4method{summary}{IdtMclust}(object, parameters = FALSE, classification = FALSE, model = "BestModel", \dots)
+ \S4method{summary}{IdtMclust}(object, parameters = FALSE, classification = FALSE, model = "BestModel", 
+ ShowClassbyOBs = FALSE, \dots)
 }
 
 \arguments{
@@ -14,6 +15,7 @@
   \item{parameters}{A boolean flag indicating if the parameter estimates of the optimal mixture should be displayed}
   \item{classification}{A boolean flag indicating if the crisp classification resulting from the optimal mixture should be displayed}
   \item{model}{A character vector specifying the the model whose solution is to be displayed.}
+  \item{ShowClassbyOBs}{A boolean flag indicating if class membership should shown by observation or by class (default)}. 
   \item{\dots}{Other named arguments.}
 }
 
@@ -24,7 +26,3 @@
 
 \keyword{methods}
 \keyword{interval data}
-
-
-
-

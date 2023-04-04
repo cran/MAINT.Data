@@ -1,7 +1,15 @@
-########## Version 2.6.2 (September 2021) ###################
+########## Versions 2.7.0 and 2.7.1 (April 2023) ###################
 
-Version 2.6.2 ensures compatibility with the upcoming CRAN enforcement of STRICT_R_HEADERS 
-by changing the constant PI to M_I in the source code.
+Versions 2.7.0 and 2.7.1 implement the following changes:
+
+1)  Arguments named Idt (Interval-valued objects) by Sdt (Symbolic data objects)
+    in generic functions that may be exported and extended to packages moddeling 
+    other types of symbolic data (ex: histogram or distritutional data).
+
+2)  The summary method for IdtMclust objects includes an additional argument indicating 
+    if class membership should shown observation by observation or class by clas (default) 
+
+3)  Some previously unitiallized variables in the C code, are now properly initialized. 
 
 ########## Version 2.6.1 (May 2021) ###################
 

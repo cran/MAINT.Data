@@ -8,19 +8,17 @@
 \description{Performs maximum likelihood estimation for parametric models of interval data}
 
 \usage{
-
-\S4method{mle}{IData}(Idt, Model=c("Normal","SKNormal","NrmandSKN"), CovCase=1:4,
-  SelCrit=c("BIC","AIC"), k2max=1e6, OptCntrl=list(), \dots)
-
+\S4method{mle}{IData}(Sdt, Model="Normal", CovCase="AllC", SelCrit=c("BIC","AIC"), 
+  k2max=1e6, OptCntrl=list(), \dots)
 }
 
 \arguments{
-  \item{Idt}{An IData object representing interval-valued units.}
+  \item{Sdt}{An IData object representing interval-valued units.}
 
   \item{Model}{The joint distribution assumed for the MidPoint and LogRanges. Current alternatives are \dQuote{Normal} for Gaussian
 distributions, \dQuote{SNNormal} for Skew-Normal and \dQuote{NrmandSKN} for both Gaussian and Skew-Normal distributions.}
 
-  \item{CovCase}{Configuration of the variance-covariance matrix: a set of integers between 1 and 4.}
+  \item{CovCase}{Configuration of the variance-covariance matrix: The string \dQuote{AllC}  for all possible configurations (default), or a set of integers between 1 and 4.}
 
    \item{SelCrit}{The model selection criterion.}
 

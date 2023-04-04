@@ -1,5 +1,5 @@
-#Ilda <- function(Conf,p,nk,prior,means,W,B,egvtol)
-Ilda <- function(Conf,p,nk,prior,means,W,B,egvtol,limlnk2)
+#Ilda <- function(Conf,p,nk,prior,means,W,B,egvtol,limlnk2)
+Slda <- function(Conf,p,nk,prior,means,W,B,egvtol,limlnk2,RtType="Idtlda")
 {
   N <- sum(nk)
   k <- length(nk) 
@@ -9,11 +9,10 @@ Ilda <- function(Conf,p,nk,prior,means,W,B,egvtol,limlnk2)
 
   if (prior[1]=="proportions") { prior <- nk/N }
   names(prior) <- rownames(means)
-#  Wi <- pdwt.solve(W)					
-#  Wi <- pdwt.solve(W,silent=TRUE)
   Wi <- Safepdsolve(W,maxlnk2=limlnk2,scale=TRUE)
   if (is.null(Wi)) {
-    warning("Ilda function received a singular matrix in the  W argument\n")
+#    warning("Ilda function received a singular matrix in the  W argument\n")
+    warning("Slda function received a singular matrix in the  W argument\n")
     return(NULL)
   }
   WiBdecp <- eigen(Wi%*%B)
@@ -40,7 +39,8 @@ Ilda <- function(Conf,p,nk,prior,means,W,B,egvtol,limlnk2)
     scaling <- diag(1/sqrt(diag(W)))
     dimnames(scaling) <- list(rownames(W),paste("LD",1:p,sep=""))
   }
-  new("Idtlda",prior=prior,means=means,scaling=scaling,N=N,CovCase=Conf) 
+#  new("Idtlda",prior=prior,means=means,scaling=scaling,N=N,CovCase=Conf) 
+  new(RtType, prior=prior,means=means,scaling=scaling,N=N,CovCase=Conf) 
 }
 
 setMethod("lda",
@@ -74,8 +74,8 @@ setMethod("lda",
     B <- matrix(0.,nrow=p,ncol=p,dimnames=list(vnames,vnames))
     for (g in 1:k) B <- B + (nk[g]/n)*outer(mugdev[g,],mugdev[g,]) 
 
-#    Ilda(Conf=selmodel,p=p,nk=nk,prior=prior,means=grpmeans,W=coef(x,selmodel)$Sigma,B=B,egvtol=egvtol,...)
-    Ilda(Conf=selmodel,p=p,nk=nk,prior=prior,means=grpmeans,W=coef(x,selmodel)$Sigma,B=B,egvtol=egvtol,limlnk2=limlnk2,...)
+#    Ilda(Conf=selmodel,p=p,nk=nk,prior=prior,means=grpmeans,W=coef(x,selmodel)$Sigma,B=B,egvtol=egvtol,limlnk2=limlnk2,...)
+    Slda(Conf=selmodel,p=p,nk=nk,prior=prior,means=grpmeans,W=coef(x,selmodel)$Sigma,B=B,egvtol=egvtol,limlnk2=limlnk2,...)
   }
 )
 
@@ -93,8 +93,8 @@ setMethod("lda",
        }  else { stop("Trying to compute a linear discriminant function from a model with non-finite log-likelihood\n") }
     }
     W <- coef(H1res(x),selmodel)$Sigma
-    Ilda(Conf=selmodel,p=2*x@NIVar,nk=as.numeric(table(x@grouping)),prior=prior,
-#      means=coef(H1res(x))$mu,W=W,B=coef(H0res(x),selmodel)$Sigma-W,egvtol=egvtol)
+#    Ilda(Conf=selmodel,p=2*x@NIVar,nk=as.numeric(table(x@grouping)),prior=prior,
+    Slda(Conf=selmodel,p=2*x@NIVar,nk=as.numeric(table(x@grouping)),prior=prior,
       means=coef(H1res(x))$mu,W=W,B=coef(H0res(x),selmodel)$Sigma-W,egvtol=egvtol,limlnk2=limlnk2)
   }
 )
@@ -115,8 +115,8 @@ setMethod("lda",
         }  else { stop("Trying to compute a linear discriminant function from a model with non-finite log-likelihood\n") }
      }
      W <- coef(H1res(x),selmodel)$Sigma
-     Ilda(Conf=selmodel,p=2*x@NIVar,nk=as.numeric(table(x@grouping)),prior=prior,
-#       means=coef(H1res)$mu,W=W,B=coef(H0res(x),selmodel)$Sigma-W,egvtol=egvtol)
+#     Ilda(Conf=selmodel,p=2*x@NIVar,nk=as.numeric(table(x@grouping)),prior=prior,
+     Slda(Conf=selmodel,p=2*x@NIVar,nk=as.numeric(table(x@grouping)),prior=prior,
        means=coef(H1res)$mu,W=W,B=coef(H0res(x),selmodel)$Sigma-W,egvtol=egvtol,limlnk2=limlnk2)
   }
 )
@@ -173,7 +173,8 @@ setMethod("lda",
     for (g in 1:k) B <- B + (nk[g]/n) * outer(mugdev[g,],mugdev[g,]) 
     selmodel <- BestModel(MxtDEst)
 
-    Ilda(Conf=selmodel,p=p,nk=nk,prior=prior,means=grpmeans,W=coef(MxtDEst,selmodel)$Sigma,B=B,egvtol=egvtol,limlnk2=limlnk2,...)
+#    Ilda(Conf=selmodel,p=p,nk=nk,prior=prior,means=grpmeans,W=coef(MxtDEst,selmodel)$Sigma,B=B,egvtol=egvtol,limlnk2=limlnk2,...)
+    Slda(Conf=selmodel,p=p,nk=nk,prior=prior,means=grpmeans,W=coef(MxtDEst,selmodel)$Sigma,B=B,egvtol=egvtol,limlnk2=limlnk2,...)
   }
 )
 
@@ -211,7 +212,8 @@ setMethod("show",
   }
 )
 
-Iqda <- function(Conf,p,nk,lev,prior,means,Wg,limlnk2)
+#Iqda <- function(Conf,p,nk,lev,prior,means,Wg,limlnk2)
+Sqda <- function(Conf,p,nk,lev,prior,means,Wg,limlnk2,RtType="Idtqda")
 {
   N <- sum(nk)
   k <- length(nk) 
@@ -240,7 +242,8 @@ Iqda <- function(Conf,p,nk,lev,prior,means,Wg,limlnk2)
       ldet[g] <- sum(log(Wd))/2
     }
   }  
-  new("Idtqda",prior=prior,means=means,scaling=scaling,ldet=ldet,lev=lev,CovCase=Conf) 
+#  new("Idtqda",prior=prior,means=means,scaling=scaling,ldet=ldet,lev=lev,CovCase=Conf) 
+  new(RtType, prior=prior,means=means,scaling=scaling,ldet=ldet,lev=lev,CovCase=Conf) 
 }
 
 setMethod("qda",
@@ -262,7 +265,8 @@ setMethod("qda",
        }  else { stop("Trying to compute a quadratic discriminant function from a model with non-finite log-likelihood\n") }
     }
 
-    Iqda(Conf=selmodel,p=2*x@NIVar,nk=as.numeric(table(x@grouping)),lev=levels(x@grouping),
+#    Iqda(Conf=selmodel,p=2*x@NIVar,nk=as.numeric(table(x@grouping)),lev=levels(x@grouping),
+    Sqda(Conf=selmodel,p=2*x@NIVar,nk=as.numeric(table(x@grouping)),lev=levels(x@grouping),
       prior=prior,means=coef(x)$mu,Wg=coef(x,selmodel)$Sigma,limlnk2=limlnk2)
   }
 )
@@ -281,7 +285,8 @@ setMethod("qda",
         stop("Trying to compute a quadratic discriminant function from a model with non-finite log-likelihood\n")
       }
     }
-    Iqda(Conf=selmodel,p=2*x@NIVar,nk=as.numeric(table(x@grouping)),lev=levels(x@grouping),
+#    Iqda(Conf=selmodel,p=2*x@NIVar,nk=as.numeric(table(x@grouping)),lev=levels(x@grouping),
+    Sqda(Conf=selmodel,p=2*x@NIVar,nk=as.numeric(table(x@grouping)),lev=levels(x@grouping),
       prior=prior,means=coef(H1res(x))$mu,Wg=coef(H1res(x),selmodel)$Sigma,limlnk2=limlnk2)
   }
 )
@@ -302,7 +307,8 @@ setMethod("qda",
         stop("Trying to compute a quadratic discriminant function from a model with non-finite log-likelihood\n")
       }
     }
-    Iqda(Conf=selmodel,p=2*x@NIVar,nk=as.numeric(table(x@grouping)),lev=levels(x@grouping),
+#    Iqda(Conf=selmodel,p=2*x@NIVar,nk=as.numeric(table(x@grouping)),lev=levels(x@grouping),
+    Sqda(Conf=selmodel,p=2*x@NIVar,nk=as.numeric(table(x@grouping)),lev=levels(x@grouping),
       prior=prior,means=coef(H1res)$mu,Wg=coef(H1res,selmodel)$Sigma,limlnk2=limlnk2)
   }
 )
@@ -314,7 +320,7 @@ setMethod("qda",
   {
     limlnk2 <- log(k2max)
     SelCrit <- match.arg(SelCrit)
-    if (x@NIVar==2) CovCase <- q1CovCase(CovCase) 
+#    if (x@NIVar==2) CovCase <- q1CovCase(CovCase) 
 
     Config <- getConfig(...)
     if (is.null(Config))  
@@ -349,7 +355,8 @@ setMethod("qda",
     MxtDEst <- IdtHetMxtNmle(x,grouping,CVtol=CVtol,CovCaseArg=CovCaseArg,Config=Config,SelCrit=SelCrit,...)
     selmodel <- BestModel(MxtDEst)
 
-    Iqda(Conf=selmodel,p=2*x@NIVar,nk=as.numeric(table(grouping)),lev=grplvls,
+#    Iqda(Conf=selmodel,p=2*x@NIVar,nk=as.numeric(table(grouping)),lev=grplvls,
+    Sqda(Conf=selmodel,p=2*x@NIVar,nk=as.numeric(table(grouping)),lev=grplvls,
       prior=prior,means=coef(MxtDEst)$mu,Wg=coef(MxtDEst,selmodel)$Sigma,limlnk2=limlnk2)
   }
 )

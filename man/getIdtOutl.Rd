@@ -5,7 +5,7 @@
 
 \description{Identifies outliers in a data set of Interval-valued variables}
 
-\usage{getIdtOutl(Idt, IdtE=NULL, muE=NULL, SigE=NULL,
+\usage{getIdtOutl(Sdt, IdtE=NULL, muE=NULL, SigE=NULL,
   eta=0.025, Rewind=NULL, m=length(Rewind),
   RefDist=c("ChiSq","HardRockeAdjF","HardRockeAsF","CerioliBetaF"),
   multiCmpCor=c("never","always","iterstep"), 
@@ -14,7 +14,7 @@
 
 
 \arguments{
-    \item{Idt}{An IData object representing interval-valued entities.}
+    \item{Sdt}{An IData object representing interval-valued entities.}
 
     \item{IdtE}{Ao object of class \code{\linkS4class{IdtSngNDRE}} or \code{\linkS4class{IdtSngNDE}} containing mean and covariance estimates.}
 

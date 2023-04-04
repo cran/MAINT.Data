@@ -1,6 +1,6 @@
 setMethod("RobMxtDEst",
-  signature(Idt = "IData"),
-  function(Idt,grouping,Mxt=c("Hom","Het"),CovEstMet=c("Pooled","Globdev"),
+  signature(Sdt = "IData"),
+  function(Sdt,grouping,Mxt=c("Hom","Het"),CovEstMet=c("Pooled","Globdev"),
     CovCase=1:4,SelCrit=c("BIC","AIC"),Robcontrol=RobEstControl(), l1medpar=NULL, ...)
   {
     if (!requireNamespace("robustbase",quietly=TRUE)) 
@@ -23,8 +23,8 @@ setMethod("RobMxtDEst",
     m <- Robcontrol@m
     otpType <- Robcontrol@otpType
 
-    n <- Idt@NObs  
-    p <- 2*Idt@NIVar  
+    n <- Sdt@NObs  
+    p <- 2*Sdt@NIVar  
     if (p==2) CovCase <- q1CovCase(CovCase) 
     if (n <=p) {
       stop("The number of observations is too small (not larger than the total number of variables) and would lead to singular covariance estimates.\n")
@@ -42,8 +42,7 @@ setMethod("RobMxtDEst",
     }
     ngrps <- length(ng)
     grpRobE <- vector("list",ngrps)
-#    Xnams <- names(cbind(Idt@MidP,Idt@LogR))
-    Xnams <- c(names(Idt@MidP),names(Idt@LogR))
+    Xnams <- c(names(Sdt@MidP),names(Sdt@LogR))
     anams <- list(Xnams,Xnams,grplvls)
     RobNmuE <- matrix(nrow=ngrps,ncol=p,dimnames=list(grplvls,Xnams))
 
@@ -76,8 +75,7 @@ setMethod("RobMxtDEst",
 
     if (Mxt=="Hom" && CovEstMet=="Globdev")
     {
-#      X <- cbind(Idt@MidP,Idt@LogR)
-      X <- cbind(Idt@MidP,Idt@LogR)
+      X <- cbind(Sdt@MidP,Sdt@LogR)
       Xdev <- matrix(nrow=n,ncol=p) 
       Xgl1med <- matrix(nrow=ngrps,ncol=p) 
       if (!is.null(l1medpar)) {
@@ -117,7 +115,7 @@ setMethod("RobMxtDEst",
           if (CovEstMet=="Pooled")  {
             X <- NULL
             for (g in 1:ngrps)  {      # Things to do: add a fulltle option !!!
-              Idtg <- Idt[grouping==grplvls[g],]
+              Idtg <- Sdt[grouping==grplvls[g],]
               grpRobE[[g]] <- fasttle(Idtg,CovC,SelCrit,
                  getalpha="NO",control=Robcontrol, ...)
               RobNmuE[g,] <- grpRobE[[g]]@RobNmuE
@@ -129,7 +127,7 @@ setMethod("RobMxtDEst",
           }
           else if (CovEstMet=="Globdev") {
             if  (getkdblstar=="Twopplusone") { 
-              kdblstar <- 2*Idt@NIVar+1
+              kdblstar <- 2*Sdt@NIVar+1
             }  else {
               if (!is.finite(getkdblstar)) {
                 stop("Wrong value for Robcontrol parameter getkdblstar\n")
@@ -137,7 +135,7 @@ setMethod("RobMxtDEst",
               kdblstar <- getkdblstar 
             }
             RobE <- fasttle1(Xdev,CovC,SelCrit,alpha,nsamp,ncsteps,trace,use.correction,kdblstar,outlin,trialmethod,m,
-              reweighted,otpType,Idt@VarNames,...)
+              reweighted,otpType,Sdt@VarNames,...)
             for (g in 1:ngrps)  RobNmuE[g,] <- Xgl1med[g,] + RobE@RobNmuE
             CovConfC[[CovC]]$RobSigE <- RobE@CovConfCases[[CovC]]$RobSigE 
           }
@@ -153,7 +151,7 @@ setMethod("RobMxtDEst",
         }  else if (Mxt=="Het") {
           CovConfC[[CovC]] <- list( RobSigE=array(dim=c(p,p,ngrps),dimnames=anams),logLik=NULL,AIC=NULL,BIC=NULL )
           for (g in 1:ngrps) {
-            grpRobE[[g]] <- fasttle(Idt[grouping==grplvls[g],],CovC,SelCrit,
+            grpRobE[[g]] <- fasttle(Sdt[grouping==grplvls[g],],CovC,SelCrit,
               getalpha="NO",control=Robcontrol, ...)
             RobNmuE[g,] <- grpRobE[[g]]@RobNmuE
             CovConfC[[CovC]]$RobSigE[,,g] <- grpRobE[[g]]@CovConfCases[[CovC]]$RobSigE
@@ -180,14 +178,8 @@ setMethod("RobMxtDEst",
             PerfSt$RepLogLik[[CovC]][,g] <- grpRobE[[g]]@PerfSt$RepLogLik[[CovC]]
             maxnSteps <- ncol(grpRobE[[g]]@PerfSt$StpLogLik[[CovC]])
             PerfSt$StpLogLik[[CovC]][,1:maxnSteps,g] <- grpRobE[[g]]@PerfSt$StpLogLik[[CovC]]
-#            nSteps <- ncol(grpRobE[[g]]@PerfSt$StpLogLik[[CovC]])
-#            tmpStpLogLik[,1:nSteps,g] <- grpRobE[[g]]@PerfSt$StpLogLik[[CovC]]
-#            maxnSteps <- max(maxnSteps,nSteps)
           }
         }
-#        if (Steps==nSteps && otpType=="SetMD2EstandPrfSt") {
-#          PerfSt$StpLogLik[[CovC]] <- array(tmpStpLogLik[,1:maxnSteps,],dim=c(nsamp,maxnSteps,ngrps),dimnames=list(Repnames,Stepnames[1:maxnSteps],grplvls)
-#        }
       }
       if (SelCrit=="AIC")  {
         bestmod = which.min(AICs)
@@ -197,7 +189,7 @@ setMethod("RobMxtDEst",
 
       if(getalpha=="TwoStep" && Steps==1)
       {
-        X <- data.frame(cbind(Idt@MidP,Idt@LogR))
+        X <- data.frame(cbind(Sdt@MidP,Sdt@LogR))
         nOtls <- 0.
         for (g in 1:ngrps)
         {
