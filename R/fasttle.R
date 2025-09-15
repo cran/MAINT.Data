@@ -22,7 +22,7 @@ setMethod("fasttle",
     k2max = control@k2max,
     otpType=control@otpType,
     control=RobEstControl(), ...)
-  {
+  { 
     limlnk2 <- log(k2max)
 
     q <- Sdt@NIVar
@@ -120,6 +120,7 @@ setMethod("fasttle",
 
 fasttle1 <- function(data,CovCase,SelCrit,alpha,nsamp,ncsteps,trace,use.correction,
   rawMD2Dist,eta,multiCmpCor,kdblstar,outlin,trialmethod,m,reweighted,limlnk2,otpType,...)
+    
 {
   datatype <- class(data)
   if (datatype!="IData" && datatype!="matrix" && datatype!="data.frame")  {
@@ -168,7 +169,6 @@ fasttle1 <- function(data,CovCase,SelCrit,alpha,nsamp,ncsteps,trace,use.correcti
   {
     n <- data@NObs  
     if (outlin=="MidPandLogR")  {
-#      X <- as.matrix(cbind(data@MidP,data@LogR))
       X <- as.matrix(cbind(data@MidP,data@LogR))
       p <- 2*data@NIVar
     }  else {
@@ -212,7 +212,7 @@ fasttle1 <- function(data,CovCase,SelCrit,alpha,nsamp,ncsteps,trace,use.correcti
           ClctSt <- FALSE
         }          
         Cftmpsol <- Rfasttle(data,kdblstar,k,nsamp,2,SelCrit,maxrefstps=ncsteps,...)
-      }  else {
+      }  else {      
         Cftmpsol <- .Call( "Cfasttle", X, n, p, Poolm, m, kdblstar, k, nsamp, Cnf,
           c0, ncsteps, limlnk2, ClctSt,  PACKAGE = "MAINT.Data" )
         if (!is.null(Cftmpsol$Set)) {
@@ -352,6 +352,7 @@ fasttle1 <- function(data,CovCase,SelCrit,alpha,nsamp,ncsteps,trace,use.correcti
     }
 
     bestsol <- IdtNmle(data[RewghtdSet,],CovCaseArg=CovCaseArg,Config=Config,SelCrit=SelCrit)
+
     for (Cnf in Config) {
       CvCase <- CovCaseMap[Cnf]	
       names(bestsol@CovConfCases[[CvCase]])[which(names(bestsol@CovConfCases[[CvCase]])=="mleSigE")] <- "RobSigE" 

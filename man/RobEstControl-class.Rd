@@ -4,7 +4,7 @@
 
 \title{Class 'RobEstControl' - contains control parameters for the robust estimation of parametric interval data models.}
 \description{
-    This class extends the \code{CovControlMcd} class
+    This class extends the \link[rrcov:CovControlMcd-class]{CovControlMcd} class
     and contains control parameters for the robust estimation of parametric interval data models.
 }
 \section{Objects from the Class}{
@@ -13,15 +13,15 @@ or by calling the constructor-function \code{RobEstControl}.
 }
 \section{Slots}{
   \describe{
-    \item{\code{alpha}:}{Inherited from class \code{"CovControlMcd"}. Numeric parameter controlling the size of the subsets over which the trimmed likelihood is maximized; roughly alpha*nrow(Sdt) observations are used for computing the trimmed likelihood. Allowed values are between 0.5 and 1.
+    \item{\code{alpha}:}{Inherited from class \code{"rrcov::CovControlMcd"}. Numeric parameter controlling the size of the subsets over which the trimmed likelihood is maximized; roughly alpha*nrow(Sdt) observations are used for computing the trimmed likelihood. Allowed values are between 0.5 and 1.
 Note that when argument \sQuote{getalpha} is set to \dQuote{TwoStep} the final value of \sQuote{alpha} is estimated by a two-step procedure and the value of argument \sQuote{alpha} is only used to specify the size of the samples used in the first step.}
-    \item{\code{nsamp}:}{Inherited from class \code{"CovControlMcd"}. Number of subsets used for initial estimates.}
-    \item{\code{scalefn}:}{Inherited from class \code{"CovControlMcd"} and not used in the package \sQuote{Maint.Data.}}
-    \item{\code{maxcsteps}:}{Inherited from class \code{"CovControlMcd"} and not used in the package \sQuote{Maint.Data.}}
-    \item{\code{seed}:}{Inherited from class \code{"CovControlMcd"}. Starting value for random generator. Default is \code{seed = NULL.}}
-    \item{\code{use.correction}:}{Inherited from class \code{"CovControlMcd"}. Whether to use finite sample correction factors.
+    \item{\code{nsamp}:}{Inherited from class \code{"rrcov::CovControlMcd"}. Number of subsets used for initial estimates.}
+    \item{\code{scalefn}:}{Inherited from class \code{"rrcov::CovControlMcd"} and not used in the package \sQuote{Maint.Data.}}
+    \item{\code{maxcsteps}:}{Inherited from class \code{"rrcov::CovControlMcd"} and not used in the package \sQuote{Maint.Data.}}
+    \item{\code{seed}:}{Inherited from class \code{"rrcov::CovControlMcd"}. Starting value for random generator. Default is \code{seed = NULL.}}
+    \item{\code{use.correction}:}{Inherited from class \code{"rrcov::CovControlMcd"}. Whether to use finite sample correction factors.
 Default is \code{use.correction=TRUE}.}
-    \item{\code{trace}, \code{tolSolve}:}{Inherited from class \code{"CovControl"}.} 
+    \item{\code{trace}, \code{tolSolve}:}{Inherited from class \code{"rrcov::CovControl"}.} 
     \item{\code{ncsteps}:}{The maximum number of concentration steps used each iteration of the fasttle algorithm.}
     \item{\code{getalpha}:}{Argument specifying if the \sQuote{alpha} parameter (roughly the percentage of the sample used for computing the trimmed likelihood) should be estimated from the data, or if the value of the argument \sQuote{alpha} should be used instead. When set to \dQuote{TwoStep}, \sQuote{alpha} is estimated by a two-step procedure with the value of argument \sQuote{alpha} specifying the size of the samples used in the first step. Otherwise, with the value of argument \sQuote{alpha} is used directly.}   
     \item{\code{rawMD2Dist}:}{The assumed reference distribution of the raw MCD squared distances, which is used to find to cutoffs defining the observations kept in one-step reweighted MCD estimates. Alternatives are \sQuote{ChiSq},\sQuote{HardRockeAsF} and \sQuote{HardRockeAdjF}, respectivelly for the usual Chi-squared, and the asymptotic and adjusted scaled F distributions proposed by Hardin and Rocke (2005).}    
@@ -39,8 +39,8 @@ Default is \code{use.correction=TRUE}.}
 }
 
 \section{Extends}{
-    Class \code{\linkS4class{CovControlMcd}}, directly.
-    Class \code{\linkS4class{CovControl}} by CovControlMcd, distance 2.
+    Class \link[rrcov:CovControlMcd-class]{CovControlMcd}, directly.
+    Class \link[rrcov:CovControl-class]{CovControl} by rrcov::CovControlMcd, distance 2.
 }
 
 \section{Methods}{

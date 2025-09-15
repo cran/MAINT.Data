@@ -1,10 +1,12 @@
 Package: MAINT.Data
 Type: Package
 Title: Model and Analyse Interval Data
-Version: 2.7.1
-Date: 2023-04-04
-Author: Pedro Duarte Silva <psilva@ucp.pt>, Paula Brito
-    <mpbrito.fep.up.pt>
+Version: 2.7.2
+Date: 2025-09-15
+Authors@R: c(person("Pedro", "Duarte Silva", role=c("aut","cre"), email="psilva@ucp.pt"), 
+             person("Paula", "Brito", role="aut",  email="mpbrito@fep.pt"))
+Author: Pedro Duarte Silva [aut, cre],
+  Paula Brito [aut]
 Maintainer: Pedro Duarte Silva <psilva@ucp.pt>
 Description: Implements methodologies for modelling interval data by Normal
     and Skew-Normal distributions, considering appropriate parameterizations of
@@ -22,6 +24,6 @@ Imports: MASS, miscTools, robustbase, rrcov, pcaPP, mclust, ggplot2,
 Suggests: testthat
 LinkingTo: Rcpp, RcppArmadillo (>= 0.9.500.2.0)
 NeedsCompilation: yes
-Packaged: 2023-04-04 07:45:36 UTC; antonio
+Packaged: 2025-09-15 21:25:20 UTC; antonio
 Repository: CRAN
-Date/Publication: 2023-04-04 08:10:02 UTC
+Date/Publication: 2025-09-15 21:50:02 UTC

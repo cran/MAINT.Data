@@ -212,13 +212,12 @@ setMethod("show",
   }
 )
 
-#Iqda <- function(Conf,p,nk,lev,prior,means,Wg,limlnk2)
 Sqda <- function(Conf,p,nk,lev,prior,means,Wg,limlnk2,RtType="Idtqda")
 {
   N <- sum(nk)
   k <- length(nk) 
   vnames <- colnames(means)
-  scaling <- array(dim=c(p,p,k),dimnames=list(vnames,paste("LD",1:p,sep=""),lev))
+  scaling <- array(dim=c(p,p,k),dimnames=list(vnames,vnames,lev))
   ldet <- numeric(k)
 
   if (prior[1]=="proportions") prior <- nk/N
@@ -228,7 +227,6 @@ Sqda <- function(Conf,p,nk,lev,prior,means,Wg,limlnk2,RtType="Idtqda")
   {
     if (Conf != 5)
     {
-#      scaling[,,g] <- backsolve(chol(Wg[,,g]),Ip)
       scalingg <- Safepdsolve(Wg[,,g],maxlnk2=limlnk2,scale=TRUE)
       if (is.null(scalingg)) {
         warning("Found a non positive definite within group matrix\n")
@@ -242,7 +240,7 @@ Sqda <- function(Conf,p,nk,lev,prior,means,Wg,limlnk2,RtType="Idtqda")
       ldet[g] <- sum(log(Wd))/2
     }
   }  
-#  new("Idtqda",prior=prior,means=means,scaling=scaling,ldet=ldet,lev=lev,CovCase=Conf) 
+   
   new(RtType, prior=prior,means=means,scaling=scaling,ldet=ldet,lev=lev,CovCase=Conf) 
 }
 
@@ -355,7 +353,6 @@ setMethod("qda",
     MxtDEst <- IdtHetMxtNmle(x,grouping,CVtol=CVtol,CovCaseArg=CovCaseArg,Config=Config,SelCrit=SelCrit,...)
     selmodel <- BestModel(MxtDEst)
 
-#    Iqda(Conf=selmodel,p=2*x@NIVar,nk=as.numeric(table(grouping)),lev=grplvls,
     Sqda(Conf=selmodel,p=2*x@NIVar,nk=as.numeric(table(grouping)),lev=grplvls,
       prior=prior,means=coef(MxtDEst)$mu,Wg=coef(MxtDEst,selmodel)$Sigma,limlnk2=limlnk2)
   }

@@ -8,7 +8,7 @@
 
 \usage{
   \S4method{plot}{IdtOutl,missing}(x, scale=c("linear","log"), RefDist=getRefDist(x), eta=geteta(x), 
-  multiCmpCor=getmultiCmpCor(x), \dots)
+  multiCmpCor=getmultiCmpCor(x), Obsnames=TRUE, sqrddist=TRUE, \dots)
 }
 
 \arguments{
@@ -21,6 +21,10 @@
     \item{eta}{Nominal size of the null hypothesis that a given observation is not an outlier. By default uses the one selected in the creation of the object \sQuote{x}.}
 
     \item{multiCmpCor}{Whether a multicomparison correction of the nominal size (eta) for the outliers tests was performed. Alternatives are: \sQuote{never} -- ignoring the multicomparisons and testing all entities at the \sQuote{eta} nominal level. \sQuote{always} -- testing all n entitites at 1.- (1.-\sQuote{eta}^(1/n)). By default uses the one selected in the creation of the object \sQuote{x}.}   
+    
+  \item{sqrddist}{A booleand flag indicating if whether the squared Mahalanobis distances (default), or only the distances by themselves should be displayed.}
+
+  \item{Obsnames}{A booleand flag indicating if the observation names are to be displayed along the horizontal axis.}
 
   \item{\dots}{ Further arguments to be passed to methods.}
 }

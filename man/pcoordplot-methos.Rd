@@ -15,12 +15,14 @@
 \usage{
 
 \S4method{pcoordplot}{IdtMclust}(x,title="Parallel Coordinate Plot",
-Seq=c("AllMidP_AllLogR","MidPLogR_VarbyVar"), model ="BestModel", legendpar=list(), \dots)
+Seq=c("AllMidP_AllLogR","MidPLogR_VarbyVar"), model ="BestModel", 
+legendpar=list(), Components = "All", \dots)
 
 }
 
 \arguments{
-  \item{x}{An object of type \dQuote{IdtMclust} representing the the clusterig results of an Interval-valued data set obtainde by the function \dQuote{IdtMclust}.}
+  \item{x}{An object of type \dQuote{IdtMclust} representing the the clusterig\cr 
+  results of an Interval-valued data set obtained by the function \dQuote{IdtMclust}.}
 
   \item{title}{The title of the plot.}
 
@@ -35,6 +37,8 @@ Seq=c("AllMidP_AllLogR","MidPLogR_VarbyVar"), model ="BestModel", legendpar=list
    base R \sQuote{cex.main} and \sQuote{cex.lab} parameters are implemented.}
 
   \item{\dots}{ Graphical arguments to be passed to methods}
+
+  \item{Components}{ The set of components to be compared}
 
 }
 

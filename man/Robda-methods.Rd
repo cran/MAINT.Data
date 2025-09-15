@@ -66,7 +66,7 @@ Duarte Silva, A.P. and Brito, P. (2015), Discriminant analysis of interval data:
 Duarte Silva, A.P., Filzmoser, P. and Brito, P. (2017), Outlier detection in interval data. \emph{Advances in Data Analysis and Classification}, 1--38.\cr
 }
 
-\seealso{\code{\link{lda}}, \code{\link{qda}}, \code{\link{snda}}, \code{\linkS4class{IData}}, \code{\linkS4class{RobEstControl}},code{\link{ConfMat}} }
+\seealso{\code{\link{lda}}, \code{\link{qda}}, \code{\link{snda}}, \code{\linkS4class{IData}}, \code{\linkS4class{RobEstControl}}, \code{\link{ConfMat}} }
 
 \keyword{methods}
 \keyword{Interval Data}

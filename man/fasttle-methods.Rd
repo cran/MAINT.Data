@@ -42,7 +42,7 @@
 
     \item{nsamp}{Number of subsets used for initial estimates.}  
 
-    \item{seed}{Initial seed for random generator, like \code{\link{.Random.seed}}, see \code{\link{rrcov.control}}.}
+    \item{seed}{Initial seed for random generator, like \code{\link{.Random.seed}}, see \code{"rrcov:rrcov.control"}.}
 
     \item{trace}{Logical (or integer) indicating if intermediate results should be printed; defaults to \code{FALSE}.}
 

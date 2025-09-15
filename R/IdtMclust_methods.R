@@ -1,27 +1,57 @@
 setMethod("pcoordplot",
   signature(x = "IdtMclust"),
   function(x, title="Parallel Coordinate Plot", Seq=c("AllMidP_AllLogR","MidPLogR_VarbyVar"), model="BestModel", 
-           legendpar=list(), ...)
+            legendpar=list(), Components="All", ...)
+#          legendpar=list(), ...)
   {
     if (requireNamespace("GGally",quietly=TRUE)==FALSE) {
       stop("Required package GGally is not installed\n")
     }
 
+#    if (model=="BestModel") {
+#      G <- BestG(x)
+#      x_mean  <- mean(x)
+#    }  else {
+#      nomodmsg <- paste("There is no model named",model,"in these Idtmclust results\n") 
+#      if (substr(model,1,3)=="Hom") {
+#        if (!is.element(model,names(x@allres$RepresHom))) stop(nomodmsg) 
+#        G  <- x@allres$RepresHom[[model]]@nG
+#        x_mean  <- x@allres$RepresHom[[model]]@parameters$mean
+#      } else if (substr(model,1,3)=="Het") {
+#        if (!is.element(model,names(x@allres$RepresHet))) stop(nomodmsg)
+#        G  <- x@allres$RepresHet[[model]]@nG
+#        x_mean <- x@allres$RepresHet[[model]]@parameters$mean
+#      } else stop(nomodmsg) 
+#    }
+
+    if (Components[1]!="All") {
+      if (model=="BestModel") allcomp <- levels(as.factor(x@classification))
+      else {
+        if (substr(model,1,3)=="Hom") allcomp <- levels(as.factor(x@allres$RepresHom[[model]]@classification))
+        else if (substr(model,1,3)=="Het") allcomp <- levels(as.factor(x@allres$RepresHet[[model]]@classification))
+      }
+      for (Comp in Components) if (!is.element(Comp,allcomp)) stop(paste("Component",Comp,"is not an elemenente of the current solution\n"))
+     } 
+
     if (model=="BestModel") {
       G <- BestG(x)
-      x_mean  <- mean(x)
+      if (Components[1]=="All") x_mean  <- mean(x)
+      else x_mean  <- mean(x)[,Components,drop=FALSE]
     }  else {
       nomodmsg <- paste("There is no model named",model,"in these Idtmclust results\n") 
       if (substr(model,1,3)=="Hom") {
         if (!is.element(model,names(x@allres$RepresHom))) stop(nomodmsg) 
         G  <- x@allres$RepresHom[[model]]@nG
-        x_mean  <- x@allres$RepresHom[[model]]@parameters$mean
+        if (Components[1]=="All") x_mean  <- x@allres$RepresHom[[model]]@parameters$mean
+        else x_mean  <- x@allres$RepresHom[[model]]@parameters$mean[,Components,drop=FALSE]
       } else if (substr(model,1,3)=="Het") {
         if (!is.element(model,names(x@allres$RepresHet))) stop(nomodmsg)
         G  <- x@allres$RepresHet[[model]]@nG
-        x_mean <- x@allres$RepresHet[[model]]@parameters$mean
+        if (Components[1]=="All") x_mean <- x@allres$RepresHet[[model]]@parameters$mean
+        else x_mean <- x@allres$RepresHet[[model]]@parameters$mean[,Components,drop=FALSE]
       } else stop(nomodmsg) 
     }
+
 
     q <- x@NIVar   # Numbef or Interval-valued variables
     p <- 2*q       # Total number of MidPoints and LogRanges
@@ -32,7 +62,8 @@ setMethod("pcoordplot",
     }  else if (Seq == "MidPLogR_VarbyVar")  {
       DF <- as.data.frame(t(x_mean[rep(1:q,each=2)+rep(c(0,q),q),]))
     }
-    DF <- cbind(DF,Component=paste("CP",1:G,sep=""))
+    if (Components[1]=="All") DF <- cbind(DF,Component=paste("CP",1:G,sep=""))
+    else DF <- cbind(DF,Component=Components)
     
     dotarguments <- match.call(expand.dots=FALSE)$...
     
@@ -204,7 +235,6 @@ setMethod("show",
 
 setMethod("summary",
   signature(object = "IdtMclust"),
-#  function(object, parameters = FALSE, classification = FALSE, model="BestModel", ...)
   function(object, parameters = FALSE, classification = FALSE, model="BestModel", ShowClassbyOBs=FALSE, ...)
   {
     if (model=="BestModel") {
@@ -239,7 +269,6 @@ setMethod("summary",
    new("summaryIdtMclust",title=title,modelName=modelName,Hmcdt=mod@Hmcdt,     
       NObs=mod@NObs,NIVar=mod@NIVar,G=G,loglik=mod@logLik,bic=mod@bic,
       pro=pro,mean=mean,covariance=covariance,classification=mod@classification,
-#      printParameters=parameters,printClassification=classification)
       printParameters=parameters,printClassification=classification,ShowClassbyOBs=ShowClassbyOBs)
   }
 )  
@@ -356,7 +385,7 @@ setMethod("classification",signature(x = "IdtMclust"),
       if (!is.element(model,names(x@allres$RepresHom))) stop(nomodmsg) 
       return(factor(x@allres$RepresHom[[model]]@classification))
     } else if (substr(model,1,3)=="Het") {
-      return(factor(x@allres$RepresHet[[model]]@lassification))
+      return(factor(x@allres$RepresHet[[model]]@classification))
     } else stop(nomodmsg) 
   }
 )
@@ -385,6 +414,3 @@ setMethod("cor",signature(x ="IdtMclust"),
    res
  }
 ) 
-
-
-

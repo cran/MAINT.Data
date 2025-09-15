@@ -1,9 +1,9 @@
 #ifndef TLEH
 #define TLEH
 
+#define ARMA_USE_CURRRENT
+
 #include <vector>
-//#include <Rcpp.h>
-//#include <RcppEigen.h>
 #include "RcppArmadillo.h"
 #include <numeric>
 
@@ -15,7 +15,6 @@ void parcolmeans(const NumericMatrix& X,const vector<int>& Set,arma::vec& res);
 
 class Estimate {
   public: 
-//    Estimate(int p) : p_(p) { muE_.resize(p); SigmaE_.resize(p,p); };
     Estimate(int p) : p_(p) { muE_.resize(p); SigmaE_.resize(p,p); };
     int p(void) { return p_; }
     arma::vec& muE(void) { return muE_; }

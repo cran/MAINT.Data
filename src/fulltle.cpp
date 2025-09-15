@@ -1,6 +1,5 @@
 #include "AdMatAlgFoo.h"
 #include "tle.h"
-#include "RcppArmadillo.h"
 
 double loglik(const NumericMatrix& X,const int n,const int p,const int Cnf, const double limlnk2,
 	double c0,const int k,const vector<int>& Set,Estimate& tmpsol);

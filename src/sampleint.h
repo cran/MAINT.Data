@@ -1,7 +1,8 @@
 #ifndef SAMPLEINTH
 #define SAMPLEINTH
 
-//#include <Rcpp.h>
+#define ARMA_USE_CURRRENT
+
 #include "RcppArmadillo.h"
 #include <vector>
 

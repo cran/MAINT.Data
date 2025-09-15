@@ -18,7 +18,7 @@
 
 	\item{fr}{The function to be minimized. If method is neither \dQuote{nlminb} or \dQuote{L-BFGS-B}, fr should accept a lbound and an ubound arguments for the parameter bounds, and should enforce these bounds before calling the local optimization routine.}
 
-	\item{gr}{A function to return the gradient for the \dQuote{nlminb}, \dQuote{BFGS}, \dQuote{CG} and {L-BFGS-B} methods.  If it is \sQuote{NULL}, a finite-difference approximation will be used. For the \dQuote{SANN} method it specifies a function to generate a new candidate point.  If it is \sQuote{NULL} a default Gaussian Markov kernel is used.}
+	\item{gr}{A function to return the gradient for the \dQuote{nlminb}, \dQuote{BFGS}, \dQuote{CG} and \dQuote{L-BFGS-B} methods.  If it is \sQuote{NULL}, a finite-difference approximation will be used. For the \dQuote{SANN} method it specifies a function to generate a new candidate point.  If it is \sQuote{NULL} a default Gaussian Markov kernel is used.}
 
 	\item{inphess}{A function to return the hessian for the \dQuote{nlminb} method. Must return a square matrix of order \sQuote{length(parmean)} with the different hessian elements in its lower triangle. It is ignored if method component of the control list is not set to its \dQuote{nlminb} default.}
 

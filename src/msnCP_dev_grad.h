@@ -1,6 +1,8 @@
 #ifndef _msnCP_dev_gra_h
 #define _msnCP_dev_gra_h
 
+#define ARMA_USE_CURRRENT
+
 #include "RcppArmadillo.h"
 using namespace arma;
 

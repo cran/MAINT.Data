@@ -1,3 +1,9 @@
+########## Versions 2.7.2 (September 2025) ###################
+
+Versions 2.7.2 correct some documentation flaws (including adding appropriate links to
+the rrcov package) and adds a Components argument to the pcoordplot IdtMclust method, 
+and a sqrddist argument to the plot, IdtOutl method.
+
 ########## Versions 2.7.0 and 2.7.1 (April 2023) ###################
 
 Versions 2.7.0 and 2.7.1 implement the following changes:

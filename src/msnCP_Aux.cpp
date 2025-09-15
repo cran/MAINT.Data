@@ -1,4 +1,5 @@
-//#include "Rcpp.h"
+#define ARMA_USE_CURRRENT
+
 #include "RcppArmadillo.h"
 #include "msnCP_Aux.h"
 

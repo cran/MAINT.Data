@@ -1,6 +1,8 @@
 #ifndef GAUSSLOGLIKH
 #define GAUSSLOGLIKH
 
+#define ARMA_USE_CURRRENT
+
 #include<vector>
 #include <RcppArmadillo.h>
 

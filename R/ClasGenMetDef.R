@@ -176,10 +176,10 @@ setGeneric("fasttle",
     control=RobEstControl(), ...)
   standardGeneric("fasttle"))
 
-setGeneric("getMahaD2",function(IdtOtl) standardGeneric("getMahaD2")) 
-setGeneric("geteta",function(IdtOtl) standardGeneric("geteta")) 
-setGeneric("getRefDist",function(IdtOtl) standardGeneric("getRefDist")) 
-setGeneric("getmultiCmpCor",function(IdtOtl) standardGeneric("getmultiCmpCor")) 
+setGeneric("getMahaD2",function(SdtOtl) standardGeneric("getMahaD2")) 
+setGeneric("geteta",function(SdtOtl) standardGeneric("geteta")) 
+setGeneric("getRefDist",function(SdtOtl) standardGeneric("getRefDist")) 
+setGeneric("getmultiCmpCor",function(SdtOtl) standardGeneric("getmultiCmpCor")) 
 
 setGeneric("RobMxtDEst",
   function(Sdt,grouping,Mxt=c("Hom","Het"),CovEstMet=c("Pooled","Globdev"),

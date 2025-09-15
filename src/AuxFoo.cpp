@@ -1,4 +1,3 @@
-#include <RcppArmadillo.h>
 #include "AdMatAlgFoo.h"
 #include "AuxFoo.h"
 

@@ -3,6 +3,8 @@
 
 #define ARMA_DONT_PRINT_ERROR
 #define ARMA_DONT_PRINT_WARNING
+#define ARMA_USE_CURRRENT
+
 #include "RcppArmadillo.h"
 
 bool MinMaxEgval(const arma::mat& Sigma, const int Cf, double& lnviol,

@@ -1,6 +1,8 @@
 #ifndef _AdMatAlgFoo_h
 #define _AdMatAlgFoo_h
 
+#define ARMA_USE_CURRRENT
+
 #include "RcppArmadillo.h"
 using namespace arma;
 

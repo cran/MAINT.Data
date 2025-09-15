@@ -2,16 +2,22 @@ setMethod("show",
   signature(object = "IdtOutl"),
   function(object) {
     print(object@outliers)
+    cat("MD2\n");
+    print(object@MD2[object@outliers])
     invisible(object)
   }
 )  
 
 setMethod("plot",
   signature(x = "IdtOutl",y = "missing"),
-  function(x,scale=c("linear","log"),RefDist=getRefDist(x),eta=geteta(x),multiCmpCor=getmultiCmpCor(x),...)
+  function(x,scale=c("linear","log"),RefDist=getRefDist(x),eta=geteta(x),multiCmpCor=getmultiCmpCor(x),
+           Obsnames=TRUE,sqrddist=TRUE, ...)
   {
     scale <- match.arg(scale)
     MD2 <- getMahaD2(x)
+    if (sqrddist) { y <- MD2 ; ylb <- "MD2" ; trshld <- x@trshld }
+    else { y <- sqrt(MD2) ; ylb <- "MD" ; trshld <- sqrt(x@trshld) }
+
     n <- x@NObs
     p <- x@p
     h <- x@h
@@ -36,21 +42,31 @@ setMethod("plot",
 
    if (RefDist!="CerioliBetaF")  {
      if (scale=="linear") {
-       plot.default(MD2,main="Robust Mahalanobis Distances",xlab="",xaxt="n",...)
+#       plot.default(MD2,main="Robust Mahalanobis Distances",xlab="",xaxt="n",...)
+       plot.default(y,main="Robust Mahalanobis Distances",xlab="",xaxt="n",ylab=ylb,...)
      } else if (scale=="log") {
-       plot.default(MD2,main="Robust Mahalanobis Distances (log scale)",xlab="",xaxt="n",log="y",...)
+#       plot.default(y,main="Robust Mahalanobis Distances (log scale)",xlab="",xaxt="n",log="y",ylab=...)
+       plot.default(y,main="Robust Mahalanobis Distances (log scale)",xlab="",xaxt="n",ylab=paste("ln",ylb),log="y",...)
      }
-     axis(1,1:n,labels=names(MD2),las=2,...)
-     abline(h=delta)
+#     axis(1,1:n,labels=names(MD2),las=2,...)
+#     abline(h=delta)
+    if (Obsnames) axis(1,1:n,labels=names(x@MD2),las=2,...)
+    abline(h=trshld[1])
+    if (length(trshld)==2) abline(h=trshld[2]) 
    } else {
       RewSet <- x@boolRewind
       if (scale=="linear") {
-        plot.default(MD2,main="Robust Mahalanobis Distances",xlab="",xaxt="n",type="n",...)
+#        plot.default(MD2,main="Robust Mahalanobis Distances",xlab="",xaxt="n",type="n",...)
+        plot.default(y,main="Robust Mahalanobis Distances",xlab="",xaxt="n",type="n",ylab=ylb,...)
       } else if (scale=="log") {
-        plot.default(MD2,main="Robust Mahalanobis Distances (log scale)",xlab="",xaxt="n",type="n",log="y",...)
-        axis(1,1:n,labels=names(MD2),las=2,...)
+#        plot.default(MD2,main="Robust Mahalanobis Distances (log scale)",xlab="",xaxt="n",type="n",log="y",...)
+#        axis(1,1:n,labels=names(MD2),las=2,...)
+        plot.default(MD2,main="Robust Mahalanobis Distances (log scale)",xlab="",xaxt="n",type="n",log="y",ylab=paste("ln",ylb),...)
       }
-      axis(1,1:n,labels=names(MD2),las=2,...)      
+#      axis(1,1:n,labels=names(MD2),las=2,...)      
+      if (Obsnames) axis(1,1:n,labels=names(x@MD2),las=2,...)
+      abline(h=trshld[1])
+      if (length(trshld)==2) abline(h=trshld[2]) 
       RewSetInd <- which(RewSet==TRUE)
       UnRewSetInd <- which(RewSet==FALSE)
       points(x=RewSetInd,y=MD2[RewSet],pch=19,col="blue")
@@ -62,8 +78,8 @@ setMethod("plot",
 )
 
 
-setMethod("getMahaD2",signature(IdtOtl = "IdtOutl"),function(IdtOtl) IdtOtl@MD2) 
-setMethod("geteta", signature(IdtOtl = "IdtOutl"), function(IdtOtl) IdtOtl@eta)
-setMethod("getRefDist", signature(IdtOtl ="IdtOutl"), function(IdtOtl) IdtOtl@RefDist)
-setMethod("getmultiCmpCor", signature(IdtOtl ="IdtOutl"), function(IdtOtl) IdtOtl@multiCmpCor)
+setMethod("getMahaD2",signature(SdtOtl = "IdtOutl"),function(SdtOtl) SdtOtl@MD2) 
+setMethod("geteta", signature(SdtOtl = "IdtOutl"), function(SdtOtl) SdtOtl@eta)
+setMethod("getRefDist", signature(SdtOtl ="IdtOutl"), function(SdtOtl) SdtOtl@RefDist)
+setMethod("getmultiCmpCor", signature(SdtOtl ="IdtOutl"), function(SdtOtl) SdtOtl@multiCmpCor)
 

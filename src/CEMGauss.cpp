@@ -5,7 +5,6 @@
 #include "CEMGauss.h"
 #include "MDataGaussLogLik.h"
 #include "MinMaxEgval.h"
-#include "RcppArmadillo.h"
 
 #include "msnCP_dev.h"
 

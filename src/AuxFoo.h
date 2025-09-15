@@ -1,6 +1,8 @@
 #ifndef _AuxFoo_h
 #define _AuxFoo_h
 
+#define ARMA_USE_CURRRENT
+
 #include "RcppArmadillo.h"
 
 using namespace Rcpp ;
