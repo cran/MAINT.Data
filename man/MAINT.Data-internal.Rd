@@ -36,8 +36,7 @@
 \alias{CovCase-methods}
 \alias{CovCase}
 
-\alias{MCDcnp2}
-\alias{MCDRewcnp2}
+\alias{AdjBxPlOtlDet}
 \alias{C1CPgrad}
 \alias{C1CovPar}
 \alias{C2CPgrad}
@@ -77,6 +76,8 @@
 \alias{ConfNestedBy}
 \alias{ConfNextModel}
 \alias{getConfig}
+\alias{MCDcnp2}
+\alias{MCDRewcnp2}
 \alias{ObsLik.Omegagrad}
 \alias{ObsLik.alphagrad}
 \alias{ObsLik.ksigrad}

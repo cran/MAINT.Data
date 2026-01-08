@@ -27,7 +27,8 @@
     \item{NObs}{Number of original observations in the original data set.}
     \item{p}{Number of total numerical variables (MidPoints and/or LogRanges) that may be responsible for the outliers.}
     \item{h}{Size of the subsets over which the trimmed likelihood was maximized when computing the robust Mahalanobis distances.})   
-    \item{boolRewind}{A logical vector indicanting which of the data units belong to the final trimmed subsetused to compute the tle estimates.})   
+    \item{boolRewind}{A logical vector indicanting which of the data units belong to the final trimmed subsetused to compute the tle estimates.}) 
+    \item{trshld}{The treshold(s) used on (squared) Mahalanobis distances to flag interval data unist as outliers}   
   }
 }
 

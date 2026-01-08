@@ -1,11 +1,11 @@
-d9580d0c13bb2f1b9a66423bafeefd16 *CHANGELOG
-bacf00f3f38b1bcc020fc7df14d7f087 *DESCRIPTION
-149e1ffaefd163b02ec8011c925571d7 *NAMESPACE
+eb04f79f0d9f4507fea9d0eb001acd01 *CHANGELOG
+779ce2c88e1e88a273f35121ee18f2a3 *DESCRIPTION
+921338b4a85404581db2b6422c0da2c9 *NAMESPACE
 e0537e35ee481a5728a8fc3dc7b5e8ff *R/AgrMcDt.R
 58626bbc5a23bbff62d4d331a93e47b0 *R/CPLogLik.grads.R
 fad14416e4ae9703d230184b5b7889ea *R/CPMaxLik.R
 c8e72bdd6398706d34a9622b453fd3f6 *R/CholeskiGradients.R
-8ed6c25d042c92dc767f50082cbbd80a *R/ClasGenMetDef.R
+4d5b6a7930c2d5decc2689e2bfa6bbc8 *R/ClasGenMetDef.R
 d23f5b275a25117d675f0afc19b68626 *R/ConfMatrix.R
 2346a7f0c103cf3b4d32dd16b3935887 *R/Conversions.R
 bdcae79ca468e6eaed6f9273f8764e91 *R/CorrHetSNSol.R
@@ -17,7 +17,7 @@ bdcae79ca468e6eaed6f9273f8764e91 *R/CorrHetSNSol.R
 8cdf2950305c57cc50f48d2fa9ed5c42 *R/IdtMaxLikNC2.R
 29e8f2186201060668d09f81acc15375 *R/IdtMaxLikSN.R
 bf1416572501528bd186b026fc0ae8d4 *R/IdtMclust_methods.R
-698dee02db1dfca975de30eb89139c6d *R/IdtOutl_methods.R
+15033f66416b3fb09445dbbcc6b16fad *R/IdtOutl_methods.R
 3de74b7a40715b6217999aafef1d297b *R/Idtmclust.R
 db18ce22b9daaffbccad0631e4543834 *R/MDFinitSq.R
 9362c98bb193c4807dab1e58a9701fe5 *R/MStep.R
@@ -30,7 +30,7 @@ d66168608ab482404b9373e1b2f7b3b8 *R/Rfulltle.R
 cf87ae4eaf0cad076d41120c6b3f3d15 *R/Robldaqda.R
 69c2142612dd9abdcd5b10a0ed5975d7 *R/SNmle.R
 63ed5ae340b7afcd79527c334d890be3 *R/SkNObsLikGradients.R
-db7d061cacf9eca6f1d8bf4b252eaa0c *R/fasttle.R
+ad4158aabd84ef69145f145a7095c769 *R/fasttle.R
 4ef62467fa7675282091ca660e7572f7 *R/feasmu0.R
 c1deb812f1d4c745d4aa9e07b2d058eb *R/fulltle.R
 2fb0c645f340b2f46b3d0bb073fd0d31 *R/lqda.R
@@ -62,7 +62,7 @@ bde54d3fa5b6ccdc379ba25feeb0b4fc *man/DACrossVal.Rd
 70988da4d79369366dca6fbca374f4cd *man/EMControl.Rd
 f2789c01d6753605364f26c43999f867 *man/IData-class.Rd
 fd40ca961dcc53f94f3925c2bb4a6134 *man/IData.Rd
-6c23917c26fc2883c44e229b3345d551 *man/IDtOutl-class.Rd
+b343b5d339ab069330c1afb7204f8365 *man/IDtOutl-class.Rd
 7c0975e99fd110de63a0574204ed85bc *man/IdtE-class.Rd
 9afc73b0ebdc1912ead088f99a6d4d00 *man/IdtMANOVA-class.Rd
 d138e3802cd178d0e809a1b249428ec5 *man/IdtMclust-class.Rd
@@ -89,8 +89,8 @@ e9c0985b8a951a3b688c0829169a8836 *man/Idtlda-class.Rd
 0db624d949f3ea9ae25dcd11afde6f76 *man/LoansbyPurpose_minmaxDt.Rd
 504dc3b9209665c32c3493a6499e8ad5 *man/LoansbyRskLvs_minmaxDt.Rd
 8fba1fb23080c8a71253e9d08dd5f0bf *man/LoansbyRskLvs_qntlDt.Rd
-c74a25d72b06cd257af46b7447b0c6d3 *man/MAINT.Data-internal.Rd
-c38bdd1df056fa5e59f4de4c828619cf *man/MAINT.Data-package.Rd
+e0172c4f53cbad5fbfc915ffcab2f3bd *man/MAINT.Data-internal.Rd
+ac45148e383f0bcd3c6afecd931c161a *man/MAINT.Data-package.Rd
 6454562ef9c7069087c6e993a2c58db4 *man/MANOVA-methods.Rd
 1d4ff5a9570433a7330788bc21663d91 *man/MANOVAPermTest.Rd
 91cb9466e539fc47f15c41694cb5f7e8 *man/RepLOptim.Rd
@@ -103,7 +103,7 @@ bffce907a14464dde1dd9dbdae78227a *man/coef-methods.Rd
 4ef8feb3cc5a2a6a4424700d3c68dd33 *man/extmatrix.Rd
 6f3d313051637c74907f1bb6bb116a0f *man/fasttle-methods.Rd
 3043296127a9e272e33375356f787101 *man/fulltle-methods.Rd
-d9d913504c3dedee7b4835e23dfceb7d *man/getIdtOutl.Rd
+38c8822ce1923a351991b36b8b27deb7 *man/getIdtOutl.Rd
 74990203a611ea00071f639c23a68afe *man/lda-methods.Rd
 a992d1276a2b28b7f6da6f7f154cab8a *man/mean-methods.Rd
 7b731a6c5ea5b4f64d8fdacd8432da5c *man/mle-methods.Rd

@@ -1,4 +1,10 @@
-########## Versions 2.7.2 (September 2025) ###################
+########## Version 2.7.3 (January 2026) ###################
+
+Version 2.7.3 adds two aditional agrument to the getIdtOutl function,
+in order to implement (as an alternative to distribution-based approaches)
+the Adjusted Box Plot rule of Hubert and Vandervieren (2008).
+
+########## Version 2.7.2 (September 2025) ###################
 
 Versions 2.7.2 correct some documentation flaws (including adding appropriate links to
 the rrcov package) and adds a Components argument to the pcoordplot IdtMclust method, 

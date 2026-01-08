@@ -30,9 +30,6 @@ setMethod("fasttle",
     p <- 2*q 
     n <- Sdt@NObs
 
-#    if (alpha*n <= 2*q) {
-#      stop("The number of observations is too small and would lead to singular covariance estimates.\n")
-#    }
     SelCrit <- match.arg(SelCrit)
     if (!requireNamespace("robustbase",quietly=TRUE)) {
       stop("fasttle needs the robustbase package to work. Please install it.\n")
@@ -448,10 +445,11 @@ RobEstControl <- function (alpha=0.75,
                          otpType="SetMD2andEst" )
 }
 
-getIdtOutl <- function(Sdt,IdtE=NULL,muE=NULL,SigE=NULL,
-  eta=0.025,Rewind=NULL,m=length(Rewind),
-  RefDist=c("ChiSq","HardRockeAdjF","HardRockeAsF","CerioliBetaF"),
-  multiCmpCor=c("never","always","iterstep"),outlin=c("MidPandLogR","MidP","LogR"))
+getIdtOutl <- function(Sdt,IdtE=NULL,muE=NULL,SigE=NULL,eta=0.025,Rewind=NULL,m=length(Rewind),
+                       RefDist=c("ChiSq","HardRockeAdjF","HardRockeAsF","CerioliBetaF"),
+#                       multiCmpCor=c("never","always","iterstep"),outlin=c("MidPandLogR","MidP","LogR"))
+                       multiCmpCor=c("never","always","iterstep"),outlin=c("MidPandLogR","MidP","LogR"),
+                       method=c("Distrib","AdjBoxPlot"),range=c(1.5,3.))  
 {
   RefDist <- match.arg(RefDist) 
   multiCmpCor <- match.arg(multiCmpCor)
@@ -486,8 +484,12 @@ getIdtOutl <- function(Sdt,IdtE=NULL,muE=NULL,SigE=NULL,
   else if (outlin=="MidP") vind <- 1:Sdt@NIVar
   else if (outlin=="LogR") vind <- (Sdt@NIVar+1):(2*Sdt@NIVar)
 
-  otl <- MDOtlDet(X[vind],muE[vind],SigE[vind,vind],eta,m,ret="Outliers",RefDist=RefDist,Rewind=Rewind,multiCmpCor=multiCmpCor,otp="indandMD2")
-  new("IdtOutl",outliers=otl$outliers,MD2=otl$MD2,eta=eta,RefDist=RefDist,multiCmpCor=multiCmpCor,NObs=Sdt@NObs,p=length(vind),h=m,boolRewind=boolRewind)
+#  otl <- MDOtlDet(X[vind],muE[vind],SigE[vind,vind],eta,m,ret="Outliers",RefDist=RefDist,Rewind=Rewind,multiCmpCor=multiCmpCor,otp="indandMD2")
+#  new("IdtOutl",outliers=otl$outliers,MD2=otl$MD2,eta=eta,RefDist=RefDist,multiCmpCor=multiCmpCor,NObs=Sdt@NObs,p=length(vind),h=m,boolRewind=boolRewind)
+  if (method=="Distrib") otl <- MDOtlDet(X[vind],muE[vind],SigE[vind,vind],eta,m,ret="Outliers",RefDist=RefDist,Rewind=Rewind,multiCmpCor=multiCmpCor,otp="indandMD2")
+  else if (method=="AdjBoxPlot") otl <- AdjBxPlOtlDet(X[vind],muE[vind],SigE[vind,vind],range=range)
+  new("IdtOutl",outliers=otl$outliers,MD2=otl$MD2,eta=eta,RefDist=RefDist,multiCmpCor=multiCmpCor,NObs=Sdt@NObs,p=length(vind),h=m,boolRewind=boolRewind,trshld=otl$trshld)
+                
 }
 
 GetMD2 <- function(Data,muE,SigE)
@@ -536,14 +538,18 @@ MDOtlDet <- function(Data,muE,SigE,eta,h=NULL,ret=c("Outliers","Regular"),
   iter <- 1
   while (findotl && iter<3)  { 
     if (RefDist=="ChiSq")  { 
-      delta <- qchisq(oneminusalpha,p)
+#      delta <- qchisq(oneminusalpha,p)
+      trshld <- delta <- qchisq(oneminusalpha,p)
     } else if (RefDist=="HardRockeAdjF")  {
-      delta <- qHardRoqF(oneminusalpha,n,p,h)
+#      delta <- qHardRoqF(oneminusalpha,n,p,h)
+      trshld <- delta <- qHardRoqF(oneminusalpha,n,p,h)
     } else if (RefDist=="HardRockeAsF")  {
-      delta <- qHardRoqF(oneminusalpha,n,p,h,adj=FALSE)
+#      delta <- qHardRoqF(oneminusalpha,n,p,h,adj=FALSE)
+      trshld <- delta <- qHardRoqF(oneminusalpha,n,p,h,adj=FALSE)
     } else if (RefDist=="CerioliBetaF")  {
       delta1 <- ((h-1)^2/h) * qbeta(oneminusalpha,p/2,(h-p-1)/2)
       delta2 <- (((h+1)*(h-1)*p)/(h*(h-p))) * qf(oneminusalpha,p,h-p)
+      trshld <- c(delta1,delta2)
     } 
     if (ret=="Outliers")  {
       if (RefDist!="CerioliBetaF") {
@@ -591,7 +597,8 @@ MDOtlDet <- function(Data,muE,SigE,eta,h=NULL,ret=c("Outliers","Regular"),
       } else if (otp=="onlycnt")  {
         return(length(otl))
       } else if (otp=="indandMD2")  {
-        return( list(outliers=otl,MD2=MDist) )
+#        return( list(outliers=otl,MD2=MDist) )
+        return( list(outliers=otl,MD2=MDist,trshld=trshld) )
       }      
   } else if (ret=="Regular") {
     if (otp=="indices")  {
@@ -599,9 +606,30 @@ MDOtlDet <- function(Data,muE,SigE,eta,h=NULL,ret=c("Outliers","Regular"),
     } else if (otp=="onlycnt")  {
       return(length(reg))
     } else if (otp=="indandMD2")  {
-      return( list(regobs=reg,MD2=MDist) )
+#      return( list(regobs=reg,MD2=MDist) )
+      return( list(regobs=reg,MD2=MDist,trshld=trshld) )
     }
   }
+}
+
+AdjBxPlOtlDet <- function(Data,muE,SigE,range=c(1.5,3.))
+{
+  if (!is.matrix(Data)) Data <- as.matrix(Data)
+  n <- nrow(Data)
+  p <- ncol(Data)
+  if (length(muE)!=p) stop("Wrong muE dimension\n")
+  if (!is.matrix(SigE)) SigE <- as.matrix(SigE)
+  if (nrow(SigE)!=p || ncol(SigE)!=p) stop("Wrong SigE dimension\n")
+  PrecME <- solve(SigE)
+
+  XDev <- scale(Data,center=muE,scale=FALSE)
+  MDist <-   apply(XDev,1,function(x) x %*% PrecME %*% x)
+  trshld <- adjbox(MDist,range=range[1],plot=FALSE)$fence[2,1]
+  if (length(range)==2) trshld <- c(trshld,adjbox(MDist,range=range[2],plot=FALSE)$fence[2,1])
+  otl <- which(MDist>trshld[1])
+  if (length(otl)==0) otl <- NULL
+
+  list(outliers=otl,MD2=MDist,trshld=trshld)
 }
 
 MCDcnp2 <- function(p,n,alpha,userobustbase=FALSE)

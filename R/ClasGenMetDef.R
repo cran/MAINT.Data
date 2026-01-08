@@ -85,7 +85,8 @@ setClass("EMControl",
   prototype = list(nrep = 0, maxiter=1000, convtol=0.01, protol=1e-3, seed=NULL, pertubfct=1, k2max=1e6, MaxVarGRt=1e6)
 )
 setClass("IdtOutl",slots=c(outliers="extinteger", MD2="numeric",eta="numeric",RefDist="character",
-  multiCmpCor="character",NObs="numeric",p="numeric",h="numeric",boolRewind="extlogical"))
+#  multiCmpCor="character",NObs="numeric",p="numeric",h="numeric",boolRewind="extlogical"))
+  multiCmpCor="character",NObs="numeric",p="numeric",h="numeric",boolRewind="extlogical",trshld="numeric"))
 
 setClass("summaryIData",slots=c(MidPsumar="table", Rngsumar="table",LogRsumar="table"))
 

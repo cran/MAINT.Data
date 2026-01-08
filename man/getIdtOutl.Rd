@@ -9,7 +9,8 @@
   eta=0.025, Rewind=NULL, m=length(Rewind),
   RefDist=c("ChiSq","HardRockeAdjF","HardRockeAsF","CerioliBetaF"),
   multiCmpCor=c("never","always","iterstep"), 
-  outlin=c("MidPandLogR","MidP","LogR"))
+  outlin=c("MidPandLogR","MidP","LogR"), 
+  method=c("Distrib","AdjBoxPlot"), range=c(1.5,3.))
 }
 
 
@@ -33,6 +34,10 @@
     \item{RefDist}{The assumed reference distributions used to find cutoffs defining the observations assumed as outliers. Alternatives are \dQuote{ChiSq},\dQuote{HardRockeAsF}, \dQuote{HardRockeAdjF} and \dQuote{CerioliBetaF}, respectivelly for the usual Chi-squared, the asymptotic and adjusted scaled F distributions proposed by Hardin and Rocke (2005), and the Beta and F distributions proposed by Cerioli (2010).}    
 
     \item{outlin}{The type of outliers to be considered. \dQuote{MidPandLogR} if outliers may be present in both MidPpoints and LogRanges, \dQuote{MidP} if outliers are only present in MidPpoints, or \dQuote{LogR} if outliers are only present in LogRanges.}
+
+    \item{method}{The method used to fine the cutt-off used to flag outliers. Either \dQuote{Distrib} if a quantile from a reference disribution is used, or \dQuote{AdjBoxPlot} if the Adjusted Box Plot of Hubert and Vandervieren (2008) is adopted .}
+
+    \item{range}{The multiple(s) of the modified inter-quartile range distance to the median used to identify outliers, when argument method is set to \dQuote{AdjBoxPlot}. When range is a two-dimensional vector, its first element is used identify moderate outliers, and the second one to identify severe outliers. This argument is ignored when method is not equal to \dQuote{AdjBoxPlot}.}
 }
 
 \value{A vector with the indices of the entities identified as outliers.} 
@@ -45,6 +50,9 @@ Duarte Silva, A.P., Filzmoser, P. and Brito, P. (2017), Outlier detection in int
 
 Hardin, J. and Rocke, A. (2005), The Distribution of Robust Distances.
 \emph{Journal of Computational and Graphical Statistics} \bold{14}, 910--927.
+
+Hubert, M. and Vandervieren, E. (2008), An adjusted boxplot rule for skewed distributions.
+\emph{Computational Statistics and Data Analysis} \bold{52} (12), 5186--5201.
 }
 
 \seealso{ \code{\link{fasttle}}, \code{\link{fulltle}} }
