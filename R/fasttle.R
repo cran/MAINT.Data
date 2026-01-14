@@ -454,6 +454,7 @@ getIdtOutl <- function(Sdt,IdtE=NULL,muE=NULL,SigE=NULL,eta=0.025,Rewind=NULL,m=
   RefDist <- match.arg(RefDist) 
   multiCmpCor <- match.arg(multiCmpCor)
   outlin <- match.arg(outlin)
+  method <- match.arg(method)
 
   if ( RefDist=="CerioliBetaF" && is.null(Rewind) ) {
     if ( class(IdtE)[1]!="IdtSngNDRE" || is.null(IdtE@RewghtdSet) ) {

@@ -1,6 +1,6 @@
-########## Version 2.7.3 (January 2026) ###################
+########## Versions 2.7.3 and 2.7.4 (January 2026) ###################
 
-Version 2.7.3 adds two aditional agrument to the getIdtOutl function,
+Versions 2.7.3 and 2.7.4 add two aditional agurments to the getIdtOutl function,
 in order to implement (as an alternative to distribution-based approaches)
 the Adjusted Box Plot rule of Hubert and Vandervieren (2008).
 
